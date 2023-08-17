@@ -12,6 +12,7 @@ use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use App\Repository\AssignmentRepository;
+use App\Validator\IsAvailableAssignment;
 use App\Validator\IsFutureAssignment;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
@@ -48,6 +49,7 @@ use Symfony\Component\Validator\Context\ExecutionContextInterface;
 	'person.name' => 'partial',
 	'seat.id' => 'exact',
 ])]
+#[IsAvailableAssignment]
 class Assignment
 {
     #[ORM\Id]
@@ -135,12 +137,23 @@ class Assignment
     }
 
 	#[Assert\Callback]
-	public function validate(ExecutionContextInterface $context, mixed $payload): void
+	public function validateThatAssignmentHasPositiveLength(ExecutionContextInterface $context, mixed $payload): void
 	{
 		if ($this->getFromDate() >= $this->getToDate()) {
 			$context->buildViolation('What are you trying to do? Well, no, the duration of the assignment really can not be negative or zero.')
 				->atPath('toDate')
 				->addViolation();
 		}
+	}
+
+	public function validateThatSeatIsAvailable(ExecutionContextInterface $context): void
+	{
+		//TODO
+
+	}
+
+	public function validateThatPersonIsAvailable(ExecutionContextInterface $context): void
+	{
+		//TODO
 	}
 }

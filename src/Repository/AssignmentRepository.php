@@ -3,6 +3,8 @@
 namespace App\Repository;
 
 use App\Entity\Assignment;
+use App\Entity\Person;
+use App\Entity\Seat;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -20,6 +22,34 @@ class AssignmentRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, Assignment::class);
     }
+
+	public function findOverlappingWithRangeForPerson(\DateTime $startDate, \DateTime $endDate, Person $person)
+	{
+		$qb = $this->createQueryBuilder('e');
+
+		return $qb->andWhere('e.person = :person')
+			->setParameter('person', $person)
+			->andWhere('e.fromDate < :toDate AND e.toDate > :fromDate')
+			->setParameter('fromDate', $startDate)
+			->setParameter('toDate', $endDate)
+			->getQuery()
+			->execute()
+			;
+	}
+
+	public function findOverlappingWithRangeForSeat(\DateTime $startDate, \DateTime $endDate, Seat $seat)
+	{
+		$qb = $this->createQueryBuilder('e');
+
+		return $qb->andWhere('e.seat = :seat')
+			->setParameter('seat', $seat)
+			->andWhere('e.fromDate < :toDate AND e.toDate > :fromDate')
+			->setParameter('fromDate', $startDate)
+			->setParameter('toDate', $endDate)
+			->getQuery()
+			->execute()
+			;
+	}
 
 //    /**
 //     * @return Assignment[] Returns an array of Assignment objects
