@@ -11,12 +11,13 @@ use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
-use ApiPlatform\Serializer\Filter\PropertyFilter;
 use App\Repository\AssignmentRepository;
+use App\Validator\IsFutureAssignment;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 #[ORM\Entity(repositoryClass: AssignmentRepository::class)]
 #[ApiResource(
@@ -71,11 +72,13 @@ class Assignment
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     #[Groups(['assignment:read', 'assignment:write'])]
     #[Assert\NotBlank]
+    #[IsFutureAssignment]
     private ?\DateTimeInterface $fromDate = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     #[Groups(['assignment:read', 'assignment:write'])]
     #[Assert\NotBlank]
+    #[IsFutureAssignment]
     private ?\DateTimeInterface $toDate = null;
 
     public function getId(): ?int
@@ -130,4 +133,14 @@ class Assignment
 
         return $this;
     }
+
+	#[Assert\Callback]
+	public function validate(ExecutionContextInterface $context, mixed $payload): void
+	{
+		if ($this->getFromDate() >= $this->getToDate()) {
+			$context->buildViolation('What are you trying to do? Well, no, the duration of the assignment really can not be negative or zero.')
+				->atPath('toDate')
+				->addViolation();
+		}
+	}
 }
