@@ -2,7 +2,10 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
+use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Patch;
@@ -13,6 +16,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: OfficeRepository::class)]
 #[ApiResource(
@@ -22,6 +26,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
 		new Post(),
 		new Put(),
 		new Patch(),
+		new Delete(),
 	],
 	formats: [
 		'jsonld',
@@ -45,7 +50,9 @@ class Office
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['office:read', 'office:write'])]
+    #[Groups(['office:read', 'office:write', 'assignment:read', 'seat:read'])]
+    #[Assert\NotBlank]
+    #[ApiFilter(SearchFilter::class, strategy: 'partial')]
     private ?string $name = null;
 
     #[ORM\OneToMany(mappedBy: 'office', targetEntity: Seat::class, orphanRemoval: true)]

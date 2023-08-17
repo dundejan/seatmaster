@@ -2,7 +2,10 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
+use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Patch;
@@ -22,6 +25,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
 		new Post(),
 		new Put(),
 		new Patch(),
+		new Delete(),
 	],
 	formats: [
 		'jsonld',
@@ -37,6 +41,10 @@ use Symfony\Component\Serializer\Annotation\Groups;
 	],
 	paginationItemsPerPage: 10,
 )]
+#[ApiFilter(SearchFilter::class, properties: [
+	'office.name' => 'partial',
+	'office.id' => 'exact',
+])]
 class Seat
 {
     #[ORM\Id]
@@ -46,7 +54,8 @@ class Seat
 
     #[ORM\ManyToOne(inversedBy: 'seats')]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups(['seat:read', 'seat:write'])]
+    #[Groups(['seat:read', 'seat:write', 'assignment:read'])]
+    #[ApiFilter(SearchFilter::class, strategy: 'partial')]
     private ?Office $office = null;
 
     #[ORM\OneToMany(mappedBy: 'seat', targetEntity: Assignment::class, orphanRemoval: true)]

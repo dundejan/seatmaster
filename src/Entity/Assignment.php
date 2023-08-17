@@ -2,13 +2,51 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
+use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Put;
+use ApiPlatform\Serializer\Filter\PropertyFilter;
 use App\Repository\AssignmentRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: AssignmentRepository::class)]
-#[ApiResource]
+#[ApiResource(
+	operations: [
+		new Get(),
+		new GetCollection(),
+		new Post(),
+		new Put(),
+		new Patch(),
+		new Delete(),
+	],
+	formats: [
+		'jsonld',
+		'json',
+		'html',
+		'csv' => 'text/csv',
+	],
+	normalizationContext: [
+		'groups' => ['assignment:read'],
+	],
+	denormalizationContext: [
+		'groups' => ['assignment:write'],
+	],
+	paginationItemsPerPage: 10,
+)]
+#[ApiFilter(SearchFilter::class, properties: [
+	'seat.office.name' => 'partial',
+	'person.name' => 'partial',
+	'seat.id' => 'exact',
+])]
 class Assignment
 {
     #[ORM\Id]
@@ -18,16 +56,26 @@ class Assignment
 
     #[ORM\ManyToOne(inversedBy: 'assignments')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['assignment:read', 'assignment:write'])]
+    #[Assert\NotBlank]
+    #[ApiFilter(SearchFilter::class, strategy: 'partial')]
     private ?Person $person = null;
 
     #[ORM\ManyToOne(inversedBy: 'assignments')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['assignment:read', 'assignment:write'])]
+    #[Assert\NotBlank]
+    #[ApiFilter(SearchFilter::class, strategy: 'exact')]
     private ?Seat $seat = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    #[Groups(['assignment:read', 'assignment:write'])]
+    #[Assert\NotBlank]
     private ?\DateTimeInterface $fromDate = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    #[Groups(['assignment:read', 'assignment:write'])]
+    #[Assert\NotBlank]
     private ?\DateTimeInterface $toDate = null;
 
     public function getId(): ?int
@@ -42,16 +90,6 @@ class Assignment
 
     public function setPerson(?Person $person): static
     {
-		foreach ($person->getAssignments() as $assignment) {
-			if (($assignment->getFromDate() < $this->toDate && $assignment->getToDate() > $this->fromDate)
-			|| ($this->fromDate < $assignment->getToDate() && $this->toDate > $assignment->fromDate)) {
-				//Collapsing assignments for that person.
-				//TODO: say, that we have problem
-				return $this;
-			}
-			return $this;
-		}
-
         $this->person = $person;
 
         return $this;
