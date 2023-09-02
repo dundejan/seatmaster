@@ -6,6 +6,9 @@ use App\Entity\Assignment;
 use App\Entity\Office;
 use App\Entity\Person;
 use App\Entity\Seat;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Dashboard;
 use EasyCorp\Bundle\EasyAdminBundle\Config\MenuItem;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractDashboardController;
@@ -59,7 +62,17 @@ class DashboardController extends AbstractDashboardController
 
 			MenuItem::linkToCrud('People', 'fa fa-person', Person::class),
 
-			MenuItem::linkToCrud('Assignments', 'fa fa-calendar', Assignment::class),
+			MenuItem::linkToCrud('Assignments', 'fa fa-calendar', Assignment::class)
+				->setDefaultSort(['id' => 'DESC']),
+
+			MenuItem::linkToUrl('Back to app', 'fa fa-arrow-left', $this->generateUrl('app_homepage')),
 		];
+	}
+
+	public function configureActions(): Actions
+	{
+		return parent::configureActions()
+			->add(Crud::PAGE_INDEX, Action::DETAIL)
+			;
 	}
 }
