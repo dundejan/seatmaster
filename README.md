@@ -1,4 +1,4 @@
-# Seatmaster 🪑
+# Seatmaster 🪑📅
 
 Repozitář pro projekt Seatmaster, vznikající jako součást bakalářské práce v rámci mého studia na FIT ČVUT 🎓.
 
@@ -32,4 +32,13 @@ symfony serve
 (Pokud právě zažíváš se Symfony web-serverem svoje "poprvé" 👩🏽‍❤️‍👨🏽, dost možná narazíš na
 error, který říká, že musíš nejprve nainstalovat certifikáty spuštěním příkazu `symfony server:ca:install`.)
 
-Otevři oblíbený webový prohlížeč, zadej `https://localhost:8000` a prohlédni si mou aplikaci 🔎.
+### Spusť databázi 💾
+
+Aplikaci je možné po úpravě souboru .env připojit k libovolné databázi 
+(návod viz [Databases and the Doctrine ORM](https://symfony.com/doc/current/doctrine.html)), 
+ovšem pro aplikaci je připravený Docker obsahující PostgreSQL databázi.
+Lze jej spustit příkazem `docker compose up` (či pro starší verze Dockeru `docker-compose up`).
+
+### Kochej se 🤓
+
+Otevři svůj oblíbený webový prohlížeč, (používáš-li Symfony web-server) zadej `https://localhost:8000` a prohlédni si mou aplikaci 🔎.
