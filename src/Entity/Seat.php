@@ -58,6 +58,9 @@ class Seat
     #[ApiFilter(SearchFilter::class, strategy: 'partial')]
     private ?Office $office = null;
 
+	/**
+	 * @var Collection<int, Assignment>
+	 */
     #[ORM\OneToMany(mappedBy: 'seat', targetEntity: Assignment::class, orphanRemoval: true)]
     #[Groups(['seat:read', 'seat:write'])]
     private Collection $assignments;
@@ -116,6 +119,6 @@ class Seat
 
 	public function __toString(): string
 	{
-		return $this->id;
+		return (string) $this->id;
 	}
 }

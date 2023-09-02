@@ -23,7 +23,7 @@ class AssignmentRepository extends ServiceEntityRepository
         parent::__construct($registry, Assignment::class);
     }
 
-	public function findOverlappingWithRangeForPerson(\DateTime $startDate, \DateTime $endDate, Person $person)
+	public function findOverlappingWithRangeForPerson(\DateTime $startDate, \DateTime $endDate, Person $person) : mixed
 	{
 		$qb = $this->createQueryBuilder('e');
 
@@ -37,7 +37,7 @@ class AssignmentRepository extends ServiceEntityRepository
 			;
 	}
 
-	public function findOverlappingWithRangeForSeat(\DateTime $startDate, \DateTime $endDate, Seat $seat)
+	public function findOverlappingWithRangeForSeat(\DateTime $startDate, \DateTime $endDate, Seat $seat) : mixed
 	{
 		$qb = $this->createQueryBuilder('e');
 

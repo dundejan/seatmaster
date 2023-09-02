@@ -54,7 +54,9 @@ class Office
     #[Assert\NotBlank]
     #[ApiFilter(SearchFilter::class, strategy: 'partial')]
     private ?string $name = null;
-
+	/**
+	 * @var Collection<int, Seat>
+	 */
     #[ORM\OneToMany(mappedBy: 'office', targetEntity: Seat::class, orphanRemoval: true)]
     #[Groups(['office:read', 'office:write'])]
     private Collection $seats;
@@ -113,6 +115,6 @@ class Office
 
 	public function __toString(): string
 	{
-		return $this->name;
+		return (string) $this->name;
 	}
 }

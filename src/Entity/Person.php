@@ -51,7 +51,9 @@ class Person
     #[Groups(['person:read', 'person:write', 'assignment:read'])]
     #[Assert\NotBlank]
     private ?string $name = null;
-
+	/**
+	 * @var Collection<int, Assignment>
+	 */
     #[ORM\OneToMany(mappedBy: 'person', targetEntity: Assignment::class, orphanRemoval: true)]
     #[Groups(['person:read', 'person:write'])]
     private Collection $assignments;
@@ -110,6 +112,6 @@ class Person
 
 	public function __toString(): string
 	{
-		return $this->name;
+		return (string) $this->name;
 	}
 }
