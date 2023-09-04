@@ -8,6 +8,7 @@ use App\Entity\Person;
 use App\Entity\Seat;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Assets;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Dashboard;
 use EasyCorp\Bundle\EasyAdminBundle\Config\MenuItem;
@@ -71,6 +72,13 @@ class DashboardController extends AbstractDashboardController
 	{
 		return parent::configureActions()
 			->add(Crud::PAGE_INDEX, Action::DETAIL)
+			;
+	}
+
+	public function configureAssets(): Assets
+	{
+		return parent::configureAssets()
+			->addWebpackEncoreEntry('admin')
 			;
 	}
 }

@@ -21,8 +21,8 @@ class SeatCrudController extends AbstractCrudController
             IdField::new('id')
 	            ->hideOnForm(),
 	        AssociationField::new('office')
-		        ->setRequired(false)
+		        ->autocomplete()
+		        ->setRequired(false),
         ];
     }
-
 }

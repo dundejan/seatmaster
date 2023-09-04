@@ -24,8 +24,10 @@ class AssignmentCrudController extends AbstractCrudController
             DateTimeField::new('fromDate'),
 	        DateTimeField::new('toDate'),
 	        AssociationField::new('seat')
+		        ->autocomplete()
 		        ->setRequired(true),
 	        AssociationField::new('person')
+		        ->autocomplete()
 		        ->setRequired(true),
         ];
     }
