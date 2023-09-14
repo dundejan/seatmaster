@@ -1,3 +1,9 @@
 body {
     background-color: lightgray;
+    background-image: url('/public/images/office.jpg');
+    background-size: cover;     /* Cover the viewport */
+    background-position: center; /* Center the image */
+    background-repeat: no-repeat; /* Do not repeat the image */
+    background-attachment: fixed; /* Fix the background to create a parallax effect on scroll */
+    height: 100vh; /* Full viewport height */
 }
