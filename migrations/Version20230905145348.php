@@ -10,7 +10,7 @@ use Doctrine\Migrations\AbstractMigration;
 /**
  * Auto-generated Migration: Please modify to your needs!
  */
-final class Version20230816165257 extends AbstractMigration
+final class Version20230905145348 extends AbstractMigration
 {
     public function getDescription(): string
     {
@@ -28,7 +28,7 @@ final class Version20230816165257 extends AbstractMigration
         $this->addSql('CREATE INDEX IDX_30C544BA217BBB47 ON assignment (person_id)');
         $this->addSql('CREATE INDEX IDX_30C544BAC1DAFE35 ON assignment (seat_id)');
         $this->addSql('CREATE TABLE office (id INT NOT NULL, name VARCHAR(255) NOT NULL, PRIMARY KEY(id))');
-        $this->addSql('CREATE TABLE person (id INT NOT NULL, name VARCHAR(255) NOT NULL, PRIMARY KEY(id))');
+        $this->addSql('CREATE TABLE person (id INT NOT NULL, first_name VARCHAR(255) NOT NULL, last_name VARCHAR(255) NOT NULL, id_external INT DEFAULT NULL, PRIMARY KEY(id))');
         $this->addSql('CREATE TABLE seat (id INT NOT NULL, office_id INT NOT NULL, PRIMARY KEY(id))');
         $this->addSql('CREATE INDEX IDX_3D5C3666FFA0C224 ON seat (office_id)');
         $this->addSql('ALTER TABLE assignment ADD CONSTRAINT FK_30C544BA217BBB47 FOREIGN KEY (person_id) REFERENCES person (id) NOT DEFERRABLE INITIALLY IMMEDIATE');
