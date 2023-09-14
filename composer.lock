@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "2285ee88cf661f68d0ad8521ae798210",
+    "content-hash": "c890e0b06c496b7f3e29a435eb6aa760",
     "packages": [
         {
             "name": "api-platform/core",
@@ -4618,6 +4618,79 @@
             "time": "2023-05-19T07:42:48+00:00"
         },
         {
+            "name": "symfony/rate-limiter",
+            "version": "v6.2.13",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/symfony/rate-limiter.git",
+                "reference": "a659a52cec6622e488cab9b5f2054e90626ffbad"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/symfony/rate-limiter/zipball/a659a52cec6622e488cab9b5f2054e90626ffbad",
+                "reference": "a659a52cec6622e488cab9b5f2054e90626ffbad",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=8.1",
+                "symfony/options-resolver": "^5.4|^6.0"
+            },
+            "require-dev": {
+                "psr/cache": "^1.0|^2.0|^3.0",
+                "symfony/lock": "^5.4|^6.0"
+            },
+            "suggest": {
+                "symfony/lock": "For preventing race conditions in rate limiters"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Symfony\\Component\\RateLimiter\\": ""
+                },
+                "exclude-from-classmap": [
+                    "/Tests/"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Wouter de Jong",
+                    "email": "wouter@wouterj.nl"
+                },
+                {
+                    "name": "Symfony Community",
+                    "homepage": "https://symfony.com/contributors"
+                }
+            ],
+            "description": "Provides a Token Bucket implementation to rate limit input and output in your application",
+            "homepage": "https://symfony.com",
+            "keywords": [
+                "limiter",
+                "rate-limiter"
+            ],
+            "support": {
+                "source": "https://github.com/symfony/rate-limiter/tree/v6.2.13"
+            },
+            "funding": [
+                {
+                    "url": "https://symfony.com/sponsor",
+                    "type": "custom"
+                },
+                {
+                    "url": "https://github.com/fabpot",
+                    "type": "github"
+                },
+                {
+                    "url": "https://tidelift.com/funding/github/packagist/symfony/symfony",
+                    "type": "tidelift"
+                }
+            ],
+            "time": "2023-07-13T14:28:09+00:00"
+        },
+        {
             "name": "symfony/routing",
             "version": "v6.2.3",
             "source": {
@@ -6070,6 +6143,86 @@
             "time": "2023-07-20T16:58:50+00:00"
         },
         {
+            "name": "symfony/ux-vue",
+            "version": "v2.11.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/symfony/ux-vue.git",
+                "reference": "f2e77ed1a162d4888c13d200ee5ae6821b8ff5c9"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/symfony/ux-vue/zipball/f2e77ed1a162d4888c13d200ee5ae6821b8ff5c9",
+                "reference": "f2e77ed1a162d4888c13d200ee5ae6821b8ff5c9",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=8.1",
+                "symfony/stimulus-bundle": "^2.9.1"
+            },
+            "require-dev": {
+                "symfony/asset-mapper": "6.3.x-dev",
+                "symfony/finder": "^5.4|^6.0",
+                "symfony/framework-bundle": "^5.4|^6.0",
+                "symfony/phpunit-bridge": "^5.4|^6.0",
+                "symfony/twig-bundle": "^5.4|^6.0",
+                "symfony/var-dumper": "^5.4|^6.0"
+            },
+            "type": "symfony-bundle",
+            "extra": {
+                "thanks": {
+                    "name": "symfony/ux",
+                    "url": "https://github.com/symfony/ux"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Symfony\\UX\\Vue\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Titouan Galopin",
+                    "email": "galopintitouan@gmail.com"
+                },
+                {
+                    "name": "Thibault Richard",
+                    "email": "thibault.richard62@gmail.com"
+                },
+                {
+                    "name": "Symfony Community",
+                    "homepage": "https://symfony.com/contributors"
+                }
+            ],
+            "description": "Integration of Vue.js in Symfony",
+            "homepage": "https://symfony.com",
+            "keywords": [
+                "symfony-ux"
+            ],
+            "support": {
+                "source": "https://github.com/symfony/ux-vue/tree/v2.11.1"
+            },
+            "funding": [
+                {
+                    "url": "https://symfony.com/sponsor",
+                    "type": "custom"
+                },
+                {
+                    "url": "https://github.com/fabpot",
+                    "type": "github"
+                },
+                {
+                    "url": "https://tidelift.com/funding/github/packagist/symfony/symfony",
+                    "type": "tidelift"
+                }
+            ],
+            "time": "2023-07-09T15:31:47+00:00"
+        },
+        {
             "name": "symfony/validator",
             "version": "v6.2.13",
             "source": {
@@ -6568,6 +6721,53 @@
                 }
             ],
             "time": "2022-12-14T16:11:27+00:00"
+        },
+        {
+            "name": "symfonycasts/verify-email-bundle",
+            "version": "v1.13.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/SymfonyCasts/verify-email-bundle.git",
+                "reference": "eb7bc997f36ad872a0d56bf209fe37fed148b0a7"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/SymfonyCasts/verify-email-bundle/zipball/eb7bc997f36ad872a0d56bf209fe37fed148b0a7",
+                "reference": "eb7bc997f36ad872a0d56bf209fe37fed148b0a7",
+                "shasum": ""
+            },
+            "require": {
+                "ext-json": "*",
+                "php": ">=7.2.5",
+                "symfony/config": "^5.4 | ^6.0",
+                "symfony/dependency-injection": "^5.4 | ^6.0",
+                "symfony/deprecation-contracts": "^2.2 | ^3.0",
+                "symfony/http-kernel": "^5.4 | ^6.0",
+                "symfony/routing": "^5.4 | ^6.0"
+            },
+            "require-dev": {
+                "doctrine/orm": "^2.7",
+                "doctrine/persistence": "^2.0",
+                "symfony/framework-bundle": "^5.4 | ^6.0",
+                "symfony/phpunit-bridge": "^5.4 | ^6.0",
+                "vimeo/psalm": "^4.3"
+            },
+            "type": "symfony-bundle",
+            "autoload": {
+                "psr-4": {
+                    "SymfonyCasts\\Bundle\\VerifyEmail\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "description": "Simple, stylish Email Verification for Symfony",
+            "support": {
+                "issues": "https://github.com/SymfonyCasts/verify-email-bundle/issues",
+                "source": "https://github.com/SymfonyCasts/verify-email-bundle/tree/v1.13.0"
+            },
+            "time": "2023-01-04T12:46:15+00:00"
         },
         {
             "name": "twig/twig",
@@ -7264,6 +7464,84 @@
                 }
             ],
             "time": "2023-07-12T15:50:46+00:00"
+        },
+        {
+            "name": "symfony/web-profiler-bundle",
+            "version": "v6.2.13",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/symfony/web-profiler-bundle.git",
+                "reference": "89a78db2bd961d7fa63865e52f79c7d505702427"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/symfony/web-profiler-bundle/zipball/89a78db2bd961d7fa63865e52f79c7d505702427",
+                "reference": "89a78db2bd961d7fa63865e52f79c7d505702427",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=8.1",
+                "symfony/config": "^5.4|^6.0",
+                "symfony/framework-bundle": "^5.4|^6.0",
+                "symfony/http-kernel": "^6.1",
+                "symfony/routing": "^5.4|^6.0",
+                "symfony/twig-bundle": "^5.4|^6.0",
+                "twig/twig": "^2.13|^3.0.4"
+            },
+            "conflict": {
+                "symfony/form": "<5.4",
+                "symfony/mailer": "<5.4",
+                "symfony/messenger": "<5.4"
+            },
+            "require-dev": {
+                "symfony/browser-kit": "^5.4|^6.0",
+                "symfony/console": "^5.4|^6.0",
+                "symfony/css-selector": "^5.4|^6.0",
+                "symfony/stopwatch": "^5.4|^6.0"
+            },
+            "type": "symfony-bundle",
+            "autoload": {
+                "psr-4": {
+                    "Symfony\\Bundle\\WebProfilerBundle\\": ""
+                },
+                "exclude-from-classmap": [
+                    "/Tests/"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Fabien Potencier",
+                    "email": "fabien@symfony.com"
+                },
+                {
+                    "name": "Symfony Community",
+                    "homepage": "https://symfony.com/contributors"
+                }
+            ],
+            "description": "Provides a development tool that gives detailed information about the execution of any request",
+            "homepage": "https://symfony.com",
+            "support": {
+                "source": "https://github.com/symfony/web-profiler-bundle/tree/v6.2.13"
+            },
+            "funding": [
+                {
+                    "url": "https://symfony.com/sponsor",
+                    "type": "custom"
+                },
+                {
+                    "url": "https://github.com/fabpot",
+                    "type": "github"
+                },
+                {
+                    "url": "https://tidelift.com/funding/github/packagist/symfony/symfony",
+                    "type": "tidelift"
+                }
+            ],
+            "time": "2023-07-19T20:17:04+00:00"
         }
     ],
     "aliases": [],
