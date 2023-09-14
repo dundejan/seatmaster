@@ -9,11 +9,18 @@ Repozitář pro projekt Seatmaster, vznikající jako součást bakalářské pr
 Ujisti se, že máš nainstalovaný [Composer](https://getcomposer.org/download/)
 a spusť příkaz:
 
-```
+```bash
 composer install
 ```
 
 (V závislosti na tom, jak máš nainstalovaný Composer na svém počítači, může být nutné namísto toho spustit `php composer.phar install`.)
+
+### Stáhni závislosti JS ⏬
+
+Ujisti se, že máš nainstalovaný [Yarn](https://classic.yarnpkg.com/lang/en/docs/install/#windows-stable) a spusť příkaz:
+```bash
+yarn watch
+```
 
 ### Spusť Symfony server 🏃
 
@@ -25,7 +32,7 @@ Pokud ještě nemáš na svém počítači nainstalovaný lokální Symfony web-
 
 Poté, pro spustění aplikace, otevři terminál a spusť příkaz:
 
-```
+```bash
 symfony serve
 ```
 
@@ -41,4 +48,4 @@ Lze jej spustit příkazem `docker compose up` (či pro starší verze Dockeru `
 
 ### Kochej se 🤓
 
-Otevři svůj oblíbený webový prohlížeč, (používáš-li Symfony web-server) zadej `https://localhost:8000` a prohlédni si mou aplikaci 🔎.
+Otevři svůj oblíbený webový prohlížeč, (používáš-li Symfony web-server) zadej https://localhost:8000 a prohlédni si mou aplikaci 🔎.
