@@ -1,3 +1,31 @@
+@import '~bootstrap';
+@import '~@fortawesome/fontawesome-free/css/all.css';
+
 body {
     background-color: lightgray;
+    /*background-image: url('/public/images/office.jpg');*/
+    background-size: cover;     /* Cover the viewport */
+    background-position: center; /* Center the image */
+    background-repeat: no-repeat; /* Do not repeat the image */
+    background-attachment: fixed; /* Fix the background to create a parallax effect on scroll */
+    height: 100vh; /* Full viewport height */
+}
+
+#sidebar-wrapper {
+    padding-top: 1rem;
+}
+
+.sidebar-heading {
+    padding: 0.8rem 1.25rem;
+    font-size: 1.2rem;
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.list-group-item {
+    border-width: 0 0 1px;
+}
+
+.no-padding-left {
+    padding-left: 0 !important;
 }

@@ -3,6 +3,7 @@
 namespace App\Controller\Admin;
 
 use App\Entity\Person;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IntegerField;
@@ -25,4 +26,17 @@ class PersonCrudController extends AbstractCrudController
 	        IntegerField::new('idExternal'),
         ];
     }
+
+	public function configureCrud(Crud $crud): Crud
+	{
+		return $crud
+			// the labels used to refer to this entity in titles, buttons, etc.
+			->setEntityLabelInSingular('Person')
+			->setEntityLabelInPlural('People')
+
+			// the Symfony Security permission needed to manage the entity
+			// (none by default, so you can manage all instances of the entity)
+			// ->setEntityPermission('ROLE_EDITOR')
+			;
+	}
 }

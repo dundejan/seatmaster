@@ -22,6 +22,13 @@ Ujisti se, že máš nainstalovaný [Yarn](https://classic.yarnpkg.com/lang/en/d
 yarn watch
 ```
 
+### Načti fixtures (volitelně) 🗃️
+
+Načti symfony fixtures ze src/DataFixtures
+```bash
+symfony console doctrine:fixtures:load
+```
+
 ### Spusť Symfony server 🏃
 
 Pokud preferuješ Nginx nebo Apache, neváhej ho použít, ale lokální Symfony web-server
