@@ -16,11 +16,34 @@
 
 {% block body %}
 
+    {% for seat in seats %}
+        {% set colour = "green" %}
+        {% set person = "noone" %}
+        {% for assignment in seat.assignments %}
+            {% set now = "now"|date("Y-m-d H:i:s", 'Europe/Paris') %} {# Get the current date-time string #}
+
+            {% if now >= assignment.fromDate.format('Y-m-d H:i:s') and now <= assignment.toDate.format('Y-m-d H:i:s') %}
+                {% set colour = "red" %}
+                {% set person = assignment.person.fullName %}
+            {% endif %}
+        {% endfor %}
+
+        <p style="color: {{ colour }}"> SEAT {{ seat.id }}: currently sitting '{{ person }}'</p>
+    {% endfor %}
+
     <h2>Hello {{ current_office.name }} from twig! ✅</h2>
+
+    {% set seatArr = seats|map(item => attribute(item, 'id')) %}
+
+    <b>seats id's in twig: </b>
+    {% for id in seatArr %}
+        {{ id }},
+    {% endfor %}
 
     <div {{ vue_component('OfficeDetails', {
         entrypoint: path('api_entrypoint'),
         officeId: current_office.id,
+        seats: seats|map(item => attribute(item, 'id')),
     }) }}></div>
 
 {% endblock %}
