@@ -11,3 +11,16 @@
         </div>
     </div>
 {% endblock %}
+
+{% block title %} {{ current_office.name }} {% endblock %}
+
+{% block body %}
+
+    <h2>Hello {{ current_office.name }} from twig! ✅</h2>
+
+    <div {{ vue_component('OfficeDetails', {
+        entrypoint: path('api_entrypoint'),
+        officeId: current_office.id,
+    }) }}></div>
+
+{% endblock %}
