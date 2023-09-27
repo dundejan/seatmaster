@@ -50,6 +50,7 @@ class Seat
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['seat:read'])]
     private ?int $id = null;
 
     #[ORM\ManyToOne(inversedBy: 'seats')]
@@ -67,11 +68,11 @@ class Seat
 
     #[ORM\Column(nullable: true)]
     #[Groups(['seat:read', 'seat:write'])]
-    private ?int $coordX = null;
+    private ?int $coordX = 100;
 
     #[ORM\Column(nullable: true)]
     #[Groups(['seat:read', 'seat:write'])]
-    private ?int $coordY = null;
+    private ?int $coordY = 100;
 
     public function __construct()
     {

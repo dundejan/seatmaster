@@ -21,6 +21,8 @@ Encore
      * and one CSS file (e.g. app.css) if your JavaScript imports CSS.
      */
     .addEntry('app', './assets/app.js')
+    .addEntry('rep_log_react', './assets/controllers/rep_log_react.js')
+    .addEntry('office_map_react', './assets/controllers/office_map_react.js')
     .addStyleEntry('admin', './assets/styles/admin.css')
 
     // enables the Symfony UX Stimulus bridge (used in assets/bootstrap.js)
@@ -64,7 +66,7 @@ Encore
     //.enableTypeScriptLoader()
 
     // uncomment if you use React
-    //.enableReactPreset()
+    .enableReactPreset()
     .enableVueLoader(() => {}, { runtimeCompilerBuild: false })
     .configureDefinePlugin((options) => {
         options.__VUE_OPTIONS_API__ = false;
