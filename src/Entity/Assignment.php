@@ -72,13 +72,13 @@ class Assignment
     private ?Seat $seat = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
-    #[Groups(['assignment:read', 'assignment:write'])]
+    #[Groups(['assignment:read', 'assignment:write', 'seat:read'])]
     #[Assert\NotBlank]
     #[IsFutureAssignment]
     private ?\DateTimeInterface $fromDate = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
-    #[Groups(['assignment:read', 'assignment:write'])]
+    #[Groups(['assignment:read', 'assignment:write', 'seat:read'])]
     #[Assert\NotBlank]
     #[IsFutureAssignment]
     private ?\DateTimeInterface $toDate = null;

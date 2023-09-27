@@ -26,7 +26,7 @@
         {% set colour = "green" %}
         {% set person = "noone" %}
         {% for assignment in seat.assignments %}
-            {% set now = "now"|date("Y-m-d H:i:s", 'Europe/Paris') %} {# Get the current date-time string #}
+            {% set now = "now"|date("Y-m-d H:i:s") %} {# Get the current date-time string #}
 
             {% if now >= assignment.fromDate.format('Y-m-d H:i:s') and now <= assignment.toDate.format('Y-m-d H:i:s') %}
                 {% set colour = "red" %}

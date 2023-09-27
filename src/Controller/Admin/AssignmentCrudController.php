@@ -22,8 +22,10 @@ class AssignmentCrudController extends AbstractCrudController
         return [
             IdField::new('id')
 	            ->hideOnForm(),
-            DateTimeField::new('fromDate'),
-	        DateTimeField::new('toDate'),
+            DateTimeField::new('fromDate')
+	            ->setFormTypeOption('view_timezone', 'Europe/Paris'),
+	        DateTimeField::new('toDate')
+	            ->setFormTypeOption('view_timezone', 'Europe/Paris'),
 	        AssociationField::new('seat')
 		        ->autocomplete()
 		        ->setRequired(true),
@@ -39,6 +41,7 @@ class AssignmentCrudController extends AbstractCrudController
 			// the labels used to refer to this entity in titles, buttons, etc.
 			->setEntityLabelInSingular('Assignment')
 			->setEntityLabelInPlural('Assignments')
+			->setTimezone('Europe/Paris')
 
 			// the Symfony Security permission needed to manage the entity
 			// (none by default, so you can manage all instances of the entity)
