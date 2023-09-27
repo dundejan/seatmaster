@@ -43,7 +43,6 @@ export default function Office({ onDropChair, children }) {
 
 	return (
 		<div ref={officeRef} style={dropAreaStyle}>
-			Drop chairs here
 			{children}
 		</div>
 	);

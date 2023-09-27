@@ -6,6 +6,17 @@ import {DndProvider} from "react-dnd";
 import {HTML5Backend} from "react-dnd-html5-backend";
 import {getSeats, updateSeatCoords} from "../api/seats_api";
 
+function hasCurrentAssignment(seat) {
+	const now = new Date();
+
+	return seat.assignments.find(assignment => {
+		const fromDate = new Date(assignment.fromDate);
+		const toDate = new Date(assignment.toDate);
+
+		return fromDate.getTime() <= now.getTime() && now.getTime() <= toDate.getTime();
+	});
+}
+
 export default class OfficeMapApp extends Component {
 	constructor(props) {
 		super(props);
@@ -22,7 +33,6 @@ export default class OfficeMapApp extends Component {
 	componentDidMount() {
 		getSeats(this.officeId)
 			.then((data) => {
-				console.log(data);
 				this.setState({
 					chairs: data
 				});
@@ -45,6 +55,8 @@ export default class OfficeMapApp extends Component {
 			return { chairs: updatedChairs };
 		});
 
+		console.log(coords.x, coords.y);
+
 		updateSeatCoords(id, coords.x, coords.y)
 			.then((data) => {
 			console.log("Seat coordinates updated");
@@ -58,7 +70,7 @@ export default class OfficeMapApp extends Component {
 					onDropChair={this.handleDropChair}
 				>
 					{this.state.chairs.map(chair => (
-						<Seat key={chair.id} id={chair.id} left={chair.coordX} top={chair.coordY} occupied={false} />
+						<Seat key={chair.id} id={chair.id} left={chair.coordX} top={chair.coordY} occupied={hasCurrentAssignment(chair)} />
 					))}
 				</Office>
 			</DndProvider>

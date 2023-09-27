@@ -145,15 +145,4 @@ class Assignment
 				->addViolation();
 		}
 	}
-
-	public function validateThatSeatIsAvailable(ExecutionContextInterface $context): void
-	{
-		//TODO
-
-	}
-
-	public function validateThatPersonIsAvailable(ExecutionContextInterface $context): void
-	{
-		//TODO
-	}
 }

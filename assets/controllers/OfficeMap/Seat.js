@@ -23,17 +23,33 @@ export default function Seat({ id, left, top, occupied }) {
 		item: { id }
 	});
 
-	return (
-		<div ref={ref} style={{ left, top, position: 'absolute' }}>
-			<ChairIcon color={occupied ? "#FF0000" : "#00ff00"} size="50px" />
-			<p>{`Seat ${id}`}</p>
-		</div>
-	);
+	if (occupied) {
+		const from = new Date(occupied.fromDate);
+		const to = new Date(occupied.toDate);
+		const title = `This chair is currently occupied.\nPERSON: TODO\nFROM: ${from}\nTO: ${to}`;
+
+		return (
+			<div title={title} ref={ref} style={{ left, top, position: 'absolute' }}>
+				<ChairIcon color={"#FF0000"} size="50px" />
+				<p>{`Seat ${id}`}</p>
+			</div>
+		);
+	}
+	else {
+		const title = `This chair is currently free.`;
+
+		return (
+			<div title={title} ref={ref} style={{left, top, position: 'absolute'}}>
+				<ChairIcon color={"#00ff00"} size="50px"/>
+				<p>{`Seat ${id}`}</p>
+			</div>
+		);
+	}
 }
 
 Seat.propTypes = {
 	id: PropTypes.number,
 	left: PropTypes.number,
 	top: PropTypes.number,
-	occupied: PropTypes.bool,
+	occupied: PropTypes.object,
 }
