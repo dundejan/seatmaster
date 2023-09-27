@@ -58,7 +58,7 @@ export default class OfficeMapApp extends Component {
 					onDropChair={this.handleDropChair}
 				>
 					{this.state.chairs.map(chair => (
-						<Seat key={chair.id} id={chair.id} left={chair.coordX} top={chair.coordY} />
+						<Seat key={chair.id} id={chair.id} left={chair.coordX} top={chair.coordY} occupied={false} />
 					))}
 				</Office>
 			</DndProvider>
