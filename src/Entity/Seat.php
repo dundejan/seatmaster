@@ -20,25 +20,25 @@ use Symfony\Component\Serializer\Annotation\Groups;
 #[ORM\Entity(repositoryClass: SeatRepository::class)]
 #[ApiResource(
 	operations: [
-		new Get(),
-		new GetCollection(),
-		new Post(),
-		new Put(),
-		new Patch(),
-		new Delete(),
-	],
+                  		new Get(),
+                  		new GetCollection(),
+                  		new Post(),
+                  		new Put(),
+                  		new Patch(),
+                  		new Delete(),
+                  	],
 	formats: [
-		'jsonld',
-		'json',
-		'html',
-		'csv' => 'text/csv',
-	],
+                  		'jsonld',
+                  		'json',
+                  		'html',
+                  		'csv' => 'text/csv',
+                  	],
 	normalizationContext: [
-		'groups' => ['seat:read'],
-	],
+                  		'groups' => ['seat:read'],
+                  	],
 	denormalizationContext: [
-		'groups' => ['seat:write'],
-	],
+                  		'groups' => ['seat:write'],
+                  	],
 	paginationItemsPerPage: 10,
 )]
 #[ApiFilter(SearchFilter::class, properties: [
@@ -64,6 +64,14 @@ class Seat
     #[ORM\OneToMany(mappedBy: 'seat', targetEntity: Assignment::class, orphanRemoval: true)]
     #[Groups(['seat:read', 'seat:write'])]
     private Collection $assignments;
+
+    #[ORM\Column(nullable: true)]
+    #[Groups(['seat:read', 'seat:write'])]
+    private ?int $coordX = null;
+
+    #[ORM\Column(nullable: true)]
+    #[Groups(['seat:read', 'seat:write'])]
+    private ?int $coordY = null;
 
     public function __construct()
     {
@@ -118,7 +126,31 @@ class Seat
     }
 
 	public function __toString(): string
-	{
-		return (string) $this->id;
-	}
+                  	{
+                  		return (string) $this->id;
+                  	}
+
+    public function getCoordX(): ?int
+    {
+        return $this->coordX;
+    }
+
+    public function setCoordX(?int $coordX): static
+    {
+        $this->coordX = $coordX;
+
+        return $this;
+    }
+
+    public function getCoordY(): ?int
+    {
+        return $this->coordY;
+    }
+
+    public function setCoordY(?int $coordY): static
+    {
+        $this->coordY = $coordY;
+
+        return $this;
+    }
 }
