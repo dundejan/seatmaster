@@ -23,29 +23,31 @@ class AssignmentRepository extends ServiceEntityRepository
         parent::__construct($registry, Assignment::class);
     }
 
-	public function findOverlappingWithRangeForPerson(\DateTime $startDate, \DateTime $endDate, Person $person) : mixed
+	public function findOverlappingWithRangeForPerson(\DateTime $startDate, \DateTime $endDate, Person $person, ?int $id) : mixed
 	{
 		$qb = $this->createQueryBuilder('e');
 
 		return $qb->andWhere('e.person = :person')
 			->setParameter('person', $person)
-			->andWhere('e.fromDate < :toDate AND e.toDate > :fromDate')
+			->andWhere('e.fromDate < :toDate AND e.toDate > :fromDate AND e.id <> :id')
 			->setParameter('fromDate', $startDate)
 			->setParameter('toDate', $endDate)
+			->setParameter('id', $id)
 			->getQuery()
 			->execute()
 			;
 	}
 
-	public function findOverlappingWithRangeForSeat(\DateTime $startDate, \DateTime $endDate, Seat $seat) : mixed
+	public function findOverlappingWithRangeForSeat(\DateTime $startDate, \DateTime $endDate, Seat $seat, ?int $id) : mixed
 	{
 		$qb = $this->createQueryBuilder('e');
 
 		return $qb->andWhere('e.seat = :seat')
 			->setParameter('seat', $seat)
-			->andWhere('e.fromDate < :toDate AND e.toDate > :fromDate')
+			->andWhere('e.fromDate < :toDate AND e.toDate > :fromDate AND e.id <> :id')
 			->setParameter('fromDate', $startDate)
 			->setParameter('toDate', $endDate)
+			->setParameter('id', $id)
 			->getQuery()
 			->execute()
 			;

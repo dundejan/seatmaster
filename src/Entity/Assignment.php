@@ -23,25 +23,25 @@ use Symfony\Component\Validator\Context\ExecutionContextInterface;
 #[ORM\Entity(repositoryClass: AssignmentRepository::class)]
 #[ApiResource(
 	operations: [
-		new Get(),
-		new GetCollection(),
-		new Post(),
-		new Put(),
-		new Patch(),
-		new Delete(),
-	],
+                           		new Get(),
+                           		new GetCollection(),
+                           		new Post(),
+                           		new Put(),
+                           		new Patch(),
+                           		new Delete(),
+                           	],
 	formats: [
-		'jsonld',
-		'json',
-		'html',
-		'csv' => 'text/csv',
-	],
+                           		'jsonld',
+                           		'json',
+                           		'html',
+                           		'csv' => 'text/csv',
+                           	],
 	normalizationContext: [
-		'groups' => ['assignment:read'],
-	],
+                           		'groups' => ['assignment:read'],
+                           	],
 	denormalizationContext: [
-		'groups' => ['assignment:write'],
-	],
+                           		'groups' => ['assignment:write'],
+                           	],
 	paginationItemsPerPage: 10,
 )]
 #[ApiFilter(SearchFilter::class, properties: [
@@ -82,6 +82,12 @@ class Assignment
     #[Assert\NotBlank]
     #[IsFutureAssignment]
     private ?\DateTimeInterface $toDate = null;
+
+    #[ORM\Column(nullable: false)]
+    private bool $recurrence = false;
+
+    #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
+    private ?\DateTimeInterface $repeatEndDate = null;
 
     public function getId(): ?int
     {
@@ -137,12 +143,36 @@ class Assignment
     }
 
 	#[Assert\Callback]
-	public function validateThatAssignmentHasPositiveLength(ExecutionContextInterface $context, mixed $payload): void
-	{
-		if ($this->getFromDate() >= $this->getToDate()) {
-			$context->buildViolation('What are you trying to do? Well, no, the duration of the assignment really can not be negative or zero.')
-				->atPath('toDate')
-				->addViolation();
-		}
-	}
+                           	public function validateThatAssignmentHasPositiveLength(ExecutionContextInterface $context, mixed $payload): void
+                           	{
+                           		if ($this->getFromDate() >= $this->getToDate()) {
+                           			$context->buildViolation('What are you trying to do? Well, no, the duration of the assignment really can not be negative or zero.')
+                           				->atPath('toDate')
+                           				->addViolation();
+                           		}
+                           	}
+
+    public function getRecurrence(): bool
+    {
+        return $this->recurrence;
+    }
+
+    public function setRecurrence(bool $recurrence): Assignment
+    {
+        $this->recurrence = $recurrence;
+
+        return $this;
+    }
+
+    public function getRepeatEndDate(): ?\DateTimeInterface
+    {
+        return $this->repeatEndDate;
+    }
+
+    public function setRepeatEndDate(?\DateTimeInterface $repeatEndDate): static
+    {
+        $this->repeatEndDate = $repeatEndDate;
+
+        return $this;
+    }
 }
