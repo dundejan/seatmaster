@@ -63,11 +63,14 @@ export default class OfficeMapApp extends Component {
 			});
 	}
 
-	render()    {
+	render() {
 		return (
 			<DndProvider backend={HTML5Backend}>
 				<Office
 					onDropChair={this.handleDropChair}
+					size="400px"
+					width="1000px"
+					officeId={this.officeId}
 				>
 					{this.state.chairs.map(chair => (
 						<Seat key={chair.id} id={chair.id} left={chair.coordX} top={chair.coordY} occupied={hasCurrentAssignment(chair)} />

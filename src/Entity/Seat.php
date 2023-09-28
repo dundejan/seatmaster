@@ -68,16 +68,21 @@ class Seat
 
     #[ORM\Column(nullable: true)]
     #[Groups(['seat:read', 'seat:write'])]
-    private ?int $coordX = 100;
+    private ?int $coordX = 0;
 
     #[ORM\Column(nullable: true)]
     #[Groups(['seat:read', 'seat:write'])]
-    private ?int $coordY = 100;
+    private ?int $coordY = 0;
 
     public function __construct()
     {
         $this->assignments = new ArrayCollection();
     }
+
+	public function __toString(): string
+	{
+		return (string) $this->id . ' (' . $this->office . ')';
+	}
 
     public function getId(): ?int
     {
@@ -125,11 +130,6 @@ class Seat
 
         return $this;
     }
-
-	public function __toString(): string
-                  	{
-                  		return (string) $this->id;
-                  	}
 
     public function getCoordX(): ?int
     {
