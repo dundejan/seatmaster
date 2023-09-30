@@ -25,7 +25,6 @@ class AssignmentCrudController extends AbstractCrudController
     public function configureFields(string $pageName): iterable
     {
         return [
-	        FormField::addTab("Assignment"),
             IdField::new('id')
 	            ->hideOnForm(),
             DateTimeField::new('fromDate')
@@ -40,12 +39,6 @@ class AssignmentCrudController extends AbstractCrudController
 	        AssociationField::new('person')
 		        ->autocomplete()
 		        ->setRequired(true),
-	        FormField::addPanel("Repeated assignment"),
-	        BooleanField::new('recurrence')
-		        ->setLabel('Repeat each week')
-	            ->renderAsSwitch(false),
-	        DateField::new('repeatEndDate')
-	            ->setLabel('Repeat each week until'),
         ];
     }
 

@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\Assignment;
+use App\Entity\Office;
 use App\Entity\Person;
 use App\Entity\Seat;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
@@ -23,6 +24,27 @@ class AssignmentRepository extends ServiceEntityRepository
         parent::__construct($registry, Assignment::class);
     }
 
+	public function findCurrentlyOngoing(?Office $office = null): mixed
+	{
+		$qb = $this->createQueryBuilder('e');
+
+		// Basic condition for ongoing assignments
+		$qb->andWhere('e.fromDate <= :currentDate AND e.toDate >= :currentDate')
+			// DateTimeZone here is set to UTC, because in database dates are also with utc time zone
+			->setParameter('currentDate', new \DateTime('now', new \DateTimeZone('UTC')));
+
+		// If an office is provided, add an additional condition
+		if ($office !== null) {
+			$qb->join('e.seat', 's')  // Join with Seat entity using alias 's'
+			->join('s.office', 'o') // Join with Office entity using alias 'o'
+			->andWhere('o = :office')
+				->setParameter('office', $office);
+		}
+
+		// Execute and return the query result
+		return $qb->getQuery()->execute();
+	}
+
 	public function findOverlappingWithRangeForPerson(\DateTime $startDate, \DateTime $endDate, Person $person, ?int $id) : mixed
 	{
 		$qb = $this->createQueryBuilder('e');
@@ -32,7 +54,7 @@ class AssignmentRepository extends ServiceEntityRepository
 			->andWhere('e.fromDate < :toDate AND e.toDate > :fromDate AND e.id <> :id')
 			->setParameter('fromDate', $startDate)
 			->setParameter('toDate', $endDate)
-			->setParameter('id', $id)
+			->setParameter('id', $id ? $id : -1)
 			->getQuery()
 			->execute()
 			;
@@ -47,7 +69,7 @@ class AssignmentRepository extends ServiceEntityRepository
 			->andWhere('e.fromDate < :toDate AND e.toDate > :fromDate AND e.id <> :id')
 			->setParameter('fromDate', $startDate)
 			->setParameter('toDate', $endDate)
-			->setParameter('id', $id)
+			->setParameter('id', $id ? $id : -1)
 			->getQuery()
 			->execute()
 			;

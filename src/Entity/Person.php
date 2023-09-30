@@ -19,25 +19,25 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\Entity(repositoryClass: PersonRepository::class)]
 #[ApiResource(
 	operations: [
-                                 		new Get(),
-                                 		new GetCollection(),
-                                 		new Post(),
-                                 		new Put(),
-                                 		new Patch(),
-                                 		new Delete(),
-                                 	],
+		new Get(),
+		new GetCollection(),
+		new Post(),
+		new Put(),
+		new Patch(),
+		new Delete(),
+	],
 	formats: [
-                                 		'jsonld',
-                                 		'json',
-                                 		'html',
-                                 		'csv' => 'text/csv',
-                                 	],
+		'jsonld',
+		'json',
+		'html',
+		'csv' => 'text/csv',
+	],
 	normalizationContext: [
-                                 		'groups' => ['person:read'],
-                                 	],
+		'groups' => ['person:read'],
+	],
 	denormalizationContext: [
-                                 		'groups' => ['person:write'],
-                                 	],
+		'groups' => ['person:write'],
+	],
 	paginationItemsPerPage: 10,
 )]
 class Person
@@ -48,7 +48,7 @@ class Person
     private ?int $id = null;
 
 	#[ORM\Column(length: 255)]
-               	private ?string $firstName = null;
+	private ?string $firstName = null;
 
     #[ORM\Column(length: 255)]
     #[Groups(['person:read', 'person:write', 'assignment:read'])]
@@ -64,6 +64,9 @@ class Person
     #[ORM\Column(nullable: true)]
     private ?int $idExternal = null;
 
+	/**
+	 * @var Collection<int, RepeatedAssignment>
+	 */
     #[ORM\OneToMany(mappedBy: 'person', targetEntity: RepeatedAssignment::class, orphanRemoval: true)]
     private Collection $repeatedAssignments;
 
@@ -89,16 +92,16 @@ class Person
     }
 
 	public function getFirstName(): ?string
-               	{
-               		return $this->firstName;
-               	}
+	{
+		return $this->firstName;
+	}
 
 	public function setFirstName(string $firstName): static
-               	{
-               		$this->firstName = $firstName;
-               
-               		return $this;
-               	}
+	{
+		$this->firstName = $firstName;
+
+		return $this;
+	}
 
     public function getLastName(): ?string
     {

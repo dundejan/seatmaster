@@ -80,12 +80,6 @@ class Assignment
     #[Assert\NotBlank]
     private ?\DateTimeInterface $toDate = null;
 
-    #[ORM\Column(nullable: false)]
-    private bool $recurrence = false;
-
-    #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
-    private ?\DateTimeInterface $repeatEndDate = null;
-
     public function getId(): ?int
     {
         return $this->id;
@@ -152,28 +146,4 @@ class Assignment
 				->addViolation();
 		}
 	}
-
-    public function getRecurrence(): bool
-    {
-        return $this->recurrence;
-    }
-
-    public function setRecurrence(bool $recurrence): Assignment
-    {
-        $this->recurrence = $recurrence;
-
-        return $this;
-    }
-
-    public function getRepeatEndDate(): ?\DateTimeInterface
-    {
-        return $this->repeatEndDate;
-    }
-
-    public function setRepeatEndDate(?\DateTimeInterface $repeatEndDate): static
-    {
-        $this->repeatEndDate = $repeatEndDate;
-
-        return $this;
-    }
 }
