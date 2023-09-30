@@ -20,25 +20,25 @@ use Symfony\Component\Serializer\Annotation\Groups;
 #[ORM\Entity(repositoryClass: SeatRepository::class)]
 #[ApiResource(
 	operations: [
-                  		new Get(),
-                  		new GetCollection(),
-                  		new Post(),
-                  		new Put(),
-                  		new Patch(),
-                  		new Delete(),
-                  	],
+                                 		new Get(),
+                                 		new GetCollection(),
+                                 		new Post(),
+                                 		new Put(),
+                                 		new Patch(),
+                                 		new Delete(),
+                                 	],
 	formats: [
-                  		'jsonld',
-                  		'json',
-                  		'html',
-                  		'csv' => 'text/csv',
-                  	],
+                                 		'jsonld',
+                                 		'json',
+                                 		'html',
+                                 		'csv' => 'text/csv',
+                                 	],
 	normalizationContext: [
-                  		'groups' => ['seat:read'],
-                  	],
+                                 		'groups' => ['seat:read'],
+                                 	],
 	denormalizationContext: [
-                  		'groups' => ['seat:write'],
-                  	],
+                                 		'groups' => ['seat:write'],
+                                 	],
 	paginationItemsPerPage: 10,
 )]
 #[ApiFilter(SearchFilter::class, properties: [
@@ -74,15 +74,19 @@ class Seat
     #[Groups(['seat:read', 'seat:write'])]
     private ?int $coordY = 0;
 
+    #[ORM\OneToMany(mappedBy: 'seat', targetEntity: RepeatedAssignment::class, orphanRemoval: true)]
+    private Collection $repeatedAssignments;
+
     public function __construct()
     {
         $this->assignments = new ArrayCollection();
+        $this->repeatedAssignments = new ArrayCollection();
     }
 
 	public function __toString(): string
-	{
-		return (string) $this->id . ' (' . $this->office . ')';
-	}
+               	{
+               		return (string) $this->id . ' (' . $this->office . ')';
+               	}
 
     public function getId(): ?int
     {
@@ -151,6 +155,36 @@ class Seat
     public function setCoordY(?int $coordY): static
     {
         $this->coordY = $coordY;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, RepeatedAssignment>
+     */
+    public function getRepeatedAssignments(): Collection
+    {
+        return $this->repeatedAssignments;
+    }
+
+    public function addRepeatedAssignment(RepeatedAssignment $repeatedAssignment): static
+    {
+        if (!$this->repeatedAssignments->contains($repeatedAssignment)) {
+            $this->repeatedAssignments->add($repeatedAssignment);
+            $repeatedAssignment->setSeat($this);
+        }
+
+        return $this;
+    }
+
+    public function removeRepeatedAssignment(RepeatedAssignment $repeatedAssignment): static
+    {
+        if ($this->repeatedAssignments->removeElement($repeatedAssignment)) {
+            // set the owning side to null (unless already changed)
+            if ($repeatedAssignment->getSeat() === $this) {
+                $repeatedAssignment->setSeat(null);
+            }
+        }
 
         return $this;
     }

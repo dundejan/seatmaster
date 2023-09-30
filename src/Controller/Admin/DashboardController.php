@@ -5,6 +5,7 @@ namespace App\Controller\Admin;
 use App\Entity\Assignment;
 use App\Entity\Office;
 use App\Entity\Person;
+use App\Entity\RepeatedAssignment;
 use App\Entity\Seat;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
@@ -23,25 +24,7 @@ class DashboardController extends AbstractDashboardController
 	#[Route('/admin', name: 'admin')]
     public function index(): Response
     {
-	    $adminUrlGenerator = $this->container->get(AdminUrlGenerator::class);
-
-	    return $this->redirect($adminUrlGenerator->setController(OfficeCrudController::class)->generateUrl());
-
-        // Option 1. You can make your dashboard redirect to some common page of your backend
-        //
-        // $adminUrlGenerator = $this->container->get(AdminUrlGenerator::class);
-        // return $this->redirect($adminUrlGenerator->setController(OneOfYourCrudController::class)->generateUrl());
-
-        // Option 2. You can make your dashboard redirect to different pages depending on the user
-        //
-        // if ('jane' === $this->getUser()->getUsername()) {
-        //     return $this->redirect('...');
-        // }
-
-        // Option 3. You can render some custom template to display a proper dashboard with widgets, etc.
-        // (tip: it's easier if your template extends from @EasyAdmin/page/content.html.twig)
-        //
-        // return $this->render('some/path/my-dashboard.html.twig');
+		return $this->render('admin/dashboard.html.twig');
     }
 
 	public function configureDashboard(): Dashboard
@@ -55,6 +38,7 @@ class DashboardController extends AbstractDashboardController
 	public function configureMenuItems(): iterable
 	{
 		return [
+			MenuItem::section('Management'),
 			MenuItem::linkToCrud('Offices', 'fa fa-building', Office::class),
 
 			MenuItem::linkToCrud('Seats', 'fas fa-chair', Seat::class),
@@ -64,6 +48,10 @@ class DashboardController extends AbstractDashboardController
 			MenuItem::linkToCrud('Assignments', 'fa fa-calendar', Assignment::class)
 				->setDefaultSort(['id' => 'DESC']),
 
+			MenuItem::linkToCrud('Repeated assignments', 'fa fa-calendar-day', RepeatedAssignment::class)
+				->setDefaultSort(['id' => 'DESC']),
+
+			MenuItem::section('Navigation')->setCssClass('navigation'),
 			MenuItem::linkToUrl('Back to app', 'fa fa-arrow-left', $this->generateUrl('app_homepage')),
 		];
 	}

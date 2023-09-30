@@ -19,25 +19,25 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\Entity(repositoryClass: PersonRepository::class)]
 #[ApiResource(
 	operations: [
-                  		new Get(),
-                  		new GetCollection(),
-                  		new Post(),
-                  		new Put(),
-                  		new Patch(),
-                  		new Delete(),
-                  	],
+                                 		new Get(),
+                                 		new GetCollection(),
+                                 		new Post(),
+                                 		new Put(),
+                                 		new Patch(),
+                                 		new Delete(),
+                                 	],
 	formats: [
-                  		'jsonld',
-                  		'json',
-                  		'html',
-                  		'csv' => 'text/csv',
-                  	],
+                                 		'jsonld',
+                                 		'json',
+                                 		'html',
+                                 		'csv' => 'text/csv',
+                                 	],
 	normalizationContext: [
-                  		'groups' => ['person:read'],
-                  	],
+                                 		'groups' => ['person:read'],
+                                 	],
 	denormalizationContext: [
-                  		'groups' => ['person:write'],
-                  	],
+                                 		'groups' => ['person:write'],
+                                 	],
 	paginationItemsPerPage: 10,
 )]
 class Person
@@ -48,7 +48,7 @@ class Person
     private ?int $id = null;
 
 	#[ORM\Column(length: 255)]
-	private ?string $firstName = null;
+               	private ?string $firstName = null;
 
     #[ORM\Column(length: 255)]
     #[Groups(['person:read', 'person:write', 'assignment:read'])]
@@ -64,20 +64,24 @@ class Person
     #[ORM\Column(nullable: true)]
     private ?int $idExternal = null;
 
+    #[ORM\OneToMany(mappedBy: 'person', targetEntity: RepeatedAssignment::class, orphanRemoval: true)]
+    private Collection $repeatedAssignments;
+
     public function __construct()
     {
         $this->assignments = new ArrayCollection();
+        $this->repeatedAssignments = new ArrayCollection();
     }
 
 	public function __toString(): string
-	{
-		return $this->getFullName();
-	}
+               	{
+               		return $this->getFullName();
+               	}
 
 	public function getFullName(): string
-	{
-		return $this->firstName . ' ' . $this->lastName;
-	}
+               	{
+               		return $this->firstName . ' ' . $this->lastName;
+               	}
 
     public function getId(): ?int
     {
@@ -85,16 +89,16 @@ class Person
     }
 
 	public function getFirstName(): ?string
-	{
-		return $this->firstName;
-	}
+               	{
+               		return $this->firstName;
+               	}
 
 	public function setFirstName(string $firstName): static
-	{
-		$this->firstName = $firstName;
-
-		return $this;
-	}
+               	{
+               		$this->firstName = $firstName;
+               
+               		return $this;
+               	}
 
     public function getLastName(): ?string
     {
@@ -146,6 +150,36 @@ class Person
     public function setIdExternal(?int $idExternal): static
     {
         $this->idExternal = $idExternal;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, RepeatedAssignment>
+     */
+    public function getRepeatedAssignments(): Collection
+    {
+        return $this->repeatedAssignments;
+    }
+
+    public function addRepeatedAssignment(RepeatedAssignment $repeatedAssignment): static
+    {
+        if (!$this->repeatedAssignments->contains($repeatedAssignment)) {
+            $this->repeatedAssignments->add($repeatedAssignment);
+            $repeatedAssignment->setPerson($this);
+        }
+
+        return $this;
+    }
+
+    public function removeRepeatedAssignment(RepeatedAssignment $repeatedAssignment): static
+    {
+        if ($this->repeatedAssignments->removeElement($repeatedAssignment)) {
+            // set the owning side to null (unless already changed)
+            if ($repeatedAssignment->getPerson() === $this) {
+                $repeatedAssignment->setPerson(null);
+            }
+        }
 
         return $this;
     }
