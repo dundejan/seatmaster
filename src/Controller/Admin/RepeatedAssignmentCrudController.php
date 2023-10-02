@@ -41,9 +41,11 @@ class RepeatedAssignmentCrudController extends AbstractCrudController
 			    ])
 			    ->setRequired(true),
 		    TimeField::new('fromTime')
-		        ->setLabel('From time'),
+		        ->setLabel('From time')
+			    ->setFormTypeOption('view_timezone', 'Europe/Paris'),
 		    TimeField::new('toTime')
-			    ->setLabel('To time'),
+			    ->setLabel('To time')
+			    ->setFormTypeOption('view_timezone', 'Europe/Paris'),
 		    DateField::new('untilDate')
 		        ->setLabel('Repeat each week until')
 			    ->setHelp('(leave blank to repeat forever)'),

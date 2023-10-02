@@ -53,3 +53,13 @@ Seat.propTypes = {
 	top: PropTypes.number,
 	occupied: PropTypes.object,
 }
+
+ChairIconSVG.propTypes = {
+	fill: PropTypes.string,
+	size: PropTypes.string,
+}
+
+ChairIcon.propTypes = {
+	color: PropTypes.string,
+	size: PropTypes.string,
+}

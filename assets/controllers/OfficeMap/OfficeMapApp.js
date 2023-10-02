@@ -78,5 +78,9 @@ export default class OfficeMapApp extends Component {
 				</Office>
 			</DndProvider>
 		);
-	};
+	}
 }
+
+OfficeMapApp.propTypes = {
+	officeId: PropTypes.string.isRequired,
+};
