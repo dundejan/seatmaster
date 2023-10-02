@@ -2,8 +2,12 @@
 
 namespace App\Repository;
 
+use App\Entity\Office;
 use App\Entity\RepeatedAssignment;
+use DateTime;
+use DateTimeZone;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -20,6 +24,34 @@ class RepeatedAssignmentRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, RepeatedAssignment::class);
     }
+
+	/**
+	 * @throws \Exception
+	 */
+	public function findCurrentlyOngoing(?Office $office = null): mixed
+	{
+		$qb = $this->createQueryBuilder('e');
+
+		// 1 for monday, 2 for tuesday, 3 for wednesday, ...
+		$currentDayOfWeek = date('N');
+
+		// Basic condition for ongoing assignments
+		$qb->andWhere('e.dayOfWeek = :currentDayOfWeek AND e.fromTime <= :currentTime AND :currentTime < e.toTime' )
+			->setParameter('currentDayOfWeek', $currentDayOfWeek)
+			// DateTimeZone here is set to Europe/Paris, because time is stored in UTC, although it is meant to be in Europe/Paris
+			->setParameter('currentTime', new DateTime('now', new DateTimeZone('Europe/Paris')), Types::TIME_MUTABLE);
+
+		// If an office is provided, add additional condition
+		if ($office !== null) {
+			$qb->join('e.seat', 's')  // Join with Seat entity using alias 's'
+			->join('s.office', 'o') // Join with Office entity using alias 'o'
+			->andWhere('o = :office')
+				->setParameter('office', $office);
+		}
+
+		// Execute and return the query result
+		return $qb->getQuery()->execute();
+	}
 
 //    /**
 //     * @return RepeatedAssignment[] Returns an array of RepeatedAssignment objects

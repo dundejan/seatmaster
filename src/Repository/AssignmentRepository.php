@@ -6,6 +6,8 @@ use App\Entity\Assignment;
 use App\Entity\Office;
 use App\Entity\Person;
 use App\Entity\Seat;
+use DateTime;
+use DateTimeZone;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -24,6 +26,9 @@ class AssignmentRepository extends ServiceEntityRepository
         parent::__construct($registry, Assignment::class);
     }
 
+	/**
+	 * @throws \Exception
+	 */
 	public function findCurrentlyOngoing(?Office $office = null): mixed
 	{
 		$qb = $this->createQueryBuilder('e');
@@ -31,9 +36,9 @@ class AssignmentRepository extends ServiceEntityRepository
 		// Basic condition for ongoing assignments
 		$qb->andWhere('e.fromDate <= :currentDate AND e.toDate >= :currentDate')
 			// DateTimeZone here is set to UTC, because in database dates are also with utc time zone
-			->setParameter('currentDate', new \DateTime('now', new \DateTimeZone('UTC')));
+			->setParameter('currentDate', new DateTime('now', new DateTimeZone('UTC')));
 
-		// If an office is provided, add an additional condition
+		// If an office is provided, add additional condition
 		if ($office !== null) {
 			$qb->join('e.seat', 's')  // Join with Seat entity using alias 's'
 			->join('s.office', 'o') // Join with Office entity using alias 'o'
@@ -45,7 +50,7 @@ class AssignmentRepository extends ServiceEntityRepository
 		return $qb->getQuery()->execute();
 	}
 
-	public function findOverlappingWithRangeForPerson(\DateTime $startDate, \DateTime $endDate, Person $person, ?int $id) : mixed
+	public function findOverlappingWithRangeForPerson(DateTime $startDate, DateTime $endDate, Person $person, ?int $id) : mixed
 	{
 		$qb = $this->createQueryBuilder('e');
 
@@ -60,7 +65,7 @@ class AssignmentRepository extends ServiceEntityRepository
 			;
 	}
 
-	public function findOverlappingWithRangeForSeat(\DateTime $startDate, \DateTime $endDate, Seat $seat, ?int $id) : mixed
+	public function findOverlappingWithRangeForSeat(DateTime $startDate, DateTime $endDate, Seat $seat, ?int $id) : mixed
 	{
 		$qb = $this->createQueryBuilder('e');
 

@@ -17,6 +17,29 @@ function hasCurrentAssignment(seat) {
 	});
 }
 
+function hasCurrentRepeatedAssignment(seat) {
+	const now = new Date();
+
+	// Retrieve day of the week (1 for Monday, 2 for Tuesday, etc.)
+	const currentDayOfWeek = now.getUTCDay() === 0 ? 7 : now.getUTCDay();
+
+	return seat.repeatedAssignments.find(repeatedAssignment => {
+		const { dayOfWeek, fromTime, toTime } = repeatedAssignment;
+
+		const fromTimeDate = new Date(fromTime);
+		const toTimeDate = new Date(toTime);
+
+		const from = fromTimeDate.getUTCHours() * 60 + fromTimeDate.getUTCMinutes();
+		const to = toTimeDate.getUTCHours() * 60 + toTimeDate.getUTCMinutes();
+		const nowTime = now.getHours() * 60 + now.getMinutes();
+
+		// Check if today is the right day of the week and current time is within fromTime and toTime
+		return currentDayOfWeek === dayOfWeek &&
+			from <= nowTime &&
+			nowTime <= to;
+	});
+}
+
 export default class OfficeMapApp extends Component {
 	constructor(props) {
 		super(props);
@@ -73,7 +96,7 @@ export default class OfficeMapApp extends Component {
 					officeId={this.officeId}
 				>
 					{this.state.chairs.map(chair => (
-						<Seat key={chair.id} id={chair.id} left={chair.coordX} top={chair.coordY} occupied={hasCurrentAssignment(chair)} />
+						<Seat key={chair.id} id={chair.id} left={chair.coordX} top={chair.coordY} occupied={hasCurrentAssignment(chair) || hasCurrentRepeatedAssignment(chair)} />
 					))}
 				</Office>
 			</DndProvider>

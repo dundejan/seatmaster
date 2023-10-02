@@ -41,11 +41,9 @@ class RepeatedAssignmentCrudController extends AbstractCrudController
 			    ])
 			    ->setRequired(true),
 		    TimeField::new('fromTime')
-		        ->setLabel('From time')
-			    ->setFormTypeOption('view_timezone', 'Europe/Paris'),
+		        ->setLabel('From time'),
 		    TimeField::new('toTime')
-			    ->setLabel('To time')
-			    ->setFormTypeOption('view_timezone', 'Europe/Paris'),
+			    ->setLabel('To time'),
 		    DateField::new('untilDate')
 		        ->setLabel('Repeat each week until')
 			    ->setHelp('(leave blank to repeat forever)'),
@@ -64,7 +62,6 @@ class RepeatedAssignmentCrudController extends AbstractCrudController
 			// the labels used to refer to this entity in titles, buttons, etc.
 			->setEntityLabelInSingular('Repeated assignment')
 			->setEntityLabelInPlural('Repeated assignments')
-			->setTimezone('Europe/Paris')
 
 			// the Symfony Security permission needed to manage the entity
 			// (none by default, so you can manage all instances of the entity)

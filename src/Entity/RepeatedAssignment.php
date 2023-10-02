@@ -48,7 +48,7 @@ class RepeatedAssignment
 
     #[ORM\ManyToOne(inversedBy: 'repeatedAssignments')]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups(['repeatedAssignment:read', 'repeatedAssignment:write'])]
+    #[Groups(['repeatedAssignment:read', 'repeatedAssignment:write', 'seat:read'])]
     private ?Person $person = null;
 
     #[ORM\ManyToOne(inversedBy: 'repeatedAssignments')]
@@ -57,19 +57,19 @@ class RepeatedAssignment
     private ?Seat $seat = null;
 
     #[ORM\Column]
-    #[Groups(['repeatedAssignment:read', 'repeatedAssignment:write'])]
+    #[Groups(['repeatedAssignment:read', 'repeatedAssignment:write', 'seat:read'])]
     private ?int $dayOfWeek = null;
 
     #[ORM\Column(type: Types::TIME_MUTABLE)]
-    #[Groups(['repeatedAssignment:read', 'repeatedAssignment:write'])]
+    #[Groups(['repeatedAssignment:read', 'repeatedAssignment:write', 'seat:read'])]
     private ?\DateTimeInterface $fromTime = null;
 
     #[ORM\Column(type: Types::TIME_MUTABLE)]
-    #[Groups(['repeatedAssignment:read', 'repeatedAssignment:write'])]
+    #[Groups(['repeatedAssignment:read', 'repeatedAssignment:write', 'seat:read'])]
     private ?\DateTimeInterface $toTime = null;
 
     #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
-    #[Groups(['repeatedAssignment:read', 'repeatedAssignment:write'])]
+    #[Groups(['repeatedAssignment:read', 'repeatedAssignment:write', 'seat:read'])]
     private ?\DateTimeInterface $untilDate = null;
 
     public function getId(): ?int

@@ -58,7 +58,7 @@ class Assignment
 
     #[ORM\ManyToOne(inversedBy: 'assignments')]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups(['assignment:read', 'assignment:write'])]
+    #[Groups(['assignment:read', 'assignment:write', 'seat:read'])]
     #[Assert\NotBlank]
     #[ApiFilter(SearchFilter::class, strategy: 'partial')]
     private ?Person $person = null;
