@@ -10,7 +10,7 @@ use Doctrine\Migrations\AbstractMigration;
 /**
  * Auto-generated Migration: Please modify to your needs!
  */
-final class Version20230905145348 extends AbstractMigration
+final class Version20230928164922 extends AbstractMigration
 {
     public function getDescription(): string
     {
@@ -24,13 +24,16 @@ final class Version20230905145348 extends AbstractMigration
         $this->addSql('CREATE SEQUENCE office_id_seq INCREMENT BY 1 MINVALUE 1 START 1');
         $this->addSql('CREATE SEQUENCE person_id_seq INCREMENT BY 1 MINVALUE 1 START 1');
         $this->addSql('CREATE SEQUENCE seat_id_seq INCREMENT BY 1 MINVALUE 1 START 1');
-        $this->addSql('CREATE TABLE assignment (id INT NOT NULL, person_id INT NOT NULL, seat_id INT NOT NULL, from_date TIMESTAMP(0) WITHOUT TIME ZONE NOT NULL, to_date TIMESTAMP(0) WITHOUT TIME ZONE NOT NULL, PRIMARY KEY(id))');
+        $this->addSql('CREATE SEQUENCE "user_id_seq" INCREMENT BY 1 MINVALUE 1 START 1');
+        $this->addSql('CREATE TABLE assignment (id INT NOT NULL, person_id INT NOT NULL, seat_id INT NOT NULL, from_date TIMESTAMP(0) WITHOUT TIME ZONE NOT NULL, to_date TIMESTAMP(0) WITHOUT TIME ZONE NOT NULL, recurrence BOOLEAN NOT NULL, repeat_end_date DATE DEFAULT NULL, PRIMARY KEY(id))');
         $this->addSql('CREATE INDEX IDX_30C544BA217BBB47 ON assignment (person_id)');
         $this->addSql('CREATE INDEX IDX_30C544BAC1DAFE35 ON assignment (seat_id)');
-        $this->addSql('CREATE TABLE office (id INT NOT NULL, name VARCHAR(255) NOT NULL, PRIMARY KEY(id))');
+        $this->addSql('CREATE TABLE office (id INT NOT NULL, name VARCHAR(255) NOT NULL, width INT NOT NULL, height INT NOT NULL, PRIMARY KEY(id))');
         $this->addSql('CREATE TABLE person (id INT NOT NULL, first_name VARCHAR(255) NOT NULL, last_name VARCHAR(255) NOT NULL, id_external INT DEFAULT NULL, PRIMARY KEY(id))');
-        $this->addSql('CREATE TABLE seat (id INT NOT NULL, office_id INT NOT NULL, PRIMARY KEY(id))');
+        $this->addSql('CREATE TABLE seat (id INT NOT NULL, office_id INT NOT NULL, coord_x INT DEFAULT NULL, coord_y INT DEFAULT NULL, PRIMARY KEY(id))');
         $this->addSql('CREATE INDEX IDX_3D5C3666FFA0C224 ON seat (office_id)');
+        $this->addSql('CREATE TABLE "user" (id INT NOT NULL, email VARCHAR(180) NOT NULL, roles JSON NOT NULL, password VARCHAR(255) NOT NULL, PRIMARY KEY(id))');
+        $this->addSql('CREATE UNIQUE INDEX UNIQ_8D93D649E7927C74 ON "user" (email)');
         $this->addSql('ALTER TABLE assignment ADD CONSTRAINT FK_30C544BA217BBB47 FOREIGN KEY (person_id) REFERENCES person (id) NOT DEFERRABLE INITIALLY IMMEDIATE');
         $this->addSql('ALTER TABLE assignment ADD CONSTRAINT FK_30C544BAC1DAFE35 FOREIGN KEY (seat_id) REFERENCES seat (id) NOT DEFERRABLE INITIALLY IMMEDIATE');
         $this->addSql('ALTER TABLE seat ADD CONSTRAINT FK_3D5C3666FFA0C224 FOREIGN KEY (office_id) REFERENCES office (id) NOT DEFERRABLE INITIALLY IMMEDIATE');
@@ -44,6 +47,7 @@ final class Version20230905145348 extends AbstractMigration
         $this->addSql('DROP SEQUENCE office_id_seq CASCADE');
         $this->addSql('DROP SEQUENCE person_id_seq CASCADE');
         $this->addSql('DROP SEQUENCE seat_id_seq CASCADE');
+        $this->addSql('DROP SEQUENCE "user_id_seq" CASCADE');
         $this->addSql('ALTER TABLE assignment DROP CONSTRAINT FK_30C544BA217BBB47');
         $this->addSql('ALTER TABLE assignment DROP CONSTRAINT FK_30C544BAC1DAFE35');
         $this->addSql('ALTER TABLE seat DROP CONSTRAINT FK_3D5C3666FFA0C224');
@@ -51,5 +55,6 @@ final class Version20230905145348 extends AbstractMigration
         $this->addSql('DROP TABLE office');
         $this->addSql('DROP TABLE person');
         $this->addSql('DROP TABLE seat');
+        $this->addSql('DROP TABLE "user"');
     }
 }

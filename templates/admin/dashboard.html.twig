@@ -1,0 +1,53 @@
+{% extends '@EasyAdmin/page/content.html.twig' %}
+
+{% block content_title %}
+    <h1>Statistics</h1>
+{% endblock %}
+
+{% block main %}
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-6 col-md-2">
+                <div class="dashboard-stat card">
+                    <div class="card-body d-flex align-items-center">
+                        <h3 class="card-title mb-0">{{ statistics.totalPersons }}</h3>
+                    </div>
+                    <footer class="card-footer bg-primary text-white">
+                        Total Persons
+                    </footer>
+                </div>
+            </div>
+            <div class="col-6 col-md-2">
+                <div class="dashboard-stat card">
+                    <div class="card-body d-flex align-items-center">
+                        <h3 class="card-title mb-0">{{ statistics.currentlyOngoingAssignments }}</h3>
+                    </div>
+                    <footer class="card-footer bg-warning text-white">
+                        Persons currently in office
+                    </footer>
+                </div>
+            </div>
+            <div class="col-6 col-md-2">
+                <div class="dashboard-stat card">
+                    <div class="card-body d-flex align-items-center">
+                        <h3 class="card-title mb-0">{{ statistics.totalOffices }}</h3>
+                    </div>
+                    <footer class="card-footer bg-success text-white">
+                        Offices
+                    </footer>
+                </div>
+            </div>
+            <div class="col-6 col-md-2">
+                <div class="dashboard-stat card">
+                    <div class="card-body d-flex align-items-center">
+                        <h3 class="card-title mb-0">{{ statistics.totalSeats }}</h3>
+                    </div>
+                    <footer class="card-footer bg-info text-white">
+                        Seats
+                    </footer>
+                </div>
+            </div>
+            {# Additional blocks for other statistics... #}
+        </div>
+    </div>
+{% endblock %}

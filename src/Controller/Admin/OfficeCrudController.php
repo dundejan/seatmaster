@@ -6,6 +6,7 @@ use App\Entity\Office;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\IntegerField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 
 class OfficeCrudController extends AbstractCrudController
@@ -34,6 +35,8 @@ class OfficeCrudController extends AbstractCrudController
 			IdField::new('id')
 				->hideOnForm(),
 			TextField::new('name'),
+			IntegerField::new('height'),
+			IntegerField::new('width'),
 		];
 	}
 }

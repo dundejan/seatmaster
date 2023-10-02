@@ -1,0 +1,59 @@
+{% extends 'base.html.twig' %}
+
+{% block sidebar %}
+    <div class="bg-light border-right" id="sidebar-wrapper">
+        <!-- Title for the sidebar -->
+        <div class="sidebar-heading p-3 border-bottom">Offices</div>
+        <div class="list-group list-group-flush">
+            {% for office in offices %}
+                <a href="{{ path('app_office_show', {'id': office.id}) }}" class="list-group-item list-group-item-action bg-light">{{ office.name }}</a>
+            {% endfor %}
+        </div>
+    </div>
+{% endblock %}
+
+{% block title %} {{ current_office.name }} {% endblock %}
+
+{% block body %}
+
+    {# start office map from react #}
+    <div class="row">
+        <div id="office-map" data-office-id="{{ current_office.id }}"></div>
+    </div>
+    {# end office map from react #}
+
+    <h2>Hello {{ current_office.name }} from twig! ✅</h2>
+
+    {% set seatArr = seats|map(item => attribute(item, 'id')) %}
+
+    <b>seats id's in twig: </b>
+    {% for id in seatArr %}
+        {{ id }},
+    {% endfor %}
+
+    {% for seat in seats %}
+        {% set colour = "green" %}
+        {% set person = "noone" %}
+        {% for assignment in seat.assignments %}
+            {% set now = "now"|date("Y-m-d H:i:s") %} {# Get the current date-time string #}
+
+            {% if now >= assignment.fromDate.format('Y-m-d H:i:s') and now <= assignment.toDate.format('Y-m-d H:i:s') %}
+                {% set colour = "red" %}
+                {% set person = assignment.person.fullName %}
+            {% endif %}
+        {% endfor %}
+
+        <p style="color: {{ colour }}"> SEAT {{ seat.id }}: currently sitting '{{ person }}'</p>
+    {% endfor %}
+
+{#    <div {{ vue_component('OfficeDetails', {#}
+{#        entrypoint: path('api_entrypoint'),#}
+{#        officeId: current_office.id,#}
+{#        seats: seats|map(item => attribute(item, 'id')),#}
+{#    }) }}></div>#}
+
+{% endblock %}
+
+{% block javascripts %}
+    {{ encore_entry_script_tags('office_map_react') }}
+{% endblock %}

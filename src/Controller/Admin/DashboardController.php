@@ -5,7 +5,12 @@ namespace App\Controller\Admin;
 use App\Entity\Assignment;
 use App\Entity\Office;
 use App\Entity\Person;
+use App\Entity\RepeatedAssignment;
 use App\Entity\Seat;
+use App\Repository\AssignmentRepository;
+use App\Repository\OfficeRepository;
+use App\Repository\PersonRepository;
+use App\Repository\SeatRepository;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Assets;
@@ -13,35 +18,42 @@ use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Dashboard;
 use EasyCorp\Bundle\EasyAdminBundle\Config\MenuItem;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractDashboardController;
-use EasyCorp\Bundle\EasyAdminBundle\Router\AdminUrlGenerator;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
 class DashboardController extends AbstractDashboardController
 {
+	private PersonRepository $personRepository;
+	private OfficeRepository $officeRepository;
+	private SeatRepository $seatRepository;
+	private AssignmentRepository $assignmentRepository;
+
+	public function __construct(
+		PersonRepository $personRepository,
+		OfficeRepository $officeRepository,
+		SeatRepository $seatRepository,
+		AssignmentRepository $assignmentRepository,
+
+	) {
+		$this->personRepository = $personRepository;
+		$this->officeRepository = $officeRepository;
+		$this->seatRepository = $seatRepository;
+		$this->assignmentRepository = $assignmentRepository;
+	}
 
 	#[Route('/admin', name: 'admin')]
     public function index(): Response
     {
-	    $adminUrlGenerator = $this->container->get(AdminUrlGenerator::class);
+	    $statistics = [
+		    'totalPersons' => $this->personRepository->count([]),
+		    'totalOffices' => $this->officeRepository->count([]),
+		    'totalSeats' => $this->seatRepository->count([]),
+		    'currentlyOngoingAssignments' => count($this->assignmentRepository->findCurrentlyOngoing()),
+	    ];
 
-	    return $this->redirect($adminUrlGenerator->setController(OfficeCrudController::class)->generateUrl());
-
-        // Option 1. You can make your dashboard redirect to some common page of your backend
-        //
-        // $adminUrlGenerator = $this->container->get(AdminUrlGenerator::class);
-        // return $this->redirect($adminUrlGenerator->setController(OneOfYourCrudController::class)->generateUrl());
-
-        // Option 2. You can make your dashboard redirect to different pages depending on the user
-        //
-        // if ('jane' === $this->getUser()->getUsername()) {
-        //     return $this->redirect('...');
-        // }
-
-        // Option 3. You can render some custom template to display a proper dashboard with widgets, etc.
-        // (tip: it's easier if your template extends from @EasyAdmin/page/content.html.twig)
-        //
-        // return $this->render('some/path/my-dashboard.html.twig');
+		return $this->render('admin/dashboard.html.twig',
+			['statistics' => $statistics],
+		);
     }
 
 	public function configureDashboard(): Dashboard
@@ -55,6 +67,11 @@ class DashboardController extends AbstractDashboardController
 	public function configureMenuItems(): iterable
 	{
 		return [
+			MenuItem::section('Info'),
+			MenuItem::linkToDashboard('Statistics', 'fa fa-chart-simple'),
+			MenuItem::linkToRoute('Current occupancy', 'fa fa-building-user','app_admin_office_statistics_index'),
+
+			MenuItem::section('Management'),
 			MenuItem::linkToCrud('Offices', 'fa fa-building', Office::class),
 
 			MenuItem::linkToCrud('Seats', 'fas fa-chair', Seat::class),
@@ -64,6 +81,10 @@ class DashboardController extends AbstractDashboardController
 			MenuItem::linkToCrud('Assignments', 'fa fa-calendar', Assignment::class)
 				->setDefaultSort(['id' => 'DESC']),
 
+			MenuItem::linkToCrud('Repeated assignments', 'fa fa-calendar-day', RepeatedAssignment::class)
+				->setDefaultSort(['id' => 'DESC']),
+
+			MenuItem::section('Navigation')->setCssClass('navigation'),
 			MenuItem::linkToUrl('Back to app', 'fa fa-arrow-left', $this->generateUrl('app_homepage')),
 		];
 	}

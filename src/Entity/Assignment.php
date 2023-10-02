@@ -13,7 +13,6 @@ use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use App\Repository\AssignmentRepository;
 use App\Validator\IsAvailableAssignment;
-use App\Validator\IsFutureAssignment;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
@@ -23,25 +22,25 @@ use Symfony\Component\Validator\Context\ExecutionContextInterface;
 #[ORM\Entity(repositoryClass: AssignmentRepository::class)]
 #[ApiResource(
 	operations: [
-		new Get(),
-		new GetCollection(),
-		new Post(),
-		new Put(),
-		new Patch(),
-		new Delete(),
-	],
+                           		new Get(),
+                           		new GetCollection(),
+                           		new Post(),
+                           		new Put(),
+                           		new Patch(),
+                           		new Delete(),
+                           	],
 	formats: [
-		'jsonld',
-		'json',
-		'html',
-		'csv' => 'text/csv',
-	],
+                           		'jsonld',
+                           		'json',
+                           		'html',
+                           		'csv' => 'text/csv',
+                           	],
 	normalizationContext: [
-		'groups' => ['assignment:read'],
-	],
+                           		'groups' => ['assignment:read'],
+                           	],
 	denormalizationContext: [
-		'groups' => ['assignment:write'],
-	],
+                           		'groups' => ['assignment:write'],
+                           	],
 	paginationItemsPerPage: 10,
 )]
 #[ApiFilter(SearchFilter::class, properties: [
@@ -72,15 +71,13 @@ class Assignment
     private ?Seat $seat = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
-    #[Groups(['assignment:read', 'assignment:write'])]
+    #[Groups(['assignment:read', 'assignment:write', 'seat:read'])]
     #[Assert\NotBlank]
-    #[IsFutureAssignment]
     private ?\DateTimeInterface $fromDate = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
-    #[Groups(['assignment:read', 'assignment:write'])]
+    #[Groups(['assignment:read', 'assignment:write', 'seat:read'])]
     #[Assert\NotBlank]
-    #[IsFutureAssignment]
     private ?\DateTimeInterface $toDate = null;
 
     public function getId(): ?int
@@ -136,6 +133,10 @@ class Assignment
         return $this;
     }
 
+	/**
+	 * @noinspection PhpUnused
+	 * @used-by Assert\CallbackValidator
+	 */
 	#[Assert\Callback]
 	public function validateThatAssignmentHasPositiveLength(ExecutionContextInterface $context, mixed $payload): void
 	{
@@ -144,16 +145,5 @@ class Assignment
 				->atPath('toDate')
 				->addViolation();
 		}
-	}
-
-	public function validateThatSeatIsAvailable(ExecutionContextInterface $context): void
-	{
-		//TODO
-
-	}
-
-	public function validateThatPersonIsAvailable(ExecutionContextInterface $context): void
-	{
-		//TODO
 	}
 }

@@ -21,25 +21,25 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\Entity(repositoryClass: OfficeRepository::class)]
 #[ApiResource(
 	operations: [
-		new Get(),
-		new GetCollection(),
-		new Post(),
-		new Put(),
-		new Patch(),
-		new Delete(),
-	],
+                  		new Get(),
+                  		new GetCollection(),
+                  		new Post(),
+                  		new Put(),
+                  		new Patch(),
+                  		new Delete(),
+                  	],
 	formats: [
-		'jsonld',
-		'json',
-		'html',
-		'csv' => 'text/csv',
-	],
+                  		'jsonld',
+                  		'json',
+                  		'html',
+                  		'csv' => 'text/csv',
+                  	],
 	normalizationContext: [
-		'groups' => ['office:read'],
-	],
+                  		'groups' => ['office:read'],
+                  	],
 	denormalizationContext: [
-		'groups' => ['office:write'],
-	],
+                  		'groups' => ['office:write'],
+                  	],
 	paginationItemsPerPage: 10,
 )]
 class Office
@@ -60,6 +60,14 @@ class Office
     #[ORM\OneToMany(mappedBy: 'office', targetEntity: Seat::class, orphanRemoval: true)]
     #[Groups(['office:read', 'office:write'])]
     private Collection $seats;
+
+    #[ORM\Column]
+    #[Groups(['office:read', 'office:write'])]
+    private ?int $width = 500;
+
+    #[ORM\Column]
+    #[Groups(['office:read', 'office:write'])]
+    private ?int $height = 500;
 
     public function __construct()
     {
@@ -114,7 +122,31 @@ class Office
     }
 
 	public function __toString(): string
-	{
-		return (string) $this->name;
-	}
+                  	{
+                  		return (string) $this->name;
+                  	}
+
+    public function getWidth(): ?int
+    {
+        return $this->width;
+    }
+
+    public function setWidth(int $width): static
+    {
+        $this->width = $width;
+
+        return $this;
+    }
+
+    public function getHeight(): ?int
+    {
+        return $this->height;
+    }
+
+    public function setHeight(int $height): static
+    {
+        $this->height = $height;
+
+        return $this;
+    }
 }
