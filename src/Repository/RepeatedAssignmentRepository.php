@@ -4,6 +4,7 @@ namespace App\Repository;
 
 use App\Entity\Office;
 use App\Entity\RepeatedAssignment;
+use App\Entity\Seat;
 use DateTime;
 use DateTimeZone;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
@@ -28,7 +29,7 @@ class RepeatedAssignmentRepository extends ServiceEntityRepository
 	/**
 	 * @throws \Exception
 	 */
-	public function findCurrentlyOngoing(?Office $office = null): mixed
+	public function findCurrentlyOngoing(mixed $parameter = null): mixed
 	{
 		$qb = $this->createQueryBuilder('e');
 
@@ -41,12 +42,20 @@ class RepeatedAssignmentRepository extends ServiceEntityRepository
 			// DateTimeZone here is set to Europe/Paris, because time is stored in UTC, although it is meant to be in Europe/Paris
 			->setParameter('currentTime', new DateTime('now', new DateTimeZone('Europe/Paris')), Types::TIME_MUTABLE);
 
-		// If an office is provided, add additional condition
-		if ($office !== null) {
-			$qb->join('e.seat', 's')  // Join with Seat entity using alias 's'
-			->join('s.office', 'o') // Join with Office entity using alias 'o'
-			->andWhere('o = :office')
-				->setParameter('office', $office);
+		// If parameter is provided
+		if ($parameter !== null) {
+			// If parameter is office instance, add additional condition
+			if ($parameter instanceof Office) {
+				$qb->join('e.seat', 's')  // Join with Seat entity using alias 's'
+				->join('s.office', 'o') // Join with Office entity using alias 'o'
+				->andWhere('o = :office')
+					->setParameter('office', $parameter);
+			}
+			// If parameter is seat instance, add additional condition
+			else if ($parameter instanceof Seat) {
+				$qb->andWhere('e.seat = :seat')
+					->setParameter('seat', $parameter);
+			}
 		}
 
 		// Execute and return the query result

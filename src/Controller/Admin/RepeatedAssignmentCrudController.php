@@ -3,6 +3,7 @@
 namespace App\Controller\Admin;
 
 use App\Entity\RepeatedAssignment;
+use DateTime;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
@@ -44,8 +45,11 @@ class RepeatedAssignmentCrudController extends AbstractCrudController
 		        ->setLabel('From time'),
 		    TimeField::new('toTime')
 			    ->setLabel('To time'),
+		    DateField::new('startDate')
+			    ->setLabel('Start date of repetition')
+			    ->setFormTypeOption('data', new DateTime('now')),
 		    DateField::new('untilDate')
-		        ->setLabel('Repeat each week until')
+		        ->setLabel('End date of repetition')
 			    ->setHelp('(leave blank to repeat forever)'),
 		    AssociationField::new('seat')
 			    ->autocomplete()

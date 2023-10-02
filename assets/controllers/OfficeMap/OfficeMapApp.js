@@ -6,38 +6,23 @@ import {DndProvider} from "react-dnd";
 import {HTML5Backend} from "react-dnd-html5-backend";
 import {getSeats, updateSeatCoords} from "../api/seats_api";
 
-function hasCurrentAssignment(seat) {
-	const now = new Date();
-
-	return seat.assignments.find(assignment => {
-		const fromDate = new Date(assignment.fromDate);
-		const toDate = new Date(assignment.toDate);
-
-		return fromDate.getTime() <= now.getTime() && now.getTime() <= toDate.getTime();
-	});
-}
-
-function hasCurrentRepeatedAssignment(seat) {
-	const now = new Date();
-
-	// Retrieve day of the week (1 for Monday, 2 for Tuesday, etc.)
-	const currentDayOfWeek = now.getUTCDay() === 0 ? 7 : now.getUTCDay();
-
-	return seat.repeatedAssignments.find(repeatedAssignment => {
-		const { dayOfWeek, fromTime, toTime } = repeatedAssignment;
-
-		const fromTimeDate = new Date(fromTime);
-		const toTimeDate = new Date(toTime);
-
-		const from = fromTimeDate.getUTCHours() * 60 + fromTimeDate.getUTCMinutes();
-		const to = toTimeDate.getUTCHours() * 60 + toTimeDate.getUTCMinutes();
-		const nowTime = now.getHours() * 60 + now.getMinutes();
-
-		// Check if today is the right day of the week and current time is within fromTime and toTime
-		return currentDayOfWeek === dayOfWeek &&
-			from <= nowTime &&
-			nowTime <= to;
-	});
+function getCurrentAssignments(seatId) {
+	return fetch(`/ongoing_assignments/seat/${seatId}`, {
+		credentials: 'same-origin',
+		headers: {
+			'Accept': 'application/json',
+			'Content-Type': 'application/json'
+		}
+	})
+		.then(response => {
+			if (!response.ok) {
+				throw new Error('Network response was not ok: ' + response.statusText);
+			}
+			return response.json();
+		})
+		.catch(error => {
+			console.error('Fetching assignments failed: ', error);
+		});
 }
 
 export default class OfficeMapApp extends Component {
@@ -58,6 +43,21 @@ export default class OfficeMapApp extends Component {
 			.then((data) => {
 				this.setState({
 					chairs: data
+				}, this.fetchAssignments);
+			});
+	}
+
+	fetchAssignments() {
+		// Map through the chairs and fetch assignments for each chair
+		const chairsWithAssignmentsPromises = this.state.chairs.map(chair =>
+			getCurrentAssignments(chair.id).then(currentAssignments => ({...chair, currentAssignments}))
+		);
+
+		// Wait for all requests to finish and update state with chairs containing their assignments
+		Promise.all(chairsWithAssignmentsPromises)
+			.then(chairsWithAssignments => {
+				this.setState({ chairs: chairsWithAssignments }, () => {
+					console.log("Updated chairs: ", this.state.chairs);
 				});
 			});
 	}
@@ -96,7 +96,7 @@ export default class OfficeMapApp extends Component {
 					officeId={this.officeId}
 				>
 					{this.state.chairs.map(chair => (
-						<Seat key={chair.id} id={chair.id} left={chair.coordX} top={chair.coordY} occupied={hasCurrentAssignment(chair) || hasCurrentRepeatedAssignment(chair)} />
+						<Seat key={chair.id} id={chair.id} left={chair.coordX} top={chair.coordY} currentAssignments={chair.currentAssignments} />
 					))}
 				</Office>
 			</DndProvider>
