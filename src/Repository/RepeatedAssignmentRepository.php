@@ -3,9 +3,11 @@
 namespace App\Repository;
 
 use App\Entity\Office;
+use App\Entity\Person;
 use App\Entity\RepeatedAssignment;
 use App\Entity\Seat;
 use DateTime;
+use DateTimeInterface;
 use DateTimeZone;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\DBAL\Types\Types;
@@ -60,6 +62,46 @@ class RepeatedAssignmentRepository extends ServiceEntityRepository
 
 		// Execute and return the query result
 		return $qb->getQuery()->execute();
+	}
+
+	public function findOverlappingWithRangeForPerson(RepeatedAssignment $repeatedAssignment) : mixed
+	{
+		$qb = $this->createQueryBuilder('e');
+
+		return $qb->andWhere('e.person = :person')
+			->setParameter('person', $repeatedAssignment->getPerson())
+			->andWhere('e.dayOfWeek = :dayOfWeek AND e.fromTime < :toTime AND e.toTime > :fromTime AND e.id <> :id')
+			->setParameter('dayOfWeek', $repeatedAssignment->getDayOfWeek())
+			->setParameter('fromTime', $repeatedAssignment->getFromTime())
+			->setParameter('toTime', $repeatedAssignment->getToTime())
+			->setParameter('id', $repeatedAssignment->getId() ?: -1)
+			->andWhere('e.startDate < :untilDate AND COALESCE(e.untilDate, :infinityDate) > :startDate')
+			->setParameter('untilDate', $repeatedAssignment->getUntilDate() ?: new \DateTime('9999-12-31 23:59:59'))
+			->setParameter('startDate', $repeatedAssignment->getStartDate())
+			->setParameter('infinityDate', new \DateTime('9999-12-31 23:59:59'))
+			->getQuery()
+			->execute()
+			;
+	}
+
+	public function findOverlappingWithRangeForSeat(RepeatedAssignment $repeatedAssignment) : mixed
+	{
+		$qb = $this->createQueryBuilder('e');
+
+		return $qb->andWhere('e.seat = :seat')
+			->setParameter('seat', $repeatedAssignment->getSeat())
+			->andWhere('e.dayOfWeek = :dayOfWeek AND e.fromTime < :toTime AND e.toTime > :fromTime AND e.id <> :id')
+			->setParameter('dayOfWeek', $repeatedAssignment->getDayOfWeek())
+			->setParameter('fromTime', $repeatedAssignment->getFromTime())
+			->setParameter('toTime', $repeatedAssignment->getToTime())
+			->setParameter('id', $repeatedAssignment->getId() ?: -1)
+			->andWhere('e.startDate < :untilDate AND COALESCE(e.untilDate, :infinityDate) > :startDate')
+			->setParameter('untilDate', $repeatedAssignment->getUntilDate() ?: new \DateTime('9999-12-31 23:59:59'))
+			->setParameter('startDate', $repeatedAssignment->getStartDate())
+			->setParameter('infinityDate', new \DateTime('9999-12-31 23:59:59'))
+			->getQuery()
+			->execute()
+			;
 	}
 
 //    /**

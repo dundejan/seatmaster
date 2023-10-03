@@ -3,6 +3,7 @@
 namespace App\Validator;
 
 use App\Entity\Assignment;
+use App\Entity\RepeatedAssignment;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
@@ -18,15 +19,40 @@ class IsAvailableAssignmentValidator extends ConstraintValidator
 
 	public function validate(mixed $value, Constraint $constraint): void
 	{
-		/** @phpstan-ignore-next-line */
-		$personConflicts = $this->em
-			->getRepository(Assignment::class)
-			->findOverlappingWithRangeForPerson($value->getFromDate(), $value->getToDate(), $value->getPerson(), $value->getId())
-		;
-		/** @phpstan-ignore-next-line */
-		$seatConflicts = $this->em
-			->getRepository(Assignment::class)
-			->findOverlappingWithRangeForSeat($value->getFromDate(), $value->getToDate(), $value->getSeat(), $value->getId());
+		$personConflicts = array();
+		$seatConflicts = array();
+
+		if ($value instanceof Assignment) {
+			/** @phpstan-ignore-next-line */
+			$personConflicts = $this->em
+				->getRepository(Assignment::class)
+				->findOverlappingWithRangeForPerson(
+					$value->getFromDate(),
+					$value->getToDate(),
+					$value->getPerson(),
+					$value->getId()
+				);
+			/** @phpstan-ignore-next-line */
+			$seatConflicts = $this->em
+				->getRepository(Assignment::class)
+				->findOverlappingWithRangeForSeat(
+					$value->getFromDate(),
+					$value->getToDate(),
+					$value->getSeat(),
+					$value->getId()
+				);
+		}
+
+		if ($value instanceof RepeatedAssignment) {
+			/** @phpstan-ignore-next-line */
+			$personConflicts = $this->em
+				->getRepository(RepeatedAssignment::class)
+				->findOverlappingWithRangeForPerson($value);
+			/** @phpstan-ignore-next-line */
+			$seatConflicts = $this->em
+				->getRepository(RepeatedAssignment::class)
+				->findOverlappingWithRangeForSeat($value);
+		}
 
 		if (count($personConflicts) > 0) {
 			/** @phpstan-ignore-next-line */

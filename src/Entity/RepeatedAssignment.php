@@ -10,6 +10,7 @@ use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use App\Repository\RepeatedAssignmentRepository;
+use App\Validator\IsAvailableAssignment;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
@@ -40,6 +41,7 @@ use Symfony\Component\Validator\Context\ExecutionContextInterface;
          	],
 	paginationItemsPerPage: 10,
 )]
+#[IsAvailableAssignment]
 class RepeatedAssignment
 {
     #[ORM\Id]

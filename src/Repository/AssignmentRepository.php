@@ -7,6 +7,7 @@ use App\Entity\Office;
 use App\Entity\Person;
 use App\Entity\Seat;
 use DateTime;
+use DateTimeInterface;
 use DateTimeZone;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -58,7 +59,7 @@ class AssignmentRepository extends ServiceEntityRepository
 		return $qb->getQuery()->execute();
 	}
 
-	public function findOverlappingWithRangeForPerson(DateTime $startDate, DateTime $endDate, Person $person, ?int $id) : mixed
+	public function findOverlappingWithRangeForPerson(DateTimeInterface $startDate, DateTimeInterface $endDate, Person $person, ?int $id) : mixed
 	{
 		$qb = $this->createQueryBuilder('e');
 
@@ -73,7 +74,7 @@ class AssignmentRepository extends ServiceEntityRepository
 			;
 	}
 
-	public function findOverlappingWithRangeForSeat(DateTime $startDate, DateTime $endDate, Seat $seat, ?int $id) : mixed
+	public function findOverlappingWithRangeForSeat(DateTimeInterface $startDate, DateTimeInterface $endDate, Seat $seat, ?int $id) : mixed
 	{
 		$qb = $this->createQueryBuilder('e');
 
