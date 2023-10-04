@@ -25,6 +25,14 @@ class RepeatedAssignmentCrudController extends AbstractCrudController
 
     public function configureFields(string $pageName): iterable
     {
+		// Declare this field here to perform logic with the default value
+	    $startDateField = DateField::new('startDate')
+		    ->setLabel('Starting date of repetition');
+		// On new page, set the start date field to the current date, otherwise not
+	    if ($pageName === Crud::PAGE_NEW) {
+		    $startDateField->setFormTypeOption('data', new \DateTime('now'));
+	    }
+
 	    return [
 		    FormField::addTab("Assignment"),
 		    IdField::new('id')
@@ -45,9 +53,7 @@ class RepeatedAssignmentCrudController extends AbstractCrudController
 		        ->setLabel('From time'),
 		    TimeField::new('toTime')
 			    ->setLabel('To time'),
-		    DateField::new('startDate')
-			    ->setLabel('Start date of repetition')
-			    ->setFormTypeOption('data', new DateTime('now')),
+		    $startDateField,
 		    DateField::new('untilDate')
 		        ->setLabel('End date of repetition')
 			    ->setHelp('(leave blank to repeat forever)'),

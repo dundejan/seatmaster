@@ -59,31 +59,31 @@ class AssignmentRepository extends ServiceEntityRepository
 		return $qb->getQuery()->execute();
 	}
 
-	public function findOverlappingWithRangeForPerson(DateTimeInterface $startDate, DateTimeInterface $endDate, Person $person, ?int $id) : mixed
+	public function findOverlappingWithRangeForPerson(Assignment $assignment) : mixed
 	{
 		$qb = $this->createQueryBuilder('e');
 
 		return $qb->andWhere('e.person = :person')
-			->setParameter('person', $person)
+			->setParameter('person', $assignment->getPerson())
 			->andWhere('e.fromDate < :toDate AND e.toDate > :fromDate AND e.id <> :id')
-			->setParameter('fromDate', $startDate)
-			->setParameter('toDate', $endDate)
-			->setParameter('id', $id ? $id : -1)
+			->setParameter('fromDate', $assignment->getFromDate())
+			->setParameter('toDate', $assignment->getToDate())
+			->setParameter('id', $assignment->getId() ?: -1)
 			->getQuery()
 			->execute()
 			;
 	}
 
-	public function findOverlappingWithRangeForSeat(DateTimeInterface $startDate, DateTimeInterface $endDate, Seat $seat, ?int $id) : mixed
+	public function findOverlappingWithRangeForSeat(Assignment $assignment) : mixed
 	{
 		$qb = $this->createQueryBuilder('e');
 
 		return $qb->andWhere('e.seat = :seat')
-			->setParameter('seat', $seat)
+			->setParameter('seat', $assignment->getSeat())
 			->andWhere('e.fromDate < :toDate AND e.toDate > :fromDate AND e.id <> :id')
-			->setParameter('fromDate', $startDate)
-			->setParameter('toDate', $endDate)
-			->setParameter('id', $id ? $id : -1)
+			->setParameter('fromDate', $assignment->getFromDate())
+			->setParameter('toDate', $assignment->getToDate())
+			->setParameter('id', $assignment->getId() ?: -1)
 			->getQuery()
 			->execute()
 			;

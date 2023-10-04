@@ -26,21 +26,11 @@ class IsAvailableAssignmentValidator extends ConstraintValidator
 			/** @phpstan-ignore-next-line */
 			$personConflicts = $this->em
 				->getRepository(Assignment::class)
-				->findOverlappingWithRangeForPerson(
-					$value->getFromDate(),
-					$value->getToDate(),
-					$value->getPerson(),
-					$value->getId()
-				);
+				->findOverlappingWithRangeForPerson($value);
 			/** @phpstan-ignore-next-line */
 			$seatConflicts = $this->em
 				->getRepository(Assignment::class)
-				->findOverlappingWithRangeForSeat(
-					$value->getFromDate(),
-					$value->getToDate(),
-					$value->getSeat(),
-					$value->getId()
-				);
+				->findOverlappingWithRangeForSeat($value);
 		}
 
 		if ($value instanceof RepeatedAssignment) {
