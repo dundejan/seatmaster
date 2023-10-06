@@ -2,6 +2,7 @@
 
 namespace App\Repository;
 
+use App\Entity\Assignment;
 use App\Entity\Office;
 use App\Entity\Person;
 use App\Entity\RepeatedAssignment;
@@ -12,6 +13,8 @@ use DateTimeZone;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\Persistence\ManagerRegistry;
+use http\Exception\InvalidArgumentException;
+use Symfony\Component\Form\Exception\LogicException;
 
 /**
  * @extends ServiceEntityRepository<RepeatedAssignment>
@@ -64,44 +67,83 @@ class RepeatedAssignmentRepository extends ServiceEntityRepository
 		return $qb->getQuery()->execute();
 	}
 
-	public function findOverlappingWithRangeForPerson(RepeatedAssignment $repeatedAssignment) : mixed
+	public function findOverlappingRepeatedAssignments(Assignment|RepeatedAssignment $assignment, string $param) : mixed
 	{
+		// Ensure that $param is one of the allowed values.
+		if (!in_array($param, ['person', 'seat'], true)) {
+			throw new InvalidArgumentException("Invalid field: $param");
+		}
+
 		$qb = $this->createQueryBuilder('e');
 
-		return $qb->andWhere('e.person = :person')
-			->setParameter('person', $repeatedAssignment->getPerson())
-			->andWhere('e.dayOfWeek = :dayOfWeek AND e.fromTime < :toTime AND e.toTime > :fromTime AND e.id <> :id')
-			->setParameter('dayOfWeek', $repeatedAssignment->getDayOfWeek())
-			->setParameter('fromTime', $repeatedAssignment->getFromTime())
-			->setParameter('toTime', $repeatedAssignment->getToTime())
-			->setParameter('id', $repeatedAssignment->getId() ?: -1)
-			->andWhere('e.startDate < :untilDate AND COALESCE(e.untilDate, :infinityDate) > :startDate')
-			->setParameter('untilDate', $repeatedAssignment->getUntilDate() ?: new \DateTime('9999-12-31 23:59:59'))
-			->setParameter('startDate', $repeatedAssignment->getStartDate())
-			->setParameter('infinityDate', new \DateTime('9999-12-31 23:59:59'))
-			->getQuery()
-			->execute()
+		if ($assignment instanceof RepeatedAssignment) {
+			$qb->andWhere('e.dayOfWeek = :dayOfWeek AND e.fromTime < :toTime AND e.toTime > :fromTime AND e.id <> :id')
+				->setParameter('dayOfWeek', $assignment->getDayOfWeek())
+				->setParameter('fromTime', $assignment->getFromTime())
+				->setParameter('toTime', $assignment->getToTime())
+				->setParameter('id', $assignment->getId() ?: -1)
+				->andWhere('e.startDate < :untilDate AND COALESCE(e.untilDate, :infinityDate) > :startDate')
+				->setParameter('untilDate', $assignment->getUntilDate() ?: new \DateTime('9999-12-31 23:59:59'))
+				->setParameter('startDate', $assignment->getStartDate())
+				->setParameter('infinityDate', new \DateTime('9999-12-31 23:59:59'))
 			;
-	}
 
-	public function findOverlappingWithRangeForSeat(RepeatedAssignment $repeatedAssignment) : mixed
-	{
-		$qb = $this->createQueryBuilder('e');
+			// Filter just those for the same person
+			if ($param === 'person') {
+				$qb->andWhere('e.person = :person')
+					->setParameter('person', $assignment->getPerson());
+			} // Filter just those for the same seat
+			else {
+				$qb->andWhere('e.seat = :seat')
+					->setParameter('seat', $assignment->getSeat());
+			}
 
-		return $qb->andWhere('e.seat = :seat')
-			->setParameter('seat', $repeatedAssignment->getSeat())
-			->andWhere('e.dayOfWeek = :dayOfWeek AND e.fromTime < :toTime AND e.toTime > :fromTime AND e.id <> :id')
-			->setParameter('dayOfWeek', $repeatedAssignment->getDayOfWeek())
-			->setParameter('fromTime', $repeatedAssignment->getFromTime())
-			->setParameter('toTime', $repeatedAssignment->getToTime())
-			->setParameter('id', $repeatedAssignment->getId() ?: -1)
-			->andWhere('e.startDate < :untilDate AND COALESCE(e.untilDate, :infinityDate) > :startDate')
-			->setParameter('untilDate', $repeatedAssignment->getUntilDate() ?: new \DateTime('9999-12-31 23:59:59'))
-			->setParameter('startDate', $repeatedAssignment->getStartDate())
-			->setParameter('infinityDate', new \DateTime('9999-12-31 23:59:59'))
-			->getQuery()
-			->execute()
-			;
+			return $qb->getQuery()->execute();
+		}
+		else {
+			// TODO: test this, especially dealing with time zones, so the -2 modifying
+
+			$em = $this->getEntityManager();
+			$connection = $em->getConnection();
+
+			$fromDate = $assignment->getFromDate();
+			$toDate = $assignment->getToDate();
+			$person = $assignment->getPerson();
+			$seat = $assignment->getSeat();
+
+			if ($fromDate === null || $toDate === null || $person === null || $seat === null) {
+				throw new LogicException('fromDate or toDate or Person or Seat null, but never should be');
+			}
+
+			$adjustedFromDate = clone $fromDate;
+			$adjustedToDate = clone $toDate;
+			$adjustedFromDate->modify('+2 hours');
+			$adjustedToDate->modify('+2 hours');
+
+			$paramId = $param . '_id';
+
+			$sql = "
+            SELECT * FROM repeated_assignment e 
+            WHERE e.$paramId = :paramId 
+            AND e.day_of_week = :dayOfWeek
+            AND (
+                (e.from_time::TIME <= :toDate AND e.to_time::TIME >= :fromDate)
+                OR
+                (e.to_time::TIME >= :fromDate AND e.from_time::TIME <= :toDate)
+            )
+       		";
+
+			$params = [
+				// As paramId return personId or seatId based on $param value
+				'paramId' => $param === 'person' ? $person->getId() : $seat->getId(),
+				'dayOfWeek' => $adjustedFromDate->format('N'),
+				'fromDate' => $adjustedFromDate->format('H:i:s'),
+				'toDate' => $adjustedToDate->format('H:i:s'),
+			];
+
+			$stmt = $connection->prepare($sql);
+			return $stmt->executeQuery($params)->fetchAllAssociative();
+		}
 	}
 
 //    /**

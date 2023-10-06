@@ -4,13 +4,14 @@ namespace App\Repository;
 
 use App\Entity\Assignment;
 use App\Entity\Office;
-use App\Entity\Person;
+use App\Entity\RepeatedAssignment;
 use App\Entity\Seat;
 use DateTime;
-use DateTimeInterface;
 use DateTimeZone;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use InvalidArgumentException;
+use Symfony\Component\Form\Exception\LogicException;
 
 /**
  * @extends ServiceEntityRepository<Assignment>
@@ -59,34 +60,81 @@ class AssignmentRepository extends ServiceEntityRepository
 		return $qb->getQuery()->execute();
 	}
 
-	public function findOverlappingWithRangeForPerson(Assignment $assignment) : mixed
+	public function findOverlappingAssignments(Assignment|RepeatedAssignment $assignment, string $param) : mixed
 	{
+		// Ensure that $param is one of the allowed values.
+		if (!in_array($param, ['person', 'seat'], true)) {
+			throw new InvalidArgumentException("Invalid field: $param");
+		}
+
 		$qb = $this->createQueryBuilder('e');
 
-		return $qb->andWhere('e.person = :person')
-			->setParameter('person', $assignment->getPerson())
-			->andWhere('e.fromDate < :toDate AND e.toDate > :fromDate AND e.id <> :id')
-			->setParameter('fromDate', $assignment->getFromDate())
-			->setParameter('toDate', $assignment->getToDate())
-			->setParameter('id', $assignment->getId() ?: -1)
-			->getQuery()
-			->execute()
+		if ($assignment instanceof Assignment) {
+			// Time overlapping assignment
+			$qb->andWhere('e.fromDate < :toDate AND e.toDate > :fromDate AND e.id <> :id')
+				->setParameter('fromDate', $assignment->getFromDate())
+				->setParameter('toDate', $assignment->getToDate())
+				->setParameter('id', $assignment->getId() ?: -1)
 			;
-	}
 
-	public function findOverlappingWithRangeForSeat(Assignment $assignment) : mixed
-	{
-		$qb = $this->createQueryBuilder('e');
+			// Filter just those for the same person
+			if ($param === 'person') {
+				$qb->andWhere('e.person = :person')
+					->setParameter('person', $assignment->getPerson());
+			}
+			// Filter just those for the same seat
+			else {
+				$qb->andWhere('e.seat = :seat')
+					->setParameter('seat', $assignment->getSeat());
+			}
 
-		return $qb->andWhere('e.seat = :seat')
-			->setParameter('seat', $assignment->getSeat())
-			->andWhere('e.fromDate < :toDate AND e.toDate > :fromDate AND e.id <> :id')
-			->setParameter('fromDate', $assignment->getFromDate())
-			->setParameter('toDate', $assignment->getToDate())
-			->setParameter('id', $assignment->getId() ?: -1)
-			->getQuery()
-			->execute()
-			;
+			return $qb->getQuery()->execute();
+		}
+		else {
+			// TODO: test this, especially dealing with time zones, so the -2 modifying
+
+			$em = $this->getEntityManager();
+			$connection = $em->getConnection();
+
+			$dayOfWeek = $assignment->getDayOfWeek();
+			$fromTime = $assignment->getFromTime();
+			$toTime = $assignment->getToTime();
+			$person = $assignment->getPerson();
+			$seat = $assignment->getSeat();
+
+			if ($fromTime === null || $toTime === null || $person === null || $seat === null) {
+				throw new LogicException('fromTime or toTime or Person or Seat null, but never should be');
+			}
+
+			$adjustedFromTime = clone $fromTime;
+			$adjustedToTime = clone $toTime;
+			$adjustedFromTime->modify('-2 hours');
+			$adjustedToTime->modify('-2 hours');
+
+			$paramId = $param . '_id';
+
+			$sql = "
+            SELECT * FROM assignment e 
+            WHERE e.$paramId = :paramId 
+            AND (EXTRACT(dow FROM e.from_date) = :dayOfWeek OR EXTRACT(dow FROM e.to_date) = :dayOfWeek)
+            AND (
+                (e.from_date::TIME <= :toTime AND e.to_date::TIME >= :fromTime)
+                OR
+                (e.to_date::TIME >= :fromTime AND e.from_date::TIME <= :toTime)
+            )
+       		";
+
+			$params = [
+				// As paramId return personId or seatId based on $param value
+				'paramId' => $param === 'person' ? $person->getId() : $seat->getId(),
+				'dayOfWeek' => $dayOfWeek !== 7 ? $dayOfWeek : 0, // Adjust for PostgreSQL day of week
+				'fromTime' => $adjustedFromTime->format('H:i:s'),
+				'toTime' => $adjustedToTime->format('H:i:s'),
+			];
+
+			$stmt = $connection->prepare($sql);
+			return $stmt->executeQuery($params)->fetchAllAssociative();
+		}
 	}
 
 //    /**

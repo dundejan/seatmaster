@@ -19,42 +19,52 @@ class IsAvailableAssignmentValidator extends ConstraintValidator
 
 	public function validate(mixed $value, Constraint $constraint): void
 	{
-		$personConflicts = array();
-		$seatConflicts = array();
+		$personConflictsWithAssignments = array();
+		$seatConflictsWithAssignments = array();
+		$personConflictsWithRepeatedAssignments = array();
+		$seatConflictsWithRepeatedAssignments = array();
 
-		if ($value instanceof Assignment) {
-			/** @phpstan-ignore-next-line */
-			$personConflicts = $this->em
-				->getRepository(Assignment::class)
-				->findOverlappingWithRangeForPerson($value);
-			/** @phpstan-ignore-next-line */
-			$seatConflicts = $this->em
-				->getRepository(Assignment::class)
-				->findOverlappingWithRangeForSeat($value);
-		}
+		$assignmentRepository = $this->em->getRepository(Assignment::class);
+		$repeatedAssignmentRepository = $this->em->getRepository(RepeatedAssignment::class);
 
-		if ($value instanceof RepeatedAssignment) {
-			/** @phpstan-ignore-next-line */
-			$personConflicts = $this->em
-				->getRepository(RepeatedAssignment::class)
-				->findOverlappingWithRangeForPerson($value);
-			/** @phpstan-ignore-next-line */
-			$seatConflicts = $this->em
-				->getRepository(RepeatedAssignment::class)
-				->findOverlappingWithRangeForSeat($value);
-		}
+		/** @phpstan-ignore-next-line */
+		$personConflictsWithAssignments = $assignmentRepository->findOverlappingAssignments($value, "person");
+		/** @phpstan-ignore-next-line */
+		$seatConflictsWithAssignments = $assignmentRepository->findOverlappingAssignments($value, "seat");
+		/** @phpstan-ignore-next-line */
+		$personConflictsWithRepeatedAssignments = $repeatedAssignmentRepository->findOverlappingRepeatedAssignments($value, "person");
+		/** @phpstan-ignore-next-line */
+		$seatConflictsWithRepeatedAssignments = $repeatedAssignmentRepository->findOverlappingRepeatedAssignments($value, "seat");
 
-		if (count($personConflicts) > 0) {
+		if (count($personConflictsWithAssignments) > 0) {
 			/** @phpstan-ignore-next-line */
 			$this->context->buildViolation($constraint->message)
-				->setParameter('{{ value }}', 'person')
+				->setParameter('{{ param }}', 'person')
+				->setParameter('{{ assignmentType }}', 'one-time')
 				->addViolation();
 		}
 
-		if (count($seatConflicts) > 0) {
+		if (count($seatConflictsWithAssignments) > 0) {
 			/** @phpstan-ignore-next-line */
 			$this->context->buildViolation($constraint->message)
-				->setParameter('{{ value }}', 'seat')
+				->setParameter('{{ param }}', 'seat')
+				->setParameter('{{ assignmentType }}', 'one-time')
+				->addViolation();
+		}
+
+		if (count($personConflictsWithRepeatedAssignments) > 0) {
+			/** @phpstan-ignore-next-line */
+			$this->context->buildViolation($constraint->message)
+				->setParameter('{{ param }}', 'person')
+				->setParameter('{{ assignmentType }}', 'repeated')
+				->addViolation();
+		}
+
+		if (count($seatConflictsWithRepeatedAssignments) > 0) {
+			/** @phpstan-ignore-next-line */
+			$this->context->buildViolation($constraint->message)
+				->setParameter('{{ param }}', 'seat')
+				->setParameter('{{ assignmentType }}', 'repeated')
 				->addViolation();
 		}
 	}
