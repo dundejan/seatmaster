@@ -7,6 +7,7 @@ use App\Entity\RepeatedAssignment;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
+use App\Helper\TimeHelper;
 
 class IsAvailableAssignmentValidator extends ConstraintValidator
 {
@@ -19,11 +20,6 @@ class IsAvailableAssignmentValidator extends ConstraintValidator
 
 	public function validate(mixed $value, Constraint $constraint): void
 	{
-		$personConflictsWithAssignments = array();
-		$seatConflictsWithAssignments = array();
-		$personConflictsWithRepeatedAssignments = array();
-		$seatConflictsWithRepeatedAssignments = array();
-
 		$assignmentRepository = $this->em->getRepository(Assignment::class);
 		$repeatedAssignmentRepository = $this->em->getRepository(RepeatedAssignment::class);
 
@@ -39,7 +35,13 @@ class IsAvailableAssignmentValidator extends ConstraintValidator
 		if (count($personConflictsWithAssignments) > 0) {
 			/** @phpstan-ignore-next-line */
 			$this->context->buildViolation($constraint->message)
-				->setParameter('{{ param }}', 'person')
+				->setParameter('{{ numberOfCollisions }}', strval(count($personConflictsWithAssignments)))
+				->setParameter('{{ collisionType }}', 'person')
+				->setParameter('{{ collidingAssignment }}',
+					'id: ' . $personConflictsWithAssignments[0]['id'] .
+					', from: ' . TimeHelper::getDateTimeAsString($personConflictsWithAssignments[0]['fromDate']) .
+					', to: ' . TimeHelper::getDateTimeAsString($personConflictsWithAssignments[0]['toDate'])
+					)
 				->setParameter('{{ assignmentType }}', 'one-time')
 				->addViolation();
 		}
@@ -47,23 +49,49 @@ class IsAvailableAssignmentValidator extends ConstraintValidator
 		if (count($seatConflictsWithAssignments) > 0) {
 			/** @phpstan-ignore-next-line */
 			$this->context->buildViolation($constraint->message)
-				->setParameter('{{ param }}', 'seat')
+				->setParameter('{{ numberOfCollisions }}', strval(count($seatConflictsWithAssignments)))
+				->setParameter('{{ collisionType }}', 'seat')
+				->setParameter('{{ collidingAssignment }}',
+					'id: ' . $seatConflictsWithAssignments[0]['id'] .
+					', from: ' . TimeHelper::getDateTimeAsString($seatConflictsWithAssignments[0]['fromDate']) .
+					', to: ' . TimeHelper::getDateTimeAsString($seatConflictsWithAssignments[0]['toDate'])
+					)
 				->setParameter('{{ assignmentType }}', 'one-time')
 				->addViolation();
 		}
 
 		if (count($personConflictsWithRepeatedAssignments) > 0) {
 			/** @phpstan-ignore-next-line */
+			$dayString = date('l', strtotime("Sunday + {$personConflictsWithRepeatedAssignments[0]['dayOfWeek']} days"));
+
+			/** @phpstan-ignore-next-line */
 			$this->context->buildViolation($constraint->message)
-				->setParameter('{{ param }}', 'person')
+				->setParameter('{{ numberOfCollisions }}', strval(count($personConflictsWithRepeatedAssignments)))
+				->setParameter('{{ collisionType }}', 'person')
+				->setParameter('{{ collidingAssignment }}',
+					'id: ' . $personConflictsWithRepeatedAssignments[0]['id'] .
+					', ' . $dayString .
+					', from: ' . TimeHelper::getDateTimeAsString($personConflictsWithRepeatedAssignments[0]['fromTime'], true) .
+					', to: ' . TimeHelper::getDateTimeAsString($personConflictsWithRepeatedAssignments[0]['toTime'], true)
+				)
 				->setParameter('{{ assignmentType }}', 'repeated')
 				->addViolation();
 		}
 
 		if (count($seatConflictsWithRepeatedAssignments) > 0) {
 			/** @phpstan-ignore-next-line */
+			$dayString = date('l', strtotime("Sunday + {$seatConflictsWithRepeatedAssignments[0]['dayOfWeek']} days"));
+
+			/** @phpstan-ignore-next-line */
 			$this->context->buildViolation($constraint->message)
-				->setParameter('{{ param }}', 'seat')
+				->setParameter('{{ numberOfCollisions }}', strval(count($seatConflictsWithRepeatedAssignments)))
+				->setParameter('{{ collisionType }}', 'seat')
+				->setParameter('{{ collidingAssignment }}',
+					'id: ' . $seatConflictsWithRepeatedAssignments[0]['id'] .
+					', ' . $dayString .
+					', from: ' . TimeHelper::getDateTimeAsString($seatConflictsWithRepeatedAssignments[0]['fromTime'], true) .
+					', to: ' . TimeHelper::getDateTimeAsString($seatConflictsWithRepeatedAssignments[0]['toTime'], true)
+				)
 				->setParameter('{{ assignmentType }}', 'repeated')
 				->addViolation();
 		}

@@ -111,11 +111,14 @@ class AssignmentRepository extends ServiceEntityRepository
 			$adjustedFromTime->modify('-2 hours');
 			$adjustedToTime->modify('-2 hours');
 
-			$paramId = $param . '_id';
+			$param_id = $param . '_id';
 
 			$sql = "
-            SELECT * FROM assignment e 
-            WHERE e.$paramId = :paramId 
+            SELECT *,
+                   e.from_date AS \"fromDate\",
+                   e.to_date AS \"toDate\"
+            FROM assignment e 
+            WHERE e.$param_id = :param_id 
             AND (EXTRACT(dow FROM e.from_date) = :dayOfWeek OR EXTRACT(dow FROM e.to_date) = :dayOfWeek)
             AND (
                 (e.from_date::TIME <= :toTime AND e.to_date::TIME >= :fromTime)
@@ -125,8 +128,8 @@ class AssignmentRepository extends ServiceEntityRepository
        		";
 
 			$params = [
-				// As paramId return personId or seatId based on $param value
-				'paramId' => $param === 'person' ? $person->getId() : $seat->getId(),
+				// As param_id return personId or seatId based on $param value
+				'param_id' => $param === 'person' ? $person->getId() : $seat->getId(),
 				'dayOfWeek' => $dayOfWeek !== 7 ? $dayOfWeek : 0, // Adjust for PostgreSQL day of week
 				'fromTime' => $adjustedFromTime->format('H:i:s'),
 				'toTime' => $adjustedToTime->format('H:i:s'),

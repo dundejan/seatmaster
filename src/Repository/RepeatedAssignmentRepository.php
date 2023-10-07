@@ -12,6 +12,7 @@ use DateTimeInterface;
 use DateTimeZone;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\DBAL\Types\Types;
+use Doctrine\ORM\Query;
 use Doctrine\Persistence\ManagerRegistry;
 use http\Exception\InvalidArgumentException;
 use Symfony\Component\Form\Exception\LogicException;
@@ -98,7 +99,7 @@ class RepeatedAssignmentRepository extends ServiceEntityRepository
 					->setParameter('seat', $assignment->getSeat());
 			}
 
-			return $qb->getQuery()->execute();
+			return $qb->getQuery()->setHydrationMode(Query::HYDRATE_ARRAY)->execute();
 		}
 		else {
 			// TODO: test this, especially dealing with time zones, so the -2 modifying
@@ -120,11 +121,15 @@ class RepeatedAssignmentRepository extends ServiceEntityRepository
 			$adjustedFromDate->modify('+2 hours');
 			$adjustedToDate->modify('+2 hours');
 
-			$paramId = $param . '_id';
+			$param_id = $param . '_id';
 
 			$sql = "
-            SELECT * FROM repeated_assignment e 
-            WHERE e.$paramId = :paramId 
+            SELECT *,
+                   e.day_of_week AS \"dayOfWeek\", 
+                   e.from_time AS \"fromTime\",
+                   e.to_time AS \"toTime\"
+            FROM repeated_assignment e 
+            WHERE e.$param_id = :param_id 
             AND e.day_of_week = :dayOfWeek
             AND (
                 (e.from_time::TIME <= :toDate AND e.to_time::TIME >= :fromDate)
@@ -134,8 +139,8 @@ class RepeatedAssignmentRepository extends ServiceEntityRepository
        		";
 
 			$params = [
-				// As paramId return personId or seatId based on $param value
-				'paramId' => $param === 'person' ? $person->getId() : $seat->getId(),
+				// As param_id return personId or seatId based on $param value
+				'param_id' => $param === 'person' ? $person->getId() : $seat->getId(),
 				'dayOfWeek' => $adjustedFromDate->format('N'),
 				'fromDate' => $adjustedFromDate->format('H:i:s'),
 				'toDate' => $adjustedToDate->format('H:i:s'),
