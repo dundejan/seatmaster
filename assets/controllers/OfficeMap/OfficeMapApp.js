@@ -6,15 +6,23 @@ import {DndProvider} from "react-dnd";
 import {HTML5Backend} from "react-dnd-html5-backend";
 import {getSeats, updateSeatCoords} from "../api/seats_api";
 
-function hasCurrentAssignment(seat) {
-	const now = new Date();
-
-	return seat.assignments.find(assignment => {
-		const fromDate = new Date(assignment.fromDate);
-		const toDate = new Date(assignment.toDate);
-
-		return fromDate.getTime() <= now.getTime() && now.getTime() <= toDate.getTime();
-	});
+function getCurrentAssignments(seatId) {
+	return fetch(`/ongoing_assignments/seat/${seatId}`, {
+		credentials: 'same-origin',
+		headers: {
+			'Accept': 'application/json',
+			'Content-Type': 'application/json'
+		}
+	})
+		.then(response => {
+			if (!response.ok) {
+				throw new Error('Network response was not ok: ' + response.statusText);
+			}
+			return response.json();
+		})
+		.catch(error => {
+			console.error('Fetching assignments failed: ', error);
+		});
 }
 
 export default class OfficeMapApp extends Component {
@@ -35,6 +43,21 @@ export default class OfficeMapApp extends Component {
 			.then((data) => {
 				this.setState({
 					chairs: data
+				}, this.fetchAssignments);
+			});
+	}
+
+	fetchAssignments() {
+		// Map through the chairs and fetch assignments for each chair
+		const chairsWithAssignmentsPromises = this.state.chairs.map(chair =>
+			getCurrentAssignments(chair.id).then(currentAssignments => ({...chair, currentAssignments}))
+		);
+
+		// Wait for all requests to finish and update state with chairs containing their assignments
+		Promise.all(chairsWithAssignmentsPromises)
+			.then(chairsWithAssignments => {
+				this.setState({ chairs: chairsWithAssignments }, () => {
+					console.log("Updated chairs: ", this.state.chairs);
 				});
 			});
 	}
@@ -73,10 +96,14 @@ export default class OfficeMapApp extends Component {
 					officeId={this.officeId}
 				>
 					{this.state.chairs.map(chair => (
-						<Seat key={chair.id} id={chair.id} left={chair.coordX} top={chair.coordY} occupied={hasCurrentAssignment(chair)} />
+						<Seat key={chair.id} id={chair.id} left={chair.coordX} top={chair.coordY} currentAssignments={chair.currentAssignments} />
 					))}
 				</Office>
 			</DndProvider>
 		);
-	};
+	}
 }
+
+OfficeMapApp.propTypes = {
+	officeId: PropTypes.string.isRequired,
+};

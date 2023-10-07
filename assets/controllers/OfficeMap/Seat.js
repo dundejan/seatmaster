@@ -17,16 +17,27 @@ function ChairIcon({ color, size }) {
 	);
 }
 
-export default function Seat({ id, left, top, occupied }) {
+export default function Seat({ id, left, top, currentAssignments }) {
 	const [, ref] = useDrag({
 		type: 'SEAT',
 		item: { id }
 	});
 
-	if (occupied) {
-		const from = new Date(occupied.fromDate);
-		const to = new Date(occupied.toDate);
-		const title = `This chair is currently occupied.\nPERSON: TODO\nFROM: ${from}\nTO: ${to}`;
+	if (typeof currentAssignments !== "undefined" && currentAssignments.length === 1) {
+		let from, to, title;
+
+		// One time assignment
+		if (typeof currentAssignments[0].dayOfWeek === 'undefined') {
+			from = new Date(currentAssignments[0].fromDate);
+			to = new Date(currentAssignments[0].toDate);
+			title = `This chair is currently occupied.\nPERSON: TODO\nFROM: ${from}\nTO: ${to}`;
+		}
+		// Repeated assignment
+		else {
+			from = new Date(currentAssignments[0].fromTime);
+			to = new Date(currentAssignments[0].toTime);
+			title = `This chair is currently occupied.\nPERSON: TODO\nFROM: ${from.getUTCHours()}:${from.getUTCMinutes()}\nTO: ${to.getUTCHours()}:${to.getUTCMinutes()}`;
+		}
 
 		return (
 			<div title={title} ref={ref} style={{ left, top, position: 'absolute' }}>
@@ -51,5 +62,15 @@ Seat.propTypes = {
 	id: PropTypes.number,
 	left: PropTypes.number,
 	top: PropTypes.number,
-	occupied: PropTypes.object,
+	currentAssignments: PropTypes.array,
+}
+
+ChairIconSVG.propTypes = {
+	fill: PropTypes.string,
+	size: PropTypes.string,
+}
+
+ChairIcon.propTypes = {
+	color: PropTypes.string,
+	size: PropTypes.string,
 }

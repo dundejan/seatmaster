@@ -56,6 +56,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[Assert\Email]
     private ?string $email = null;
 
+	/**
+	 * @var array<string>
+	 */
     #[ORM\Column]
     private array $roles = [];
 
@@ -105,6 +108,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return array_unique($roles);
     }
 
+	/**
+	 * @param array<string> $roles
+	 */
     public function setRoles(array $roles): static
     {
         $this->roles = $roles;
@@ -117,7 +123,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     public function getPassword(): string
     {
-        return $this->password;
+        return $this->password ?: "";
     }
 
     public function setPassword(string $password): static

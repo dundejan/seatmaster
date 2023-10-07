@@ -3,6 +3,8 @@
 namespace App\Controller\Admin;
 
 use App\Entity\RepeatedAssignment;
+use DateTime;
+use DateTimeZone;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
@@ -24,6 +26,14 @@ class RepeatedAssignmentCrudController extends AbstractCrudController
 
     public function configureFields(string $pageName): iterable
     {
+		// Declare this field here to perform logic with the default value
+	    $startDateField = DateField::new('startDate')
+		    ->setLabel('Starting date of repetition');
+		// On new page, set the start date field to the current date, otherwise not
+	    if ($pageName === Crud::PAGE_NEW) {
+		    $startDateField->setFormTypeOption('data', new DateTime('now', new DateTimeZone('UTC')));
+	    }
+
 	    return [
 		    FormField::addTab("Assignment"),
 		    IdField::new('id')
@@ -41,11 +51,14 @@ class RepeatedAssignmentCrudController extends AbstractCrudController
 			    ])
 			    ->setRequired(true),
 		    TimeField::new('fromTime')
-		        ->setLabel('From time'),
+		        ->setLabel('From time')
+			    ->setFormTypeOption('view_timezone', 'UTC'),
 		    TimeField::new('toTime')
-			    ->setLabel('To time'),
+			    ->setLabel('To time')
+			    ->setFormTypeOption('view_timezone', 'UTC'),
+		    $startDateField,
 		    DateField::new('untilDate')
-		        ->setLabel('Repeat each week until')
+		        ->setLabel('End date of repetition')
 			    ->setHelp('(leave blank to repeat forever)'),
 		    AssociationField::new('seat')
 			    ->autocomplete()
@@ -62,7 +75,7 @@ class RepeatedAssignmentCrudController extends AbstractCrudController
 			// the labels used to refer to this entity in titles, buttons, etc.
 			->setEntityLabelInSingular('Repeated assignment')
 			->setEntityLabelInPlural('Repeated assignments')
-			->setTimezone('Europe/Paris')
+			->setTimezone('UTC')
 
 			// the Symfony Security permission needed to manage the entity
 			// (none by default, so you can manage all instances of the entity)

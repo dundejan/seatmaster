@@ -10,6 +10,7 @@ use App\Entity\Seat;
 use App\Repository\AssignmentRepository;
 use App\Repository\OfficeRepository;
 use App\Repository\PersonRepository;
+use App\Repository\RepeatedAssignmentRepository;
 use App\Repository\SeatRepository;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
@@ -27,18 +28,20 @@ class DashboardController extends AbstractDashboardController
 	private OfficeRepository $officeRepository;
 	private SeatRepository $seatRepository;
 	private AssignmentRepository $assignmentRepository;
+	private RepeatedAssignmentRepository $repeatedAssignmentRepository;
 
 	public function __construct(
 		PersonRepository $personRepository,
 		OfficeRepository $officeRepository,
 		SeatRepository $seatRepository,
 		AssignmentRepository $assignmentRepository,
-
+		RepeatedAssignmentRepository $repeatedAssignmentRepository,
 	) {
 		$this->personRepository = $personRepository;
 		$this->officeRepository = $officeRepository;
 		$this->seatRepository = $seatRepository;
 		$this->assignmentRepository = $assignmentRepository;
+		$this->repeatedAssignmentRepository = $repeatedAssignmentRepository;
 	}
 
 	#[Route('/admin', name: 'admin')]
@@ -48,7 +51,9 @@ class DashboardController extends AbstractDashboardController
 		    'totalPersons' => $this->personRepository->count([]),
 		    'totalOffices' => $this->officeRepository->count([]),
 		    'totalSeats' => $this->seatRepository->count([]),
-		    'currentlyOngoingAssignments' => count($this->assignmentRepository->findCurrentlyOngoing()),
+		    'currentlyOngoingAssignments' =>
+			    count($this->assignmentRepository->findCurrentlyOngoing())
+		        + count($this->repeatedAssignmentRepository->findCurrentlyOngoing()),
 	    ];
 
 		return $this->render('admin/dashboard.html.twig',

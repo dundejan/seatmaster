@@ -74,7 +74,11 @@ class Seat
     #[Groups(['seat:read', 'seat:write'])]
     private ?int $coordY = 0;
 
+	/**
+	 * @var Collection<int, RepeatedAssignment>
+	 */
     #[ORM\OneToMany(mappedBy: 'seat', targetEntity: RepeatedAssignment::class, orphanRemoval: true)]
+    #[Groups(['seat:read', 'seat:write'])]
     private Collection $repeatedAssignments;
 
     public function __construct()

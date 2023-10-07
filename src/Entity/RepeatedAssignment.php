@@ -10,34 +10,38 @@ use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use App\Repository\RepeatedAssignmentRepository;
+use App\Validator\IsAvailableAssignment;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 #[ORM\Entity(repositoryClass: RepeatedAssignmentRepository::class)]
 #[ApiResource(
 	operations: [
-		new Get(),
-		new GetCollection(),
-		new Post(),
-		new Put(),
-		new Patch(),
-		new Delete(),
-	],
+         		new Get(),
+         		new GetCollection(),
+         		new Post(),
+         		new Put(),
+         		new Patch(),
+         		new Delete(),
+         	],
 	formats: [
-		'jsonld',
-		'json',
-		'html',
-		'csv' => 'text/csv',
-	],
+         		'jsonld',
+         		'json',
+         		'html',
+         		'csv' => 'text/csv',
+         	],
 	normalizationContext: [
-		'groups' => ['repeatedAssignment:read'],
-	],
+         		'groups' => ['repeatedAssignment:read'],
+         	],
 	denormalizationContext: [
-		'groups' => ['repeatedAssignment:write'],
-	],
+         		'groups' => ['repeatedAssignment:write'],
+         	],
 	paginationItemsPerPage: 10,
 )]
+#[IsAvailableAssignment]
 class RepeatedAssignment
 {
     #[ORM\Id]
@@ -48,29 +52,39 @@ class RepeatedAssignment
 
     #[ORM\ManyToOne(inversedBy: 'repeatedAssignments')]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups(['repeatedAssignment:read', 'repeatedAssignment:write'])]
+    #[Groups(['repeatedAssignment:read', 'repeatedAssignment:write', 'seat:read'])]
+    #[Assert\NotBlank]
     private ?Person $person = null;
 
     #[ORM\ManyToOne(inversedBy: 'repeatedAssignments')]
     #[ORM\JoinColumn(nullable: false)]
     #[Groups(['repeatedAssignment:read', 'repeatedAssignment:write'])]
+    #[Assert\NotBlank]
     private ?Seat $seat = null;
 
     #[ORM\Column]
-    #[Groups(['repeatedAssignment:read', 'repeatedAssignment:write'])]
+    #[Groups(['repeatedAssignment:read', 'repeatedAssignment:write', 'seat:read'])]
+    #[Assert\NotBlank]
     private ?int $dayOfWeek = null;
 
     #[ORM\Column(type: Types::TIME_MUTABLE)]
-    #[Groups(['repeatedAssignment:read', 'repeatedAssignment:write'])]
+    #[Groups(['repeatedAssignment:read', 'repeatedAssignment:write', 'seat:read'])]
+    #[Assert\NotBlank]
     private ?\DateTimeInterface $fromTime = null;
 
     #[ORM\Column(type: Types::TIME_MUTABLE)]
-    #[Groups(['repeatedAssignment:read', 'repeatedAssignment:write'])]
+    #[Groups(['repeatedAssignment:read', 'repeatedAssignment:write', 'seat:read'])]
+    #[Assert\NotBlank]
     private ?\DateTimeInterface $toTime = null;
 
     #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
-    #[Groups(['repeatedAssignment:read', 'repeatedAssignment:write'])]
+    #[Groups(['repeatedAssignment:read', 'repeatedAssignment:write', 'seat:read'])]
     private ?\DateTimeInterface $untilDate = null;
+
+    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    #[Groups(['repeatedAssignment:read', 'repeatedAssignment:write', 'seat:read'])]
+    #[Assert\NotBlank]
+    private ?\DateTimeInterface $startDate = null;
 
     public function getId(): ?int
     {
@@ -148,4 +162,30 @@ class RepeatedAssignment
 
         return $this;
     }
+
+    public function getStartDate(): ?\DateTimeInterface
+    {
+        return $this->startDate;
+    }
+
+    public function setStartDate(\DateTimeInterface $startDate): static
+    {
+        $this->startDate = $startDate;
+
+        return $this;
+    }
+
+	/**
+	 * @noinspection PhpUnused
+	 * @used-by Assert\CallbackValidator
+	 */
+	#[Assert\Callback]
+	public function validateThatAssignmentHasPositiveLength(ExecutionContextInterface $context, mixed $payload): void
+	{
+		if ($this->getFromTime() >= $this->getToTime()) {
+			$context->buildViolation('What are you trying to do? Well, no, the duration of the assignment really can not be negative or zero.')
+				->atPath('toTime')
+				->addViolation();
+		}
+	}
 }

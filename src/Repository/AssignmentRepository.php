@@ -4,10 +4,14 @@ namespace App\Repository;
 
 use App\Entity\Assignment;
 use App\Entity\Office;
-use App\Entity\Person;
+use App\Entity\RepeatedAssignment;
 use App\Entity\Seat;
+use DateTime;
+use DateTimeZone;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use InvalidArgumentException;
+use Symfony\Component\Form\Exception\LogicException;
 
 /**
  * @extends ServiceEntityRepository<Assignment>
@@ -24,55 +28,118 @@ class AssignmentRepository extends ServiceEntityRepository
         parent::__construct($registry, Assignment::class);
     }
 
-	public function findCurrentlyOngoing(?Office $office = null): mixed
+	/**
+	 * @throws \Exception
+	 */
+	public function findCurrentlyOngoing(mixed $parameter = null): mixed
 	{
 		$qb = $this->createQueryBuilder('e');
 
 		// Basic condition for ongoing assignments
 		$qb->andWhere('e.fromDate <= :currentDate AND e.toDate >= :currentDate')
 			// DateTimeZone here is set to UTC, because in database dates are also with utc time zone
-			->setParameter('currentDate', new \DateTime('now', new \DateTimeZone('UTC')));
+			->setParameter('currentDate', new DateTime('now', new DateTimeZone('UTC')));
 
-		// If an office is provided, add an additional condition
-		if ($office !== null) {
-			$qb->join('e.seat', 's')  // Join with Seat entity using alias 's'
-			->join('s.office', 'o') // Join with Office entity using alias 'o'
-			->andWhere('o = :office')
-				->setParameter('office', $office);
+		// If parameter is provided
+		if ($parameter !== null) {
+			// If parameter is office instance, add additional condition
+			if ($parameter instanceof Office) {
+				$qb->join('e.seat', 's')  // Join with Seat entity using alias 's'
+				->join('s.office', 'o') // Join with Office entity using alias 'o'
+				->andWhere('o = :office')
+					->setParameter('office', $parameter);
+			}
+			// If parameter is seat instance, add additional condition
+			else if ($parameter instanceof Seat) {
+				$qb->andWhere('e.seat = :seat')
+					->setParameter('seat', $parameter);
+			}
 		}
 
 		// Execute and return the query result
 		return $qb->getQuery()->execute();
 	}
 
-	public function findOverlappingWithRangeForPerson(\DateTime $startDate, \DateTime $endDate, Person $person, ?int $id) : mixed
+	public function findOverlappingAssignments(Assignment|RepeatedAssignment $assignment, string $param) : mixed
 	{
+		// Ensure that $param is one of the allowed values.
+		if (!in_array($param, ['person', 'seat'], true)) {
+			throw new InvalidArgumentException("Invalid field: $param");
+		}
+
 		$qb = $this->createQueryBuilder('e');
 
-		return $qb->andWhere('e.person = :person')
-			->setParameter('person', $person)
-			->andWhere('e.fromDate < :toDate AND e.toDate > :fromDate AND e.id <> :id')
-			->setParameter('fromDate', $startDate)
-			->setParameter('toDate', $endDate)
-			->setParameter('id', $id ? $id : -1)
-			->getQuery()
-			->execute()
+		if ($assignment instanceof Assignment) {
+			// Time overlapping assignment
+			$qb->andWhere('e.fromDate < :toDate AND e.toDate > :fromDate AND e.id <> :id')
+				->setParameter('fromDate', $assignment->getFromDate())
+				->setParameter('toDate', $assignment->getToDate())
+				->setParameter('id', $assignment->getId() ?: -1)
 			;
-	}
 
-	public function findOverlappingWithRangeForSeat(\DateTime $startDate, \DateTime $endDate, Seat $seat, ?int $id) : mixed
-	{
-		$qb = $this->createQueryBuilder('e');
+			// Filter just those for the same person
+			if ($param === 'person') {
+				$qb->andWhere('e.person = :person')
+					->setParameter('person', $assignment->getPerson());
+			}
+			// Filter just those for the same seat
+			else {
+				$qb->andWhere('e.seat = :seat')
+					->setParameter('seat', $assignment->getSeat());
+			}
 
-		return $qb->andWhere('e.seat = :seat')
-			->setParameter('seat', $seat)
-			->andWhere('e.fromDate < :toDate AND e.toDate > :fromDate AND e.id <> :id')
-			->setParameter('fromDate', $startDate)
-			->setParameter('toDate', $endDate)
-			->setParameter('id', $id ? $id : -1)
-			->getQuery()
-			->execute()
-			;
+			return $qb->getQuery()->execute();
+		}
+		else {
+			// TODO: test this, especially dealing with time zones, so the -2 modifying
+
+			$em = $this->getEntityManager();
+			$connection = $em->getConnection();
+
+			$dayOfWeek = $assignment->getDayOfWeek();
+			$fromTime = $assignment->getFromTime();
+			$toTime = $assignment->getToTime();
+			$person = $assignment->getPerson();
+			$seat = $assignment->getSeat();
+
+			if ($fromTime === null || $toTime === null || $person === null || $seat === null) {
+				throw new LogicException('fromTime or toTime or Person or Seat null, but never should be');
+			}
+
+			/** @var DateTime $adjustedFromTime */
+			$adjustedFromTime = clone $fromTime;
+			/** @var DateTime $adjustedToTime */
+			$adjustedToTime = clone $toTime;
+			$adjustedFromTime->modify('-2 hours');
+			$adjustedToTime->modify('-2 hours');
+
+			$param_id = $param . '_id';
+
+			$sql = "
+            SELECT *,
+                   e.from_date AS \"fromDate\",
+                   e.to_date AS \"toDate\"
+            FROM assignment e 
+            WHERE e.$param_id = :param_id 
+            AND (EXTRACT(dow FROM e.from_date) = :dayOfWeek OR EXTRACT(dow FROM e.to_date) = :dayOfWeek)
+            AND (
+                (e.from_date::TIME <= :toTime AND e.to_date::TIME >= :fromTime)
+                OR
+                (e.to_date::TIME >= :fromTime AND e.from_date::TIME <= :toTime)
+            )
+       		";
+
+			$params = [
+				// As param_id return personId or seatId based on $param value
+				'param_id' => $param === 'person' ? $person->getId() : $seat->getId(),
+				'dayOfWeek' => $dayOfWeek !== 7 ? $dayOfWeek : 0, // Adjust for PostgreSQL day of week
+				'fromTime' => $adjustedFromTime->format('H:i:s'),
+				'toTime' => $adjustedToTime->format('H:i:s'),
+			];
+
+			$stmt = $connection->prepare($sql);
+			return $stmt->executeQuery($params)->fetchAllAssociative();
+		}
 	}
 
 //    /**
