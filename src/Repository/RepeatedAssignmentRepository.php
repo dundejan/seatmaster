@@ -116,7 +116,9 @@ class RepeatedAssignmentRepository extends ServiceEntityRepository
 				throw new LogicException('fromDate or toDate or Person or Seat null, but never should be');
 			}
 
+			/** @var DateTime $adjustedFromDate */
 			$adjustedFromDate = clone $fromDate;
+			/** @var DateTime $adjustedToDate */
 			$adjustedToDate = clone $toDate;
 			$adjustedFromDate->modify('+2 hours');
 			$adjustedToDate->modify('+2 hours');

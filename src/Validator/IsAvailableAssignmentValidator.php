@@ -4,7 +4,10 @@ namespace App\Validator;
 
 use App\Entity\Assignment;
 use App\Entity\RepeatedAssignment;
+use App\Repository\AssignmentRepository;
+use App\Repository\RepeatedAssignmentRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\Form\Exception\LogicException;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 use App\Helper\TimeHelper;
@@ -20,18 +23,17 @@ class IsAvailableAssignmentValidator extends ConstraintValidator
 
 	public function validate(mixed $value, Constraint $constraint): void
 	{
+		/** @var AssignmentRepository $assignmentRepository */
 		$assignmentRepository = $this->em->getRepository(Assignment::class);
+		/** @var RepeatedAssignmentRepository $repeatedAssignmentRepository */
 		$repeatedAssignmentRepository = $this->em->getRepository(RepeatedAssignment::class);
 
-		/** @phpstan-ignore-next-line */
 		$personConflictsWithAssignments = $assignmentRepository->findOverlappingAssignments($value, "person");
-		/** @phpstan-ignore-next-line */
 		$seatConflictsWithAssignments = $assignmentRepository->findOverlappingAssignments($value, "seat");
-		/** @phpstan-ignore-next-line */
 		$personConflictsWithRepeatedAssignments = $repeatedAssignmentRepository->findOverlappingRepeatedAssignments($value, "person");
-		/** @phpstan-ignore-next-line */
 		$seatConflictsWithRepeatedAssignments = $repeatedAssignmentRepository->findOverlappingRepeatedAssignments($value, "seat");
 
+		// Overlapping one-time assignments using same person
 		if (count($personConflictsWithAssignments) > 0) {
 			/** @phpstan-ignore-next-line */
 			$this->context->buildViolation($constraint->message)
@@ -46,6 +48,7 @@ class IsAvailableAssignmentValidator extends ConstraintValidator
 				->addViolation();
 		}
 
+		// Overlapping one-time assignments using same seat
 		if (count($seatConflictsWithAssignments) > 0) {
 			/** @phpstan-ignore-next-line */
 			$this->context->buildViolation($constraint->message)
@@ -60,9 +63,12 @@ class IsAvailableAssignmentValidator extends ConstraintValidator
 				->addViolation();
 		}
 
+		// Overlapping repeated assignments using same person
 		if (count($personConflictsWithRepeatedAssignments) > 0) {
-			/** @phpstan-ignore-next-line */
-			$dayString = date('l', strtotime("Sunday + {$personConflictsWithRepeatedAssignments[0]['dayOfWeek']} days"));
+			$dayString = date(
+				'l',
+				strtotime("Sunday + {$personConflictsWithRepeatedAssignments[0]['dayOfWeek']} days") ?:
+					throw new LogicException('strtotime() could not create dateTime'));
 
 			/** @phpstan-ignore-next-line */
 			$this->context->buildViolation($constraint->message)
@@ -78,9 +84,12 @@ class IsAvailableAssignmentValidator extends ConstraintValidator
 				->addViolation();
 		}
 
+		// Overlapping repeated assignments using same seat
 		if (count($seatConflictsWithRepeatedAssignments) > 0) {
-			/** @phpstan-ignore-next-line */
-			$dayString = date('l', strtotime("Sunday + {$seatConflictsWithRepeatedAssignments[0]['dayOfWeek']} days"));
+			$dayString = date(
+				'l',
+				strtotime("Sunday + {$seatConflictsWithRepeatedAssignments[0]['dayOfWeek']} days") ?:
+					throw new LogicException('strtotime() could not create dateTime'));
 
 			/** @phpstan-ignore-next-line */
 			$this->context->buildViolation($constraint->message)

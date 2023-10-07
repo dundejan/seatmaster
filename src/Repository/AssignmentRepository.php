@@ -106,7 +106,9 @@ class AssignmentRepository extends ServiceEntityRepository
 				throw new LogicException('fromTime or toTime or Person or Seat null, but never should be');
 			}
 
+			/** @var DateTime $adjustedFromTime */
 			$adjustedFromTime = clone $fromTime;
+			/** @var DateTime $adjustedToTime */
 			$adjustedToTime = clone $toTime;
 			$adjustedFromTime->modify('-2 hours');
 			$adjustedToTime->modify('-2 hours');
