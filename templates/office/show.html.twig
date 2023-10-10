@@ -1,6 +1,9 @@
 {% extends 'base.html.twig' %}
 
-{% block sidebar %}
+{% block title %} {{ current_office.name }} {% endblock %}
+
+{% block body %}
+<div class="col-md-2">
     <div class="bg-light border-right" id="sidebar-wrapper">
         <!-- Title for the sidebar -->
         <div class="sidebar-heading p-3 border-bottom">Offices</div>
@@ -10,11 +13,9 @@
             {% endfor %}
         </div>
     </div>
-{% endblock %}
+</div>
 
-{% block title %} {{ current_office.name }} {% endblock %}
-
-{% block body %}
+<div class="col-md-10">
 
     {# start office map from react #}
     <div class="row">
@@ -52,6 +53,7 @@
 {#        seats: seats|map(item => attribute(item, 'id')),#}
 {#    }) }}></div>#}
 
+</div>
 {% endblock %}
 
 {% block javascripts %}
