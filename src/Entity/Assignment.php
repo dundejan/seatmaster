@@ -22,25 +22,25 @@ use Symfony\Component\Validator\Context\ExecutionContextInterface;
 #[ORM\Entity(repositoryClass: AssignmentRepository::class)]
 #[ApiResource(
 	operations: [
-                           		new Get(),
-                           		new GetCollection(),
-                           		new Post(),
-                           		new Put(),
-                           		new Patch(),
-                           		new Delete(),
-                           	],
+		new Get(),
+		new GetCollection(),
+		new Post(security: 'is_granted("ROLE_ADMIN")'),
+		new Put(security: 'is_granted("ROLE_ADMIN")'),
+		new Patch(security: 'is_granted("ROLE_ADMIN")'),
+		new Delete(security: 'is_granted("ROLE_ADMIN")'),
+	],
 	formats: [
-                           		'jsonld',
-                           		'json',
-                           		'html',
-                           		'csv' => 'text/csv',
-                           	],
+		'jsonld',
+		'json',
+		'html',
+		'csv' => 'text/csv',
+	],
 	normalizationContext: [
-                           		'groups' => ['assignment:read'],
-                           	],
+		'groups' => ['assignment:read'],
+	],
 	denormalizationContext: [
-                           		'groups' => ['assignment:write'],
-                           	],
+		'groups' => ['assignment:write'],
+	],
 	paginationItemsPerPage: 10,
 )]
 #[ApiFilter(SearchFilter::class, properties: [

@@ -19,11 +19,23 @@
 
     {# start office map from react #}
     <div class="row">
-        <div id="office-map" data-office-id="{{ current_office.id }}"></div>
+        <div id="office-map"
+             data-office-id="{{ current_office.id }}"
+             data-tokens="{{ app.user ? app.user.validTokenStrings|json_encode : null }}"
+        ></div>
     </div>
     {# end office map from react #}
 
     <h2>Hello {{ current_office.name }} from twig! ✅</h2>
+    {% if app.user %}
+        <b>Tokens printed in twig: </b>
+        {% for token in app.user.validTokenStrings %}
+            {{ token }},
+        {% endfor %}
+    {% else %}
+        <b>No logged user, so I can not show tokens.</b>
+    {% endif %}
+    <br>
 
     {% set seatArr = seats|map(item => attribute(item, 'id')) %}
 

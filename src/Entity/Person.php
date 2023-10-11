@@ -21,10 +21,10 @@ use Symfony\Component\Validator\Constraints as Assert;
 	operations: [
 		new Get(),
 		new GetCollection(),
-		new Post(),
-		new Put(),
-		new Patch(),
-		new Delete(),
+		new Post(security: 'is_granted("ROLE_ADMIN")'),
+		new Put(security: 'is_granted("ROLE_ADMIN")'),
+		new Patch(security: 'is_granted("ROLE_ADMIN")'),
+		new Delete(security: 'is_granted("ROLE_ADMIN")'),
 	],
 	formats: [
 		'jsonld',

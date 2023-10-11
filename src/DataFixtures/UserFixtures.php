@@ -3,6 +3,7 @@
 namespace App\DataFixtures;
 
 use App\Entity\User;
+use App\Factory\ApiTokenFactory;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
@@ -30,5 +31,9 @@ class UserFixtures extends Fixture
 	    $manager->persist($user2);
 
         $manager->flush();
+
+	    ApiTokenFactory::createOne([
+		    'ownedBy' => $user1,
+	    ]);
     }
 }

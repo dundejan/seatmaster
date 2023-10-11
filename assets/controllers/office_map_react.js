@@ -4,6 +4,7 @@ import OfficeMapApp from './OfficeMap/OfficeMapApp';
 
 const targetElement = document.getElementById('office-map');
 const officeId = targetElement.getAttribute('data-office-id');
+const tokens = targetElement.getAttribute('data-tokens');
 
 const root = createRoot(targetElement);
 

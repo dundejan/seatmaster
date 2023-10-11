@@ -20,25 +20,25 @@ use Symfony\Component\Serializer\Annotation\Groups;
 #[ORM\Entity(repositoryClass: SeatRepository::class)]
 #[ApiResource(
 	operations: [
-                                 		new Get(),
-                                 		new GetCollection(),
-                                 		new Post(),
-                                 		new Put(),
-                                 		new Patch(),
-                                 		new Delete(),
-                                 	],
+		new Get(),
+		new GetCollection(),
+		new Post(security: 'is_granted("ROLE_ADMIN")'),
+		new Put(security: 'is_granted("ROLE_ADMIN")'),
+		new Patch(security: 'is_granted("ROLE_ADMIN")'),
+		new Delete(security: 'is_granted("ROLE_ADMIN")'),
+	],
 	formats: [
-                                 		'jsonld',
-                                 		'json',
-                                 		'html',
-                                 		'csv' => 'text/csv',
-                                 	],
+		'jsonld',
+		'json',
+		'html',
+		'csv' => 'text/csv',
+	],
 	normalizationContext: [
-                                 		'groups' => ['seat:read'],
-                                 	],
+		'groups' => ['seat:read'],
+	],
 	denormalizationContext: [
-                                 		'groups' => ['seat:write'],
-                                 	],
+		'groups' => ['seat:write'],
+	],
 	paginationItemsPerPage: 10,
 )]
 #[ApiFilter(SearchFilter::class, properties: [

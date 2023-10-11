@@ -20,25 +20,25 @@ use Symfony\Component\Validator\Context\ExecutionContextInterface;
 #[ORM\Entity(repositoryClass: RepeatedAssignmentRepository::class)]
 #[ApiResource(
 	operations: [
-         		new Get(),
-         		new GetCollection(),
-         		new Post(),
-         		new Put(),
-         		new Patch(),
-         		new Delete(),
+		new Get(),
+		new GetCollection(),
+		new Post(security: 'is_granted("ROLE_ADMIN")'),
+		new Put(security: 'is_granted("ROLE_ADMIN")'),
+		new Patch(security: 'is_granted("ROLE_ADMIN")'),
+		new Delete(security: 'is_granted("ROLE_ADMIN")'),
          	],
 	formats: [
-         		'jsonld',
-         		'json',
-         		'html',
-         		'csv' => 'text/csv',
-         	],
+		'jsonld',
+		'json',
+		'html',
+		'csv' => 'text/csv',
+	],
 	normalizationContext: [
-         		'groups' => ['repeatedAssignment:read'],
-         	],
+		'groups' => ['repeatedAssignment:read'],
+	],
 	denormalizationContext: [
-         		'groups' => ['repeatedAssignment:write'],
-         	],
+		'groups' => ['repeatedAssignment:write'],
+	],
 	paginationItemsPerPage: 10,
 )]
 #[IsAvailableAssignment]
