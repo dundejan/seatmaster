@@ -24,11 +24,9 @@ class ApiTokenCrudController extends AbstractCrudController
 
     public function configureFields(string $pageName): iterable
     {
-		$scopes = ['ROLE_SUPER_ADMIN', 'ROLE_ADMIN'];
-
         return [
 	        FormField::addPanel('Warning! Creating or editing API tokens manually is not recommended.')
-		        ->setHelp('Make sure you know what you are doing ;-)')
+		        ->setHelp('If you plan to do that, make sure you know what you are doing ;-)')
 		        ->setFormTypeOption('disabled', true), // Disables the input field
             IdField::new('id')
 	            ->hideOnForm(),
@@ -37,11 +35,6 @@ class ApiTokenCrudController extends AbstractCrudController
 		        ->setDisabled(),
             AssociationField::new('ownedBy'),
             DateTimeField::new('expiresAt'),
-	        ChoiceField::new('scopes')
-		        ->setChoices(array_combine($scopes, $scopes))
-		        ->allowMultipleChoices()
-		        ->renderExpanded()
-		        ->renderAsBadges(),
         ];
     }
 

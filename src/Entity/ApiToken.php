@@ -14,13 +14,6 @@ class ApiToken
 	 * @var string Just my prefix smp_ as Seat Master Personal
 	 */
 	private const PERSONAL_ACCESS_TOKEN_PREFIX = 'smp_';
-	public const SCOPE_ADMIN = 'ROLE_ADMIN';
-	public const SCOPE_SUPER_ADMIN = 'ROLE_SUPER_ADMIN';
-
-	public const SCOPES = [
-		self::SCOPE_ADMIN => 'Admin access - edit all excluding users',
-		self::SCOPE_SUPER_ADMIN => 'Super-admin access - edit all',
-	];
 
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -36,12 +29,6 @@ class ApiToken
 
     #[ORM\Column(length: 68)]
     private string $token;
-
-	/**
-	 * @var array<string>
-	 */
-    #[ORM\Column]
-    private array $scopes = [];
 
 	/**
 	 * @throws Exception Logic PHP error, never should happen
@@ -88,24 +75,6 @@ class ApiToken
     public function setToken(string $token): static
     {
         $this->token = $token;
-
-        return $this;
-    }
-
-	/**
-	 * @return array<string>
-	 */
-    public function getScopes(): array
-    {
-        return $this->scopes;
-    }
-
-	/**
-	 * @param array<string> $scopes
-	 */
-    public function setScopes(array $scopes): static
-    {
-        $this->scopes = $scopes;
 
         return $this;
     }

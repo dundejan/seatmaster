@@ -77,15 +77,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(mappedBy: 'ownedBy', targetEntity: ApiToken::class)]
     private Collection $apiTokens;
 
-	/**
-	 * Scopes given during API authentication
-	 * @var array<string>|null
-	 */
-	private ?array $accessTokenScopes = null;
-
-    public function __construct()
+	public function __construct()
     {
         $this->apiTokens = new ArrayCollection();
+
+		$apiToken = new ApiToken();
+		$this->addApiToken($apiToken);
     }
 
 	public function __toString()
@@ -125,14 +122,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     public function getRoles(): array
     {
-	    if (null === $this->accessTokenScopes) {
-		    // logged in via the full user mechanism
-		    $roles = $this->roles;
-		    //$roles[] = 'ROLE_FULL_USER';
-	    } else {
-		    $roles = $this->roles;
-		    //$roles = $this->accessTokenScopes;
-	    }
+	    $roles = $this->roles;
 
 	    // guarantee every user at least has ROLE_USER
 	    $roles[] = 'ROLE_USER';
@@ -219,14 +209,5 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 			->map(fn (ApiToken $token) => $token->getToken())
 			->toArray()
 			;
-	}
-
-	/**
-	 * @param array<string> $scopes
-	 * @return void
-	 */
-	public function markAsTokenAuthenticated(array $scopes): void
-	{
-		$this->accessTokenScopes = $scopes;
 	}
 }

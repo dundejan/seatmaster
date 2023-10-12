@@ -20,20 +20,23 @@ class UserFixtures extends Fixture
 	    $hashedPassword = $this->passwordHasher->hashPassword($user1, 'admin');
 		$user1->setEmail('admin@example.com')
 			->setPassword($hashedPassword)
-			->setRoles(['ROLE_ADMIN']);
+			->setRoles(['ROLE_SUPER_ADMIN']);
 
 	    $user2 = new User();
 	    $hashedPassword = $this->passwordHasher->hashPassword($user1, 'user');
 	    $user2->setEmail('user@example.com')
 		    ->setPassword($hashedPassword);
 
+		foreach ($user1->getApiTokens() as $apiToken) {
+			$manager->persist($apiToken);
+		}
         $manager->persist($user1);
+
+	    foreach ($user2->getApiTokens() as $apiToken) {
+		    $manager->persist($apiToken);
+	    }
 	    $manager->persist($user2);
 
         $manager->flush();
-
-	    ApiTokenFactory::createOne([
-		    'ownedBy' => $user1,
-	    ]);
     }
 }
