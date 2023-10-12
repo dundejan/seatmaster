@@ -3,21 +3,23 @@
 namespace App\Entity;
 
 use App\Repository\ApiTokenRepository;
+use DateTimeImmutable;
 use Doctrine\ORM\Mapping as ORM;
+use Exception;
 
 #[ORM\Entity(repositoryClass: ApiTokenRepository::class)]
 class ApiToken
 {
-	private const PERSONAL_ACCESS_TOKEN_PREFIX = 'tcp_';
-
-	public const SCOPE_USER_EDIT = 'ROLE_USER_EDIT';
-	public const SCOPE_TREASURE_CREATE = 'ROLE_TREASURE_CREATE';
-	public const SCOPE_TREASURE_EDIT = 'ROLE_TREASURE_EDIT';
+	/**
+	 * @var string Just my prefix smp_ as Seat Master Personal
+	 */
+	private const PERSONAL_ACCESS_TOKEN_PREFIX = 'smp_';
+	public const SCOPE_ADMIN = 'ROLE_ADMIN';
+	public const SCOPE_SUPER_ADMIN = 'ROLE_SUPER_ADMIN';
 
 	public const SCOPES = [
-		self::SCOPE_USER_EDIT => 'Edit User',
-		self::SCOPE_TREASURE_CREATE => 'Create Treasures',
-		self::SCOPE_TREASURE_EDIT => 'Edit Treasures',
+		self::SCOPE_ADMIN => 'Admin access - edit all excluding users',
+		self::SCOPE_SUPER_ADMIN => 'Super-admin access - edit all',
 	];
 
     #[ORM\Id]
@@ -30,14 +32,20 @@ class ApiToken
     private ?User $ownedBy = null;
 
     #[ORM\Column(nullable: true)]
-    private ?\DateTimeImmutable $expiresAt = null;
+    private ?DateTimeImmutable $expiresAt = null;
 
     #[ORM\Column(length: 68)]
     private string $token;
 
+	/**
+	 * @var array<string>
+	 */
     #[ORM\Column]
     private array $scopes = [];
 
+	/**
+	 * @throws Exception Logic PHP error, never should happen
+	 */
 	public function __construct(string $tokenType = self::PERSONAL_ACCESS_TOKEN_PREFIX)
 	{
 		$this->token = $tokenType.bin2hex(random_bytes(32));
@@ -60,12 +68,12 @@ class ApiToken
         return $this;
     }
 
-    public function getExpiresAt(): ?\DateTimeImmutable
+    public function getExpiresAt(): ?DateTimeImmutable
     {
         return $this->expiresAt;
     }
 
-    public function setExpiresAt(?\DateTimeImmutable $expiresAt): static
+    public function setExpiresAt(?DateTimeImmutable $expiresAt): static
     {
         $this->expiresAt = $expiresAt;
 
@@ -84,11 +92,17 @@ class ApiToken
         return $this;
     }
 
+	/**
+	 * @return array<string>
+	 */
     public function getScopes(): array
     {
         return $this->scopes;
     }
 
+	/**
+	 * @param array<string> $scopes
+	 */
     public function setScopes(array $scopes): static
     {
         $this->scopes = $scopes;
@@ -98,6 +112,6 @@ class ApiToken
 
 	public function isValid(): bool
 	{
-		return $this->expiresAt === null || $this->expiresAt > new \DateTimeImmutable();
+		return $this->expiresAt === null || $this->expiresAt > new DateTimeImmutable();
 	}
 }

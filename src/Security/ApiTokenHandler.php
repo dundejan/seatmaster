@@ -5,6 +5,7 @@ namespace App\Security;
 use App\Repository\ApiTokenRepository;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Component\Security\Core\Exception\CustomUserMessageAuthenticationException;
+use Symfony\Component\Security\Core\Exception\LogicException;
 use Symfony\Component\Security\Http\AccessToken\AccessTokenHandlerInterface;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
 
@@ -23,8 +24,12 @@ class ApiTokenHandler implements AccessTokenHandlerInterface
 			throw new BadCredentialsException();
 		}
 
+		if (!$token->getOwnedBy()) {
+			throw new LogicException('Token is owned by no-one.');
+		}
+
 		if (!$token->isValid()) {
-			throw new CustomUserMessageAuthenticationException('Token expired');
+			throw new CustomUserMessageAuthenticationException('Token expired.');
 		}
 
 		$token->getOwnedBy()->markAsTokenAuthenticated($token->getScopes());

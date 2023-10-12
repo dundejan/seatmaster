@@ -71,16 +71,27 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[Groups(['user:write'])]
     private ?string $password = null;
 
+	/**
+	 * @var Collection<int,ApiToken>
+	 */
     #[ORM\OneToMany(mappedBy: 'ownedBy', targetEntity: ApiToken::class)]
     private Collection $apiTokens;
 
-	/* Scopes given during API authentication */
+	/**
+	 * Scopes given during API authentication
+	 * @var array<string>|null
+	 */
 	private ?array $accessTokenScopes = null;
 
     public function __construct()
     {
         $this->apiTokens = new ArrayCollection();
     }
+
+	public function __toString()
+	{
+		return $this->email ?: '';
+	}
 
     public function getId(): ?int
     {
@@ -117,9 +128,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 	    if (null === $this->accessTokenScopes) {
 		    // logged in via the full user mechanism
 		    $roles = $this->roles;
-		    $roles[] = 'ROLE_FULL_USER';
+		    //$roles[] = 'ROLE_FULL_USER';
 	    } else {
-		    $roles = $this->accessTokenScopes;
+		    $roles = $this->roles;
+		    //$roles = $this->accessTokenScopes;
 	    }
 
 	    // guarantee every user at least has ROLE_USER
@@ -129,9 +141,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     }
 
 	public function hasRole(string $role) : bool
-                        	{
-                        		return in_array($role, $this->getRoles());
-                        	}
+	{
+		return in_array($role, $this->getRoles());
+	}
 
 	/**
 	 * @param array<string> $roles
@@ -198,7 +210,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     }
 
 	/**
-	 * @return string[]
+	 * @return array<int, string|null>
 	 */
 	public function getValidTokenStrings(): array
 	{
@@ -209,7 +221,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 			;
 	}
 
-	public function markAsTokenAuthenticated(array $scopes)
+	/**
+	 * @param array<string> $scopes
+	 * @return void
+	 */
+	public function markAsTokenAuthenticated(array $scopes): void
 	{
 		$this->accessTokenScopes = $scopes;
 	}

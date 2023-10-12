@@ -2,6 +2,7 @@
 
 namespace App\Controller\Admin;
 
+use App\Entity\ApiToken;
 use App\Entity\Assignment;
 use App\Entity\Office;
 use App\Entity\Person;
@@ -92,7 +93,10 @@ class DashboardController extends AbstractDashboardController
 
 			MenuItem::linkToCrud('Users', 'fa fa-user', User::class),
 
-			MenuItem::section('Navigation')->setCssClass('navigation'),
+			MenuItem::section('Api'),
+			MenuItem::linkToCrud('API tokens', 'fa fa-key', ApiToken::class),
+
+			MenuItem::section('Navigation'),
 			MenuItem::linkToUrl('Back to app', 'fa fa-arrow-left', $this->generateUrl('app_homepage')),
 		];
 	}
