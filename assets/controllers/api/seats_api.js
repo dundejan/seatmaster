@@ -32,6 +32,7 @@ export function updateSeatCoords(seatId, coordX, coordY) {
 				// Handle errors, if the response is not in the 200-299 range
 				throw new Error('Network response was not ok');
 			}
-			return response.json();
+
+			return response;
 		});
 }

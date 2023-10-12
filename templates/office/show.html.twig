@@ -21,7 +21,7 @@
     <div class="row">
         <div id="office-map"
              data-office-id="{{ current_office.id }}"
-             data-tokens="{{ app.user ? app.user.validTokenStrings|json_encode : null }}"
+             data-tokens="{{ app.user ? app.user.validTokenStrings|json_encode : '' }}"
         ></div>
     </div>
     {# end office map from react #}
