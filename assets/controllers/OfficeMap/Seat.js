@@ -1,6 +1,7 @@
 import React from 'react';
 import { useDrag } from 'react-dnd';
 import PropTypes from "prop-types";
+import { Tooltip as ReactTooltip } from "react-tooltip";
 
 function ChairIconSVG({ fill, size = "800px" }) {
 	return (
@@ -23,39 +24,53 @@ export default function Seat({ id, left, top, currentAssignments }) {
 		item: { id }
 	});
 
+	let title, color;
+
 	if (typeof currentAssignments !== "undefined" && currentAssignments.length === 1) {
-		let from, to, title;
+		let from, to;
+		color = '#ff0000';
 
 		// One time assignment
 		if (typeof currentAssignments[0].dayOfWeek === 'undefined') {
 			from = new Date(currentAssignments[0].fromDate);
 			to = new Date(currentAssignments[0].toDate);
-			title = `This chair is currently occupied.\nPERSON: TODO\nFROM: ${from}\nTO: ${to}`;
+			title = (
+				<div>
+					This chair is currently occupied.<br />
+					PERSON: TODO<br />
+					FROM: {from.getUTCHours()}:{from.getUTCMinutes().toString().padStart(2, '0')}<br />
+					TO: {to.getUTCHours()}:{to.getUTCMinutes().toString().padStart(2, '0')}
+				</div>
+			);
 		}
 		// Repeated assignment
 		else {
 			from = new Date(currentAssignments[0].fromTime);
 			to = new Date(currentAssignments[0].toTime);
-			title = `This chair is currently occupied.\nPERSON: TODO\nFROM: ${from.getUTCHours()}:${from.getUTCMinutes()}\nTO: ${to.getUTCHours()}:${to.getUTCMinutes()}`;
+			title = (
+				<div>
+					This chair is currently occupied.<br />
+					PERSON: TODO<br />
+					FROM: {from.getUTCHours()}:{from.getUTCMinutes().toString().padStart(2, '0')}<br />
+					TO: {to.getUTCHours()}:{to.getUTCMinutes().toString().padStart(2, '0')}
+				</div>
+			);
 		}
-
-		return (
-			<div title={title} ref={ref} style={{ left, top, position: 'absolute' }}>
-				<ChairIcon color={"#FF0000"} size="50px" />
-				<p>{`Seat ${id}`}</p>
-			</div>
-		);
 	}
 	else {
-		const title = `This chair is currently free.`;
-
-		return (
-			<div title={title} ref={ref} style={{left, top, position: 'absolute'}}>
-				<ChairIcon color={"#00ff00"} size="50px"/>
-				<p>{`Seat ${id}`}</p>
-			</div>
-		);
+		color = '#00ff00';
+		title = `This chair is currently free.`;
 	}
+
+	return (
+		<div data-tooltip-id={id} ref={ref} style={{ left, top, position: 'absolute' }}>
+			<ChairIcon color={color} size="50px" />
+			<p>{`Seat ${id}`}</p>
+			<ReactTooltip id={id} place="top">
+				{title}
+			</ReactTooltip>
+		</div>
+	);
 }
 
 Seat.propTypes = {

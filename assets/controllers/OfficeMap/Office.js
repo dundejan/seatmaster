@@ -4,6 +4,8 @@ import PropTypes from "prop-types";
 import axios from "axios";
 import {updateOfficeSize} from "../api/seats_api";
 import PopupWarning from "../Warnings/PopupWarning";
+import {Box, Button, Card, CardContent, CardHeader, TextField, Typography} from "@mui/material";
+import {withStyles} from "@mui/styles";
 
 function roundToNearest50(n) {
 	return Math.round(n / 50) * 50;
@@ -13,7 +15,7 @@ export default function Office({ onDropChair, officeId, children }) {
 	const officeRef = useRef(null);
 	const [size, setSize] = useState(0);
 	const [width, setWidth] = useState(0);
-	const [stagedSize, setStagedSize] = useState(0);
+	const [stagedHeight, setStagedHeight] = useState(0);
 	const [stagedWidth, setStagedWidth] = useState(0);
 	const [isSaving, setIsSaving] = useState(false);
 	const [saveError, setSaveError] = useState(null);
@@ -32,7 +34,7 @@ export default function Office({ onDropChair, officeId, children }) {
 	}, [officeId]);
 
 	useEffect(() => {
-		setStagedSize(size);
+		setStagedHeight(size);
 		setStagedWidth(width);
 	}, [size, width]);
 
@@ -46,7 +48,7 @@ export default function Office({ onDropChair, officeId, children }) {
 		}
 	};
 
-	const handleSizeChange = (e) => setStagedSize(parseInt(e.target.value, 10));
+	const handleHeightChange = (e) => setStagedHeight(parseInt(e.target.value, 10));
 	const handleWidthChange = (e) => setStagedWidth(parseInt(e.target.value, 10));
 
 	const updateSizeInBackend = async () => {
@@ -54,13 +56,13 @@ export default function Office({ onDropChair, officeId, children }) {
 		setSaveError(null);
 
 		try {
-			const response = await updateOfficeSize(officeId, stagedSize, stagedWidth);
+			const response = await updateOfficeSize(officeId, stagedHeight, stagedWidth);
 			if (response.redirected === true) {
 				handleShowPopup();
 				console.log("Seat coordinates were not updated. Access denied.");
 			}
 			else {
-				setSize(stagedSize);
+				setSize(stagedHeight);
 				setWidth(stagedWidth);
 			}
 		} catch (error) {
@@ -96,19 +98,44 @@ export default function Office({ onDropChair, officeId, children }) {
 
 	return (
 		<div>
-			<div style={{ marginBottom: '10px' }}>
-				<label>
-					Size:
-					<input type="number" value={stagedSize} onChange={handleSizeChange} style={{ width: '60px', marginLeft: '5px' }} disabled={isSaving} />
-				</label>
-				<label style={{ marginLeft: '10px' }}>
-					Width:
-					<input type="number" value={stagedWidth} onChange={handleWidthChange} style={{ width: '60px', marginLeft: '5px' }} disabled={isSaving} />
-				</label>
-				<button onClick={updateSizeInBackend} disabled={isSaving} style={{ marginLeft: '10px' }}>Change</button>
-			</div>
+			<Card sx={{ maxWidth: 350, display: 'flex', flexDirection: 'column', alignItems: 'center', marginTop: '10px'}}>
+				<CardContent sx={{ textAlign: 'center' }}>
+					<Box sx={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+						<TextField
+							label="Height"
+							type="number"
+							value={stagedHeight}
+							onChange={handleHeightChange}
+							variant="outlined"
+							size="small"
+							style={{ width: '100px' }}
+							disabled={isSaving}
+						/>
+						<TextField
+							label="Width"
+							type="number"
+							value={stagedWidth}
+							onChange={handleWidthChange}
+							variant="outlined"
+							size="small"
+							style={{ width: '100px' }}
+							disabled={isSaving}
+						/>
+						<Button
+							variant="contained"
+							color="primary"
+							onClick={updateSizeInBackend}
+							disabled={isSaving}
+						>
+							Change
+						</Button>
+					</Box>
+				</CardContent>
+			</Card>
 			{saveError && <p style={{ color: 'red' }}>{saveError}</p>}
-			Office
+			<Typography variant="caption" color="textSecondary">
+				OFFICE:
+			</Typography>
 			<div ref={officeRef} style={dropAreaStyle}>{children}</div>
 			<div>
 				{showPopup && (

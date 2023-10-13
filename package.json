@@ -37,9 +37,17 @@
         "build": "encore production --progress"
     },
     "dependencies": {
+        "@emotion/react": "^11.11.1",
+        "@emotion/styled": "^11.11.0",
+        "@fontsource/roboto": "^5.0.8",
+        "@mui/material": "^5.14.13",
+        "@mui/styles": "^5.14.13",
         "@svgr/webpack": "^8.1.0",
         "axios": "^1.5.0",
         "react-dnd": "^16.0.1",
-        "react-dnd-html5-backend": "^16.0.1"
+        "react-dnd-html5-backend": "^16.0.1",
+        "react-icons": "^4.11.0",
+        "react-tooltip": "^5.21.5",
+        "styled-components": "^6.0.9"
     }
 }
