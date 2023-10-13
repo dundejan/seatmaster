@@ -10,6 +10,8 @@ use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use App\Repository\UserRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
@@ -23,10 +25,10 @@ use Symfony\Component\Validator\Constraints as Assert;
 	operations: [
 		new Get(),
 		new GetCollection(),
-		new Post(),
-		new Put(),
-		new Patch(),
-		new Delete(),
+		new Post(security: 'is_granted("ROLE_ADMIN")'),
+		new Put(security: 'is_granted("ROLE_ADMIN")'),
+		new Patch(security: 'is_granted("ROLE_ADMIN")'),
+		new Delete(security: 'is_granted("ROLE_ADMIN")'),
 	],
 	formats: [
 		'jsonld',
@@ -69,6 +71,22 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[Groups(['user:write'])]
     private ?string $password = null;
 
+	/**
+	 * @var Collection<int,ApiToken>
+	 */
+    #[ORM\OneToMany(mappedBy: 'ownedBy', targetEntity: ApiToken::class)]
+    private Collection $apiTokens;
+
+	public function __construct()
+    {
+        $this->apiTokens = new ArrayCollection();
+    }
+
+	public function __toString()
+	{
+		return $this->email ?: '';
+	}
+
     public function getId(): ?int
     {
         return $this->id;
@@ -101,12 +119,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     public function getRoles(): array
     {
-        $roles = $this->roles;
-        // guarantee every user at least has ROLE_USER
-        $roles[] = 'ROLE_USER';
+	    $roles = $this->roles;
 
-        return array_unique($roles);
+	    // guarantee every user at least has ROLE_USER
+	    $roles[] = 'ROLE_USER';
+
+	    return array_unique($roles);
     }
+
+	public function hasRole(string $role) : bool
+	{
+		return in_array($role, $this->getRoles());
+	}
 
 	/**
 	 * @param array<string> $roles
@@ -141,4 +165,46 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         // If you store any temporary, sensitive data on the user, clear it here
         // $this->plainPassword = null;
     }
+
+    /**
+     * @return Collection<int, ApiToken>
+     */
+    public function getApiTokens(): Collection
+    {
+        return $this->apiTokens;
+    }
+
+    public function addApiToken(ApiToken $apiToken): static
+    {
+        if (!$this->apiTokens->contains($apiToken)) {
+            $this->apiTokens->add($apiToken);
+            $apiToken->setOwnedBy($this);
+        }
+
+        return $this;
+    }
+
+    public function removeApiToken(ApiToken $apiToken): static
+    {
+        if ($this->apiTokens->removeElement($apiToken)) {
+            // set the owning side to null (unless already changed)
+            if ($apiToken->getOwnedBy() === $this) {
+                $apiToken->setOwnedBy(null);
+            }
+        }
+
+        return $this;
+    }
+
+	/**
+	 * @return array<int, string|null>
+	 */
+	public function getValidTokenStrings(): array
+	{
+		return $this->getApiTokens()
+			->filter(fn (ApiToken $token) => $token->isValid())
+			->map(fn (ApiToken $token) => $token->getToken())
+			->toArray()
+			;
+	}
 }

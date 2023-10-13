@@ -5,6 +5,7 @@ import Seat from "./Seat";
 import {DndProvider} from "react-dnd";
 import {HTML5Backend} from "react-dnd-html5-backend";
 import {getSeats, updateSeatCoords} from "../api/seats_api";
+import PopupWarning from "../Warnings/PopupWarning";
 
 function getCurrentAssignments(seatId) {
 	return fetch(`/ongoing_assignments/seat/${seatId}`, {
@@ -33,9 +34,12 @@ export default class OfficeMapApp extends Component {
 
 		this.state = {
 			chairs: [],
-		}
+			showPopup: false, // Initialize popup state
+			popupMessage: "", // Message for the popup
+		};
 
 		this.handleDropChair = this.handleDropChair.bind(this);
+		this.closePopup = this.closePopup.bind(this); // Function to close the popup
 	}
 
 	componentDidMount() {
@@ -62,7 +66,18 @@ export default class OfficeMapApp extends Component {
 			});
 	}
 
-	handleDropChair(id, coords) {
+	async handleDropChair(id, coords) {
+		const response = await updateSeatCoords(id, coords.x, coords.y);
+
+		if (response.redirected === true) {
+			this.setState({
+				showPopup: true,
+				popupMessage: "Seat coordinates were not updated. Access denied. You need to have admin rights. ",
+			});
+			console.log("Seat coordinates were not updated. Access denied.");
+			return;
+		}
+
 		this.setState(prevState => {
 			const updatedChairs = prevState.chairs.map(chair => {
 				if (chair.id === id) {
@@ -75,15 +90,18 @@ export default class OfficeMapApp extends Component {
 				return chair;
 			});
 
-			return { chairs: updatedChairs };
+			return {chairs: updatedChairs};
 		});
 
 		console.log(coords.x, coords.y);
+	}
 
-		updateSeatCoords(id, coords.x, coords.y)
-			.then((data) => {
-			console.log("Seat coordinates updated");
-			});
+	// Function to close the popup
+	closePopup() {
+		this.setState({
+			showPopup: false,
+			popupMessage: "", // Reset popup message
+		});
 	}
 
 	render() {
@@ -99,6 +117,13 @@ export default class OfficeMapApp extends Component {
 						<Seat key={chair.id} id={chair.id} left={chair.coordX} top={chair.coordY} currentAssignments={chair.currentAssignments} />
 					))}
 				</Office>
+				{this.state.showPopup && (
+					// Render the PopupWarning component when showPopup is true
+					<PopupWarning
+						message={this.state.popupMessage}
+						onClose={this.closePopup}
+					/>
+				)}
 			</DndProvider>
 		);
 	}

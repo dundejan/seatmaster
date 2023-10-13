@@ -1,6 +1,9 @@
 {% extends 'base.html.twig' %}
 
-{% block sidebar %}
+{% block title %} {{ current_office.name }} {% endblock %}
+
+{% block body %}
+<div class="col-md-2">
     <div class="bg-light border-right" id="sidebar-wrapper">
         <!-- Title for the sidebar -->
         <div class="sidebar-heading p-3 border-bottom">Offices</div>
@@ -10,19 +13,29 @@
             {% endfor %}
         </div>
     </div>
-{% endblock %}
+</div>
 
-{% block title %} {{ current_office.name }} {% endblock %}
-
-{% block body %}
+<div class="col-md-10">
 
     {# start office map from react #}
     <div class="row">
-        <div id="office-map" data-office-id="{{ current_office.id }}"></div>
+        <div id="office-map"
+             data-office-id="{{ current_office.id }}"
+             data-tokens="{{ app.user ? app.user.validTokenStrings|json_encode : '' }}"
+        ></div>
     </div>
     {# end office map from react #}
 
     <h2>Hello {{ current_office.name }} from twig! ✅</h2>
+    {% if app.user %}
+        <b>Tokens printed in twig: </b>
+        {% for token in app.user.validTokenStrings %}
+            {{ token }},
+        {% endfor %}
+    {% else %}
+        <b>No logged user, so I can not show tokens.</b>
+    {% endif %}
+    <br>
 
     {% set seatArr = seats|map(item => attribute(item, 'id')) %}
 
@@ -52,6 +65,7 @@
 {#        seats: seats|map(item => attribute(item, 'id')),#}
 {#    }) }}></div>#}
 
+</div>
 {% endblock %}
 
 {% block javascripts %}

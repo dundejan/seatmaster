@@ -2,11 +2,13 @@
 
 namespace App\Controller\Admin;
 
+use App\Entity\ApiToken;
 use App\Entity\Assignment;
 use App\Entity\Office;
 use App\Entity\Person;
 use App\Entity\RepeatedAssignment;
 use App\Entity\Seat;
+use App\Entity\User;
 use App\Repository\AssignmentRepository;
 use App\Repository\OfficeRepository;
 use App\Repository\PersonRepository;
@@ -89,7 +91,12 @@ class DashboardController extends AbstractDashboardController
 			MenuItem::linkToCrud('Repeated assignments', 'fa fa-calendar-day', RepeatedAssignment::class)
 				->setDefaultSort(['id' => 'DESC']),
 
-			MenuItem::section('Navigation')->setCssClass('navigation'),
+			MenuItem::linkToCrud('Users', 'fa fa-user', User::class),
+
+			MenuItem::section('Api'),
+			MenuItem::linkToCrud('API tokens', 'fa fa-key', ApiToken::class),
+
+			MenuItem::section('Navigation'),
 			MenuItem::linkToUrl('Back to app', 'fa fa-arrow-left', $this->generateUrl('app_homepage')),
 		];
 	}
