@@ -26,44 +26,38 @@
     </div>
     {# end office map from react #}
 
-    <h2>Hello {{ current_office.name }} from twig! ✅</h2>
-    {% if app.user %}
-        <b>Tokens printed in twig: </b>
-        {% for token in app.user.validTokenStrings %}
-            {{ token }},
-        {% endfor %}
-    {% else %}
-        <b>No logged user, so I can not show tokens.</b>
-    {% endif %}
-    <br>
+{#    <h2>Hello {{ current_office.name }} from twig! ✅</h2>#}
+{#    {% if app.user %}#}
+{#        <b>Tokens printed in twig: </b>#}
+{#        {% for token in app.user.validTokenStrings %}#}
+{#            {{ token }},#}
+{#        {% endfor %}#}
+{#    {% else %}#}
+{#        <b>No logged user, so I can not show tokens.</b>#}
+{#    {% endif %}#}
+{#    <br>#}
 
-    {% set seatArr = seats|map(item => attribute(item, 'id')) %}
+{#    {% set seatArr = seats|map(item => attribute(item, 'id')) %}#}
 
-    <b>seats id's in twig: </b>
-    {% for id in seatArr %}
-        {{ id }},
-    {% endfor %}
+{#    <b>seats id's in twig: </b>#}
+{#    {% for id in seatArr %}#}
+{#        {{ id }},#}
+{#    {% endfor %}#}
 
-    {% for seat in seats %}
-        {% set colour = "green" %}
-        {% set person = "noone" %}
-        {% for assignment in seat.assignments %}
-            {% set now = "now"|date("Y-m-d H:i:s") %} {# Get the current date-time string #}
+{#    {% for seat in seats %}#}
+{#        {% set colour = "green" %}#}
+{#        {% set person = "noone" %}#}
+{#        {% for assignment in seat.assignments %}#}
+{#            {% set now = "now"|date("Y-m-d H:i:s") %} #}{# Get the current date-time string #}
 
-            {% if now >= assignment.fromDate.format('Y-m-d H:i:s') and now <= assignment.toDate.format('Y-m-d H:i:s') %}
-                {% set colour = "red" %}
-                {% set person = assignment.person.fullName %}
-            {% endif %}
-        {% endfor %}
+{#            {% if now >= assignment.fromDate.format('Y-m-d H:i:s') and now <= assignment.toDate.format('Y-m-d H:i:s') %}#}
+{#                {% set colour = "red" %}#}
+{#                {% set person = assignment.person.fullName %}#}
+{#            {% endif %}#}
+{#        {% endfor %}#}
 
-        <p style="color: {{ colour }}"> SEAT {{ seat.id }}: currently sitting '{{ person }}'</p>
-    {% endfor %}
-
-{#    <div {{ vue_component('OfficeDetails', {#}
-{#        entrypoint: path('api_entrypoint'),#}
-{#        officeId: current_office.id,#}
-{#        seats: seats|map(item => attribute(item, 'id')),#}
-{#    }) }}></div>#}
+{#        <p style="color: {{ colour }}"> SEAT {{ seat.id }}: currently sitting '{{ person }}'</p>#}
+{#    {% endfor %}#}
 
 </div>
 {% endblock %}

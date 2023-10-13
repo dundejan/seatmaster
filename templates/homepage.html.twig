@@ -1,15 +1,23 @@
 {% extends 'base.html.twig' %}
 
 {% block body %}
-<div class="col-md-2">
-    <div class="bg-light border-right" id="sidebar-wrapper">
-        <!-- Title for the sidebar -->
-        <div class="sidebar-heading p-3 border-bottom">Offices</div>
-        <div class="list-group list-group-flush">
-            {% for office in offices %}
-                <a href="{{ path('app_office_show', {'id': office.id}) }}" class="list-group-item list-group-item-action bg-light">{{ office.name }}</a>
-            {% endfor %}
+    <div class="col-md-2">
+        <div class="bg-light border-right" id="sidebar-wrapper">
+            <!-- Title for the sidebar -->
+            <div class="sidebar-heading p-3 border-bottom">Offices</div>
+            <div class="list-group list-group-flush">
+                {% for office in offices %}
+                    <a href="{{ path('app_office_show', {'id': office.id}) }}" class="list-group-item list-group-item-action bg-light">{{ office.name }}</a>
+                {% endfor %}
+            </div>
         </div>
     </div>
-    <div class="col-md-2">
+    <div class="col-md-10">
+        <!-- Your other content here -->
+    </div>
+    <div class="position-absolute top-50 start-50 translate-middle">
+        <h1 class="display-1 text-center font-weight-bold bg-light rounded p-4" style="opacity: 0.8;">
+            WELCOME TO SEATMASTER
+        </h1>
+    </div>
 {% endblock %}

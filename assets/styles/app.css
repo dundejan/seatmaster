@@ -3,7 +3,7 @@
 
 body {
     background-color: lightgray;
-    /*background-image: url('/public/images/office.jpg');*/
+    background-image: url('/public/images/realistic-office.png');
     background-size: cover;     /* Cover the viewport */
     background-position: center; /* Center the image */
     background-repeat: no-repeat; /* Do not repeat the image */

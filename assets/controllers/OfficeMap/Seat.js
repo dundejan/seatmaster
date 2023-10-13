@@ -18,8 +18,10 @@ export function Seat({ id, left, top, currentAssignments }) {
 	let title, color;
 
 	if (typeof currentAssignments !== "undefined" && currentAssignments.length === 1) {
-		let from, to;
+		let from, to, name;
 		color = '#ff0000';
+
+		name = currentAssignments[0].person.firstName + ' ' + currentAssignments[0].person.lastName;
 
 		// One time assignment
 		if (typeof currentAssignments[0].dayOfWeek === 'undefined') {
@@ -28,9 +30,9 @@ export function Seat({ id, left, top, currentAssignments }) {
 			title = (
 				<div>
 					This chair is currently occupied.<br />
-					PERSON: TODO<br />
-					FROM: {from.getUTCHours()}:{from.getUTCMinutes().toString().padStart(2, '0')}<br />
-					TO: {to.getUTCHours()}:{to.getUTCMinutes().toString().padStart(2, '0')}
+					PERSON: {name}<br />
+					FROM: {from.getHours()}:{from.getMinutes().toString().padStart(2, '0')}<br />
+					TO: {to.getHours()}:{to.getMinutes().toString().padStart(2, '0')}
 				</div>
 			);
 		}
@@ -41,7 +43,7 @@ export function Seat({ id, left, top, currentAssignments }) {
 			title = (
 				<div>
 					This chair is currently occupied.<br />
-					PERSON: TODO<br />
+					PERSON: {name}<br />
 					FROM: {from.getUTCHours()}:{from.getUTCMinutes().toString().padStart(2, '0')}<br />
 					TO: {to.getUTCHours()}:{to.getUTCMinutes().toString().padStart(2, '0')}
 				</div>
