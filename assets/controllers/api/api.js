@@ -58,3 +58,22 @@ export function updateOfficeSize(officeId, height, width) {
 			return response;
 		});
 }
+
+export function getCurrentAssignments(seatId) {
+	return fetch(`/ongoing_assignments/seat/${seatId}`, {
+		credentials: 'same-origin',
+		headers: {
+			'Accept': 'application/json',
+			'Content-Type': 'application/json'
+		}
+	})
+		.then(response => {
+			if (!response.ok) {
+				throw new Error('Network response was not ok: ' + response.statusText);
+			}
+			return response.json();
+		})
+		.catch(error => {
+			console.error('Fetching assignments failed: ', error);
+		});
+}

@@ -2,16 +2,14 @@ import React, { useEffect, useState, useRef } from 'react';
 import { useDrop } from 'react-dnd';
 import PropTypes from "prop-types";
 import axios from "axios";
-import {updateOfficeSize} from "../api/seats_api";
-import PopupWarning from "../Warnings/PopupWarning";
-import {Box, Button, Card, CardContent, CardHeader, TextField, Typography} from "@mui/material";
-import {withStyles} from "@mui/styles";
+import {updateOfficeSize} from "../api/api";
+import {Box, Button, Card, CardContent, TextField, Typography} from "@mui/material";
 
 function roundToNearest50(n) {
 	return Math.round(n / 50) * 50;
 }
 
-export default function Office({ onDropChair, officeId, children }) {
+export default function Office({ onDropChair, officeId, showPopupMessage, children }) {
 	const officeRef = useRef(null);
 	const [size, setSize] = useState(0);
 	const [width, setWidth] = useState(0);
@@ -19,18 +17,11 @@ export default function Office({ onDropChair, officeId, children }) {
 	const [stagedWidth, setStagedWidth] = useState(0);
 	const [isSaving, setIsSaving] = useState(false);
 	const [saveError, setSaveError] = useState(null);
-	const [showPopup, setShowPopup] = useState(false);
-
-	const handleShowPopup = () => {
-		setShowPopup(true);
-	};
-
-	const handleClosePopup = () => {
-		setShowPopup(false);
-	};
 
 	useEffect(() => {
-		fetchOfficeData();
+		(async () => {
+			await fetchOfficeData();
+		})();
 	}, [officeId]);
 
 	useEffect(() => {
@@ -58,7 +49,8 @@ export default function Office({ onDropChair, officeId, children }) {
 		try {
 			const response = await updateOfficeSize(officeId, stagedHeight, stagedWidth);
 			if (response.redirected === true) {
-				handleShowPopup();
+				// Using the function from parent
+				showPopupMessage("Office size was not updated. Access denied. You need to have admin rights.");
 				console.log("Seat coordinates were not updated. Access denied.");
 			}
 			else {
@@ -137,17 +129,13 @@ export default function Office({ onDropChair, officeId, children }) {
 				OFFICE:
 			</Typography>
 			<div ref={officeRef} style={dropAreaStyle}>{children}</div>
-			<div>
-				{showPopup && (
-					<PopupWarning message="Office size was not updated. Access denied. You need to have admin rights. " onClose={handleClosePopup} />
-				)}
-			</div>
 		</div>
 	);
 }
 
 Office.propTypes = {
 	onDropChair: PropTypes.func.isRequired,
+	showPopupMessage: PropTypes.func.isRequired,
 	children: PropTypes.oneOfType([
 		PropTypes.arrayOf(PropTypes.node),
 		PropTypes.node
