@@ -80,9 +80,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 	public function __construct()
     {
         $this->apiTokens = new ArrayCollection();
-
-		$apiToken = new ApiToken();
-		$this->addApiToken($apiToken);
     }
 
 	public function __toString()

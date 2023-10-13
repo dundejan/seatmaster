@@ -2,6 +2,8 @@ import React, { useEffect, useState, useRef } from 'react';
 import { useDrop } from 'react-dnd';
 import PropTypes from "prop-types";
 import axios from "axios";
+import {updateOfficeSize} from "../api/seats_api";
+import PopupWarning from "../Warnings/PopupWarning";
 
 function roundToNearest50(n) {
 	return Math.round(n / 50) * 50;
@@ -15,6 +17,15 @@ export default function Office({ onDropChair, officeId, children }) {
 	const [stagedWidth, setStagedWidth] = useState(0);
 	const [isSaving, setIsSaving] = useState(false);
 	const [saveError, setSaveError] = useState(null);
+	const [showPopup, setShowPopup] = useState(false);
+
+	const handleShowPopup = () => {
+		setShowPopup(true);
+	};
+
+	const handleClosePopup = () => {
+		setShowPopup(false);
+	};
 
 	useEffect(() => {
 		fetchOfficeData();
@@ -43,12 +54,15 @@ export default function Office({ onDropChair, officeId, children }) {
 		setSaveError(null);
 
 		try {
-			await axios.put(`/api/offices/${officeId}`, {
-				height: stagedSize,
-				width: stagedWidth
-			});
-			setSize(stagedSize);
-			setWidth(stagedWidth);
+			const response = await updateOfficeSize(officeId, stagedSize, stagedWidth);
+			if (response.redirected === true) {
+				handleShowPopup();
+				console.log("Seat coordinates were not updated. Access denied.");
+			}
+			else {
+				setSize(stagedSize);
+				setWidth(stagedWidth);
+			}
 		} catch (error) {
 			setSaveError(error.message);
 		} finally {
@@ -96,6 +110,11 @@ export default function Office({ onDropChair, officeId, children }) {
 			{saveError && <p style={{ color: 'red' }}>{saveError}</p>}
 			Office
 			<div ref={officeRef} style={dropAreaStyle}>{children}</div>
+			<div>
+				{showPopup && (
+					<PopupWarning message="Office size was not updated. Access denied. You need to have admin rights. " onClose={handleClosePopup} />
+				)}
+			</div>
 		</div>
 	);
 }

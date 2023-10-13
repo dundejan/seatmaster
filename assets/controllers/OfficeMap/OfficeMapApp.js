@@ -67,9 +67,9 @@ export default class OfficeMapApp extends Component {
 	}
 
 	async handleDropChair(id, coords) {
-		const data = await updateSeatCoords(id, coords.x, coords.y);
+		const response = await updateSeatCoords(id, coords.x, coords.y);
 
-		if (data.redirected === true) {
+		if (response.redirected === true) {
 			this.setState({
 				showPopup: true,
 				popupMessage: "Seat coordinates were not updated. Access denied. You need to have admin rights. ",

@@ -27,14 +27,7 @@ class UserFixtures extends Fixture
 	    $user2->setEmail('user@example.com')
 		    ->setPassword($hashedPassword);
 
-		foreach ($user1->getApiTokens() as $apiToken) {
-			$manager->persist($apiToken);
-		}
         $manager->persist($user1);
-
-	    foreach ($user2->getApiTokens() as $apiToken) {
-		    $manager->persist($apiToken);
-	    }
 	    $manager->persist($user2);
 
         $manager->flush();
