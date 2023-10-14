@@ -115,7 +115,7 @@ export default function Office({ onDropChair, officeId, officeName, showPopupMes
 			<div className="col-md-3 ps-md-4">
 				<Card sx={{ maxWidth: 350, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
 					<CardHeader
-						title="EASY ADMIN"
+						title="QUICK ADMIN"
 						subheader="OFFICE SIZE"
 						subheaderTypographyProps={{ variant: 'body1', style: { marginBottom: '-15px', textAlign: 'center' } }}
 					/>
