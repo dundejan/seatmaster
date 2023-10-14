@@ -37,7 +37,7 @@ class RepeatedAssignmentRepository extends ServiceEntityRepository
 	 */
 	public function findCurrentlyOngoing(mixed $parameter = null): mixed
 	{
-		// Current date-time for Europe/Paris
+		// Current date-time, set to Europe/Paris, because time is stored in UTC, although it is meant to be in Europe/Paris
 		$dateTime = new DateTime('now', new DateTimeZone('Europe/Paris'));
 
 		$qb = $this->createQueryBuilder('e');
@@ -48,7 +48,6 @@ class RepeatedAssignmentRepository extends ServiceEntityRepository
 		// Basic condition for ongoing assignments
 		$qb->andWhere('e.dayOfWeek = :currentDayOfWeek AND e.fromTime <= :currentTime AND :currentTime < e.toTime' )
 			->setParameter('currentDayOfWeek', $currentDayOfWeek)
-			// DateTimeZone here is set to Europe/Paris, because time is stored in UTC, although it is meant to be in Europe/Paris
 			->setParameter('currentTime', $dateTime, Types::TIME_MUTABLE);
 
 		// If parameter is provided

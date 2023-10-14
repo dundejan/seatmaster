@@ -3,7 +3,7 @@ import { useDrop } from 'react-dnd';
 import PropTypes from "prop-types";
 import axios from "axios";
 import {updateOfficeSize} from "../api/api";
-import {Box, Button, Card, CardContent, TextField, Typography} from "@mui/material";
+import {Box, Button, Card, CardContent, CardHeader, TextField, Typography} from "@mui/material";
 
 function roundToNearest50(n) {
 	return Math.round(n / 50) * 50;
@@ -89,10 +89,15 @@ export default function Office({ onDropChair, officeId, showPopupMessage, childr
 	};
 
 	return (
-		<div>
-			<Card sx={{ maxWidth: 350, display: 'flex', flexDirection: 'column', alignItems: 'center', marginTop: '10px'}}>
-				<CardContent sx={{ textAlign: 'center' }}>
-					<Box sx={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+		<div className="row">
+			<div className="col-md-2 ps-md-3">
+				<Card sx={{ maxWidth: 350, display: 'flex', flexDirection: 'column', alignItems: 'center', marginTop: '10px' }}>
+					<CardHeader
+						subheader="OFFICE SIZE"
+						subheaderTypographyProps={{ variant: 'body2', style: { marginBottom: '-15px' } }}
+					/>
+					<CardContent sx={{ textAlign: 'center' }}>
+						<Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '10px' }}>
 						<TextField
 							label="Height"
 							type="number"
@@ -124,11 +129,14 @@ export default function Office({ onDropChair, officeId, showPopupMessage, childr
 					</Box>
 				</CardContent>
 			</Card>
-			{saveError && <p style={{ color: 'red' }}>{saveError}</p>}
-			<Typography variant="caption" color="textSecondary">
-				OFFICE:
-			</Typography>
-			<div ref={officeRef} style={dropAreaStyle}>{children}</div>
+				{saveError && <p style={{ color: 'red' }}>{saveError}</p>}
+			</div>
+			<div className="col-md-9">
+				<Typography variant="caption" color="textSecondary">
+					OFFICE:
+				</Typography>
+				<div ref={officeRef} style={dropAreaStyle}>{children}</div>
+			</div>
 		</div>
 	);
 }

@@ -129,7 +129,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
 	public function hasRole(string $role) : bool
 	{
-		return in_array($role, $this->getRoles());
+		return (in_array('ROLE_SUPER_ADMIN', $this->getRoles()) || in_array($role, $this->getRoles()));
 	}
 
 	/**
