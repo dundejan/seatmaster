@@ -7,7 +7,7 @@ import { HTML5Backend } from "react-dnd-html5-backend";
 import { getCurrentAssignments, getSeats, updateSeatCoords } from "../api/api";
 import PopupWarning from "../Warnings/PopupWarning";
 
-const OfficeMapApp = ({ officeId }) => {
+const OfficeMapApp = ({ officeId, officeName }) => {
 	const [chairs, setChairs] = useState([]);
 	const [showPopup, setShowPopup] = useState(false);
 	const [popupMessage, setPopupMessage] = useState("");
@@ -30,6 +30,10 @@ const OfficeMapApp = ({ officeId }) => {
 
 		fetchSeatsAndAssignments();
 	}, [officeId]);
+
+	const addNewChair = (newChair) => {
+		setChairs([...chairs, newChair]);
+	}
 
 	const handleDropChair = async (id, coords) => {
 		try {
@@ -63,11 +67,14 @@ const OfficeMapApp = ({ officeId }) => {
 			<Office
 				onDropChair={handleDropChair}
 				officeId={officeId}
+				officeName={officeName}
 				showPopupMessage={showPopupMessage} // Passing down the function
+				chairs={chairs}
+				addNewChair={addNewChair}
 			>
-				{chairs.map(chair => (
-					<Seat key={chair.id} id={chair.id} left={chair.coordX} top={chair.coordY} currentAssignments={chair.currentAssignments} />
-				))}
+				{/*{chairs.map(chair => (*/}
+				{/*	<Seat key={chair.id} id={chair.id} left={chair.coordX} top={chair.coordY} currentAssignments={chair.currentAssignments} />*/}
+				{/*))}*/}
 			</Office>
 			{showPopup && <PopupWarning message={popupMessage} onClose={closePopup} />}
 		</DndProvider>
@@ -76,6 +83,7 @@ const OfficeMapApp = ({ officeId }) => {
 
 OfficeMapApp.propTypes = {
 	officeId: PropTypes.string.isRequired,
+	officeName: PropTypes.string.isRequired,
 };
 
 export default OfficeMapApp;

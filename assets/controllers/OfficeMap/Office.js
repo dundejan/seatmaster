@@ -2,14 +2,15 @@ import React, { useEffect, useState, useRef } from 'react';
 import { useDrop } from 'react-dnd';
 import PropTypes from "prop-types";
 import axios from "axios";
-import {updateOfficeSize} from "../api/api";
+import {addSeat, updateOfficeSize} from "../api/api";
 import {Box, Button, Card, CardContent, CardHeader, TextField, Typography} from "@mui/material";
+import {Seat} from "./Seat";
 
 function roundToNearest50(n) {
 	return Math.round(n / 50) * 50;
 }
 
-export default function Office({ onDropChair, officeId, showPopupMessage, children }) {
+export default function Office({ onDropChair, officeId, officeName, showPopupMessage, chairs, addNewChair }) {
 	const officeRef = useRef(null);
 	const [size, setSize] = useState(0);
 	const [width, setWidth] = useState(0);
@@ -51,11 +52,32 @@ export default function Office({ onDropChair, officeId, showPopupMessage, childr
 			if (response.redirected === true) {
 				// Using the function from parent
 				showPopupMessage("Office size was not updated. Access denied. You need to have admin rights.");
-				console.log("Seat coordinates were not updated. Access denied.");
 			}
 			else {
 				setSize(stagedHeight);
 				setWidth(stagedWidth);
+			}
+		} catch (error) {
+			setSaveError(error.message);
+		} finally {
+			setIsSaving(false);
+		}
+	};
+
+	const addSeatInBackend = async () => {
+		setIsSaving(true);
+		setSaveError(null);
+
+		try {
+			const response = await addSeat(officeId);
+			if (response.redirected === true) {
+				// Using the function from parent
+				showPopupMessage("Seat was not added. Access denied. You need to have admin rights.");
+			}
+			else {
+				const newSeat = await response.json();
+				console.log(newSeat);
+				addNewChair(newSeat);
 			}
 		} catch (error) {
 			setSaveError(error.message);
@@ -89,12 +111,13 @@ export default function Office({ onDropChair, officeId, showPopupMessage, childr
 	};
 
 	return (
-		<div className="row">
-			<div className="col-md-2 ps-md-3">
-				<Card sx={{ maxWidth: 350, display: 'flex', flexDirection: 'column', alignItems: 'center', marginTop: '10px' }}>
+		<div className="row mt-2">
+			<div className="col-md-3 ps-md-4">
+				<Card sx={{ maxWidth: 350, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
 					<CardHeader
+						title="EASY ADMIN"
 						subheader="OFFICE SIZE"
-						subheaderTypographyProps={{ variant: 'body2', style: { marginBottom: '-15px' } }}
+						subheaderTypographyProps={{ variant: 'body1', style: { marginBottom: '-15px', textAlign: 'center' } }}
 					/>
 					<CardContent sx={{ textAlign: 'center' }}>
 						<Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '10px' }}>
@@ -124,18 +147,40 @@ export default function Office({ onDropChair, officeId, showPopupMessage, childr
 							onClick={updateSizeInBackend}
 							disabled={isSaving}
 						>
-							Change
+							<i className="fa-solid fa-maximize"></i>&nbsp;Change
 						</Button>
 					</Box>
+						<CardHeader
+							subheader="OFFICE SEATS"
+							subheaderTypographyProps={{ variant: 'body1', style: { marginBottom: '-15px', textAlign: 'center' } }}
+						/>
+						<CardContent sx={{ textAlign: 'center' }}>
+							<Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '10px' }}>
+								<Button
+									variant="contained"
+									color="primary"
+									onClick={addSeatInBackend}
+									disabled={isSaving}
+								>
+									<i className="fa-solid fa-square-plus"></i>&nbsp;Add new
+								</Button>
+							</Box>
+						</CardContent>
 				</CardContent>
 			</Card>
 				{saveError && <p style={{ color: 'red' }}>{saveError}</p>}
 			</div>
 			<div className="col-md-9">
-				<Typography variant="caption" color="textSecondary">
-					OFFICE:
-				</Typography>
-				<div ref={officeRef} style={dropAreaStyle}>{children}</div>
+				<div style={{ backgroundColor: '#f5f5f5', display: 'inline-block' }}>
+					<Typography variant="caption" color="textSecondary" style={{ fontSize: '0.8em', textTransform: "uppercase" }}>
+						&nbsp;{officeName}&nbsp;
+					</Typography>
+				</div>
+				<div ref={officeRef} style={dropAreaStyle}>
+					{chairs.map(chair => (
+						<Seat key={chair.id} id={chair.id} left={chair.coordX} top={chair.coordY} currentAssignments={chair.currentAssignments} />
+					))}
+				</div>
 			</div>
 		</div>
 	);
@@ -148,5 +193,6 @@ Office.propTypes = {
 		PropTypes.arrayOf(PropTypes.node),
 		PropTypes.node
 	]).isRequired,
-	officeId: PropTypes.string.isRequired
+	officeId: PropTypes.string.isRequired,
+	officeName: PropTypes.string.isRequired,
 };

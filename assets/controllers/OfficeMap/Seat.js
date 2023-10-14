@@ -3,6 +3,7 @@ import { useDrag } from 'react-dnd';
 import PropTypes from "prop-types";
 import { Tooltip as ReactTooltip } from "react-tooltip";
 import {ChairIcon} from "./ChairIcon/ChairIcon";
+import {Typography} from "@mui/material";
 
 export function Seat({ id, left, top, currentAssignments }) {
 	const [isDragging, setIsDragging] = useState(false);
@@ -64,9 +65,9 @@ export function Seat({ id, left, top, currentAssignments }) {
 			onMouseUp={handleMouseUp}
 		>
 			<ChairIcon color={color} size="50px" />
-			<p>{`Seat ${id}`}</p>
+			<Typography variant="body2" style={{ fontSize: '12px' }}>{`SEAT ${id}`}</Typography>
 			{!isDragging && (
-				<ReactTooltip id={id} place="top">
+				<ReactTooltip id={id} place="top" style={{ zIndex: 1000 }}>
 					{title}
 				</ReactTooltip>
 			)}

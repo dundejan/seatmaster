@@ -8,7 +8,7 @@
     <div class="row">
         <div id="office-map"
              data-office-id="{{ current_office.id }}"
-             data-tokens="{{ app.user ? app.user.validTokenStrings|json_encode : '' }}"
+             data-office-name="{{ current_office.name }}"
         ></div>
     </div>
     {# end office map from react #}

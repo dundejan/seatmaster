@@ -37,6 +37,27 @@ export function updateSeatCoords(seatId, coordX, coordY) {
 		});
 }
 
+export function addSeat(officeId) {
+	return fetch(`/api/seats`, {
+		method: 'POST',
+		credentials: 'same-origin',
+		headers: {
+			'Content-Type': 'application/json'
+		},
+		body: JSON.stringify({
+			office: `/api/offices/${officeId}`,
+		})
+	})
+		.then(async response => {
+			if (!response.ok) {
+				// Handle errors, if the response is not in the 200-299 range
+				throw new Error('Network response was not ok');
+			}
+
+			return response;
+		});
+}
+
 export function updateOfficeSize(officeId, height, width) {
 	return fetch(`/api/offices/${officeId}`, {
 		method: 'PUT',
