@@ -2,7 +2,6 @@
 
 namespace App\Controller;
 
-use App\Entity\RepeatedAssignment;
 use App\Repository\AssignmentRepository;
 use App\Repository\OfficeRepository;
 use App\Repository\RepeatedAssignmentRepository;
@@ -66,6 +65,24 @@ class AssignmentController extends AbstractController
 		$repeatedAssignments = $repeatedAssignmentRepository->findCurrentlyOngoing($seat);
 
 		$allAssignments = array_merge($assignments, $repeatedAssignments);
+
+		$data = $serializer->serialize($allAssignments, 'json');
+
+		return new JsonResponse($data, 200, [], true);
+	}
+
+	/**
+	 * @throws \Exception
+	 */
+	#[Route('/ongoing_assignments/all', name: 'ongoing_assignments')]
+	public function getOngoingAssignments(
+		\DateTime $from,
+		\DateTime $to,
+		RepeatedAssignmentRepository $repeatedAssignmentRepository,
+		AssignmentRepository $assignmentRepository,
+		SerializerInterface $serializer,
+	): JsonResponse {
+		$allAssignments = $assignmentRepository->findOngoing($from, $to);
 
 		$data = $serializer->serialize($allAssignments, 'json');
 
