@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from "prop-types";
 
 const PopupWarning = ({ message, onClose }) => {
     const popupStyle = {
@@ -30,7 +31,7 @@ const PopupWarning = ({ message, onClose }) => {
         padding: '10px 20px',
         borderRadius: '5px',
         cursor: 'pointer',
-        marginTop: '10px',
+        marginLeft: '20px',
     };
 
     return (
@@ -44,3 +45,8 @@ const PopupWarning = ({ message, onClose }) => {
 };
 
 export default PopupWarning;
+
+PopupWarning.propTypes = {
+    message: PropTypes.string.isRequired,
+    onClose: PropTypes.func.isRequired,
+};

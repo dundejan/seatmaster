@@ -48,10 +48,12 @@ class Person
     private ?int $id = null;
 
 	#[ORM\Column(length: 255)]
+	#[Groups(['person:read', 'person:write', 'assignment:read', 'repeatedAssignment:read'])]
+	#[Assert\NotBlank]
 	private ?string $firstName = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['person:read', 'person:write', 'assignment:read'])]
+    #[Groups(['person:read', 'person:write', 'assignment:read', 'repeatedAssignment:read'])]
     #[Assert\NotBlank]
     private ?string $lastName = null;
 	/**

@@ -4,10 +4,10 @@ import OfficeMapApp from './OfficeMap/OfficeMapApp';
 
 const targetElement = document.getElementById('office-map');
 const officeId = targetElement.getAttribute('data-office-id');
-const dataTokens = targetElement.getAttribute('data-tokens');
+const officeName = targetElement.getAttribute('data-office-name');
 
 const root = createRoot(targetElement);
 
 root.render(
-	<OfficeMapApp officeId={officeId} />
+	<OfficeMapApp officeId={officeId} officeName={officeName}/>
 )

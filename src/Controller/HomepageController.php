@@ -9,16 +9,9 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class HomepageController extends AbstractController
 {
-	public function __construct(private readonly OfficeRepository $officeRepository)
-	{
-	}
 	#[Route('/', name: 'app_homepage')]
 	public function homepage(): Response
 	{
-		$offices = $this->officeRepository->findAll();
-
-		return $this->render('homepage.html.twig', [
-			'offices' => $offices,
-		]);
+		return $this->render('homepage.html.twig');
 	}
 }
