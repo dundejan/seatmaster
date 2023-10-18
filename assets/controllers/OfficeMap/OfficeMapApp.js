@@ -1,35 +1,46 @@
-import React, { useState, useEffect } from "react";
+import React, {useEffect, useState} from "react";
 import PropTypes from "prop-types";
 import Office from "./Office";
-import { Seat } from "./Seat";
-import { DndProvider } from "react-dnd";
-import { HTML5Backend } from "react-dnd-html5-backend";
-import { getCurrentAssignments, getSeats, updateSeatCoords } from "../api/api";
+import {DndProvider} from "react-dnd";
+import {HTML5Backend} from "react-dnd-html5-backend";
+import {getCurrentAssignments, getSeats, updateSeatCoords} from "../api/api";
 import PopupWarning from "../Warnings/PopupWarning";
+
+// Function to get current datetime in the format "YYYY-MM-DDTHH:MM"
+const getCurrentDateTimeLocal = () => {
+	const now = new Date();
+	return new Date(now.getTime() - now.getTimezoneOffset() * 60000)
+		.toISOString()
+		.slice(0, 16);
+};
 
 const OfficeMapApp = ({ officeId, officeName }) => {
 	const [chairs, setChairs] = useState([]);
 	const [showPopup, setShowPopup] = useState(false);
 	const [popupMessage, setPopupMessage] = useState("");
+	const [dateTimeParam, setDateTimeParam] = useState(getCurrentDateTimeLocal());
+	const [refreshFlag, setRefreshFlag] = useState(false);
 
 	useEffect(() => {
 		const fetchSeatsAndAssignments = async () => {
 			try {
 				const seatData = await getSeats(officeId);
 				const chairPromises = seatData.map(async chair => {
-					const currentAssignments = await getCurrentAssignments(chair.id);
+					const currentAssignments = await getCurrentAssignments(chair.id, dateTimeParam);
 					return { ...chair, currentAssignments };
 				});
 
 				const chairsWithAssignments = await Promise.all(chairPromises);
 				setChairs(chairsWithAssignments);
+				console.log("Chairs with assignments");
+				console.log(chairsWithAssignments);
 			} catch (error) {
 				console.error("Error fetching data", error);
 			}
 		};
 
 		fetchSeatsAndAssignments();
-	}, [officeId]);
+	}, [officeId, refreshFlag]); // Include refreshFlag here
 
 	const addNewChair = (newChair) => {
 		setChairs([...chairs, newChair]);
@@ -71,10 +82,11 @@ const OfficeMapApp = ({ officeId, officeName }) => {
 				showPopupMessage={showPopupMessage} // Passing down the function
 				chairs={chairs}
 				addNewChair={addNewChair}
+				dateTimeParam={dateTimeParam}
+				setDateTimeParam={setDateTimeParam}
+				refreshFlag={refreshFlag}
+				setRefreshFlag={setRefreshFlag}
 			>
-				{/*{chairs.map(chair => (*/}
-				{/*	<Seat key={chair.id} id={chair.id} left={chair.coordX} top={chair.coordY} currentAssignments={chair.currentAssignments} />*/}
-				{/*))}*/}
 			</Office>
 			{showPopup && <PopupWarning message={popupMessage} onClose={closePopup} />}
 		</DndProvider>

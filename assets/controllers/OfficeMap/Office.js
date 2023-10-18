@@ -10,7 +10,7 @@ function roundToNearest50(n) {
 	return Math.round(n / 50) * 50;
 }
 
-export default function Office({ onDropChair, officeId, officeName, showPopupMessage, chairs, addNewChair }) {
+export default function Office({onDropChair, officeId, officeName, showPopupMessage, chairs, addNewChair, refreshFlag, setRefreshFlag, dateTimeParam, setDateTimeParam }) {
 	const officeRef = useRef(null);
 	const [size, setSize] = useState(0);
 	const [width, setWidth] = useState(0);
@@ -110,9 +110,36 @@ export default function Office({ onDropChair, officeId, officeName, showPopupMes
 		backgroundSize: '50px 50px'
 	};
 
+	const handleFetch = () => {
+		setRefreshFlag(!refreshFlag); // Toggle the state to trigger useEffect
+	};
+
 	return (
 		<div className="row mt-2">
 			<div className="col-md-3 ps-md-4">
+				<Card sx={{ maxWidth: 350, display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: '16px' }}>
+					<CardHeader
+						subheader="FILTER"
+						subheaderTypographyProps={{ variant: 'body1', style: { marginBottom: '-15px', textAlign: 'center' } }}
+					/>
+					<CardContent sx={{ textAlign: 'center' }}>
+						<Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '10px' }}>
+							<TextField
+								id="datetime-local"
+								label="Choose date-time"
+								type="datetime-local"
+								value={dateTimeParam}
+								onChange={(e) => setDateTimeParam(e.target.value)}
+								InputLabelProps={{
+									shrink: true,
+								}}
+							/>
+							<Button variant="contained" color="primary" onClick={handleFetch}>
+								<i className="fa-solid fa-business-time"></i>&nbsp;Fetch Assignments
+							</Button>
+						</Box>
+					</CardContent>
+				</Card>
 				<Card sx={{ maxWidth: 350, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
 					<CardHeader
 						title="QUICK ADMIN"
@@ -189,10 +216,8 @@ export default function Office({ onDropChair, officeId, officeName, showPopupMes
 Office.propTypes = {
 	onDropChair: PropTypes.func.isRequired,
 	showPopupMessage: PropTypes.func.isRequired,
-	children: PropTypes.oneOfType([
-		PropTypes.arrayOf(PropTypes.node),
-		PropTypes.node
-	]).isRequired,
 	officeId: PropTypes.string.isRequired,
 	officeName: PropTypes.string.isRequired,
+	chairs: PropTypes.array.isRequired,
+	addNewChair: PropTypes.func.isRequired,
 };

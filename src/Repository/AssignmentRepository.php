@@ -10,6 +10,7 @@ use DateTime;
 use DateTimeZone;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use Exception;
 use InvalidArgumentException;
 use Symfony\Component\Form\Exception\LogicException;
 
@@ -29,16 +30,26 @@ class AssignmentRepository extends ServiceEntityRepository
     }
 
 	/**
-	 * @throws \Exception
+	 * @throws Exception
 	 */
 	public function findCurrentlyOngoing(mixed $parameter = null): mixed
 	{
+		$now = new DateTime('now', new DateTimeZone('UTC'));
+
+		return $this->findOngoing($now, $now, $parameter);
+	}
+
+	/**
+	 * @throws Exception
+	 */
+	public function findOngoing(DateTime $from, DateTime $to, mixed $parameter = null): mixed
+	{
 		$qb = $this->createQueryBuilder('e');
 
-		// Basic condition for ongoing assignments
-		$qb->andWhere('e.fromDate <= :currentDate AND e.toDate >= :currentDate')
-			// DateTimeZone here is set to UTC, because in database dates are also with utc time zone
-			->setParameter('currentDate', new DateTime('now', new DateTimeZone('UTC')));
+		// Basic time condition for assignments ongoing between from and to
+		$qb->andWhere('e.fromDate <= :toDate AND e.toDate > :fromDate')
+			->setParameter('fromDate', $from)
+			->setParameter('toDate', $to);
 
 		// If parameter is provided
 		if ($parameter !== null) {
@@ -101,6 +112,10 @@ class AssignmentRepository extends ServiceEntityRepository
 			$toTime = $assignment->getToTime();
 			$person = $assignment->getPerson();
 			$seat = $assignment->getSeat();
+			/** @var DateTime $startDate */
+			$startDate = $assignment->getStartDate();
+			/** @var null|DateTime $untilDate */
+			$untilDate = $assignment->getUntilDate();
 
 			if ($fromTime === null || $toTime === null || $person === null || $seat === null) {
 				throw new LogicException('fromTime or toTime or Person or Seat null, but never should be');
@@ -127,6 +142,9 @@ class AssignmentRepository extends ServiceEntityRepository
                 OR
                 (e.to_date::TIME >= :fromTime AND e.from_date::TIME <= :toTime)
             )
+            AND (
+                e.from_date > :startDate
+            )
        		";
 
 			$params = [
@@ -135,7 +153,16 @@ class AssignmentRepository extends ServiceEntityRepository
 				'dayOfWeek' => $dayOfWeek !== 7 ? $dayOfWeek : 0, // Adjust for PostgreSQL day of week
 				'fromTime' => $adjustedFromTime->format('H:i:s'),
 				'toTime' => $adjustedToTime->format('H:i:s'),
+				'startDate' => $startDate->format('Y-m-d H:i:s'),
 			];
+
+			if ($untilDate) {
+				$sql .= "
+			AND (
+				e.to_date < :untilDate
+			)";
+				$params['untilDate'] = $untilDate->format('Y-m-d H:i:s');
+			}
 
 			$stmt = $connection->prepare($sql);
 			return $stmt->executeQuery($params)->fetchAllAssociative();
