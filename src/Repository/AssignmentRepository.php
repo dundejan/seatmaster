@@ -10,6 +10,7 @@ use DateTime;
 use DateTimeZone;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use Exception;
 use InvalidArgumentException;
 use Symfony\Component\Form\Exception\LogicException;
 
@@ -29,46 +30,24 @@ class AssignmentRepository extends ServiceEntityRepository
     }
 
 	/**
-	 * @throws \Exception
+	 * @throws Exception
 	 */
 	public function findCurrentlyOngoing(mixed $parameter = null): mixed
 	{
-		$qb = $this->createQueryBuilder('e');
+		$now = new DateTime('now', new DateTimeZone('UTC'));
 
-		// Basic condition for ongoing assignments
-		$qb->andWhere('e.fromDate <= :currentDate AND e.toDate >= :currentDate')
-			// DateTimeZone here is set to UTC, because in database dates are also with utc time zone
-			->setParameter('currentDate', new DateTime('now', new DateTimeZone('UTC')));
-
-		// If parameter is provided
-		if ($parameter !== null) {
-			// If parameter is office instance, add additional condition
-			if ($parameter instanceof Office) {
-				$qb->join('e.seat', 's')  // Join with Seat entity using alias 's'
-				->join('s.office', 'o') // Join with Office entity using alias 'o'
-				->andWhere('o = :office')
-					->setParameter('office', $parameter);
-			}
-			// If parameter is seat instance, add additional condition
-			else if ($parameter instanceof Seat) {
-				$qb->andWhere('e.seat = :seat')
-					->setParameter('seat', $parameter);
-			}
-		}
-
-		// Execute and return the query result
-		return $qb->getQuery()->execute();
+		return $this->findOngoing($now, $now, $parameter);
 	}
 
 	/**
-	 * @throws \Exception
+	 * @throws Exception
 	 */
 	public function findOngoing(DateTime $from, DateTime $to, mixed $parameter = null): mixed
 	{
 		$qb = $this->createQueryBuilder('e');
 
-		// Basic condition for ongoing assignments
-		$qb->andWhere('e.fromDate < :toDate AND e.toDate > :fromDate')
+		// Basic time condition for assignments ongoing between from and to
+		$qb->andWhere('e.fromDate <= :toDate AND e.toDate > :fromDate')
 			->setParameter('fromDate', $from)
 			->setParameter('toDate', $to);
 

@@ -37,18 +37,36 @@ class RepeatedAssignmentRepository extends ServiceEntityRepository
 	 */
 	public function findCurrentlyOngoing(mixed $parameter = null): mixed
 	{
-		// Current date-time, set to Europe/Paris, because time is stored in UTC, although it is meant to be in Europe/Paris
-		$dateTime = new DateTime('now', new DateTimeZone('Europe/Paris'));
+		$now = new DateTime('now', new DateTimeZone('UTC'));
+
+		return $this->findOngoing($now, $now, $parameter);
+	}
+
+	/**
+	 * @throws \Exception
+	 */
+	public function findOngoing(DateTime $from, DateTime $to, mixed $parameter = null): mixed
+	{
+		// Create clones and convert time zones
+		$fromParis = clone $from;
+		$fromParis->setTimezone(new DateTimeZone('Europe/Paris'));
+		$toParis = clone $to;
+		$toParis->setTimezone(new DateTimeZone('Europe/Paris'));
 
 		$qb = $this->createQueryBuilder('e');
 
 		// 1 for monday, 2 for tuesday, 3 for wednesday, ...
-		$currentDayOfWeek = $dateTime->format('N');
+		$currentDayOfWeek = $fromParis->format('N');
 
 		// Basic condition for ongoing assignments
-		$qb->andWhere('e.dayOfWeek = :currentDayOfWeek AND e.fromTime <= :currentTime AND :currentTime < e.toTime' )
+		$qb->andWhere('e.dayOfWeek = :currentDayOfWeek AND e.fromTime <= :toTime AND :fromTime < e.toTime' )
 			->setParameter('currentDayOfWeek', $currentDayOfWeek)
-			->setParameter('currentTime', $dateTime, Types::TIME_MUTABLE);
+			->setParameter('fromTime', $fromParis, Types::TIME_MUTABLE)
+			->setParameter('toTime', $toParis, Types::TIME_MUTABLE);
+
+		$qb->andWhere('e.startDate <= :fromTime AND COALESCE(e.untilDate, :infinityDate) >= :fromTime')
+			->setParameter('fromTime', $fromParis)
+			->setParameter('infinityDate', new \DateTime('9999-12-31 23:59:59'));
 
 		// If parameter is provided
 		if ($parameter !== null) {

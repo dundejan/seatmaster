@@ -6,6 +6,8 @@ use App\Entity\Seat;
 use App\Repository\AssignmentRepository;
 use App\Repository\RepeatedAssignmentRepository;
 use App\Repository\SeatRepository;
+use DateTime;
+use DateTimeZone;
 use Exception;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
@@ -26,7 +28,8 @@ class SeatController extends AbstractController
 	#[Route('/seats-free', name: 'app_seats_free', methods: ['GET'])]
 	public function show(): Response
 	{
-		$currentAssignments = $this->assignmentRepository->findCurrentlyOngoing();
+		$now = new DateTime('now', new DateTimeZone('UTC'));
+		$currentAssignments = $this->assignmentRepository->findOngoing($now, $now);
 		$currentRepeatedAssignments = $this->repeatedAssignmentRepository->findCurrentlyOngoing();
 
 		$allCurrentAssignments = array_merge($currentAssignments, $currentRepeatedAssignments);

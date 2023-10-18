@@ -80,8 +80,14 @@ export function updateOfficeSize(officeId, height, width) {
 		});
 }
 
-export function getCurrentAssignments(seatId) {
-	return fetch(`/ongoing_assignments/seat/${seatId}`, {
+export function getCurrentAssignments(seatId, dateTimeParam = null) {
+	let url = `/ongoing_assignments/seat/${seatId}`;
+	if (dateTimeParam) {
+		const utcDateTime = new Date(dateTimeParam).toISOString();
+		url += `?dateTimeParam=${encodeURIComponent(utcDateTime)}`;
+	}
+
+	return fetch(url, {
 		credentials: 'same-origin',
 		headers: {
 			'Accept': 'application/json',
