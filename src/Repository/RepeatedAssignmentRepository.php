@@ -13,6 +13,7 @@ use Doctrine\DBAL\Exception;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\AbstractQuery;
 use Doctrine\ORM\Query;
+use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 use http\Exception\InvalidArgumentException;
 use Symfony\Component\Form\Exception\LogicException;
@@ -35,17 +36,7 @@ class RepeatedAssignmentRepository extends ServiceEntityRepository
 	/**
 	 * @throws \Exception
 	 */
-	public function findCurrentlyOngoing(mixed $parameter = null): mixed
-	{
-		$now = new DateTime('now', new DateTimeZone('UTC'));
-
-		return $this->findOngoing($now, $now, $parameter);
-	}
-
-	/**
-	 * @throws \Exception
-	 */
-	public function findOngoing(DateTime $from, DateTime $to, mixed $parameter = null): mixed
+	public function getQueryForOngoing(DateTime $from, DateTime $to, mixed $parameter = null): QueryBuilder
 	{
 		// Create clones and convert time zones
 		$fromParis = clone $from;
@@ -84,8 +75,34 @@ class RepeatedAssignmentRepository extends ServiceEntityRepository
 			}
 		}
 
+		return $qb;
+	}
+
+	/**
+	 * @throws \Exception
+	 */
+	public function getQueryForCurrentlyOngoing(mixed $parameter = null): QueryBuilder
+	{
+		$now = new DateTime('now', new DateTimeZone('UTC'));
+		return $this->getQueryForOngoing($now, $now, $parameter);
+	}
+
+	/**
+	 * @throws \Exception
+	 */
+	public function findCurrentlyOngoing(mixed $parameter = null): mixed
+	{
 		// Execute and return the query result
-		return $qb->getQuery()->execute();
+		return $this->getQueryForCurrentlyOngoing($parameter)->getQuery()->execute();
+	}
+
+	/**
+	 * @throws \Exception
+	 */
+	public function findOngoing(DateTime $from, DateTime $to, mixed $parameter = null): mixed
+	{
+		// Execute and return the query result
+		return $this->getQueryForOngoing($from, $to, $parameter)->getQuery()->execute();
 	}
 
 	/**

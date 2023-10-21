@@ -4,6 +4,7 @@ namespace App\Controller\Admin;
 
 use App\Entity\Office;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Filters;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IntegerField;
@@ -38,5 +39,12 @@ class OfficeCrudController extends AbstractCrudController
 			IntegerField::new('height'),
 			IntegerField::new('width'),
 		];
+	}
+
+	public function configureFilters(Filters $filters): Filters
+	{
+		return parent::configureFilters($filters)
+			->add('height')
+			->add('width');
 	}
 }

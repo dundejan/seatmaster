@@ -46,6 +46,9 @@ class DashboardController extends AbstractDashboardController
 		$this->repeatedAssignmentRepository = $repeatedAssignmentRepository;
 	}
 
+	/**
+	 * @throws \Exception
+	 */
 	#[Route('/admin', name: 'admin')]
     public function index(): Response
     {
@@ -67,7 +70,7 @@ class DashboardController extends AbstractDashboardController
 	{
 		return Dashboard::new()
 			->setTitle('ADMIN')
-			->setFaviconPath('boss-icon.svg')
+			->setFaviconPath('images/boss-icon.svg')
 			;
 	}
 
@@ -85,11 +88,27 @@ class DashboardController extends AbstractDashboardController
 
 			MenuItem::linkToCrud('People', 'fa fa-person', Person::class),
 
-			MenuItem::linkToCrud('Assignments', 'fa fa-calendar', Assignment::class)
-				->setDefaultSort(['id' => 'DESC']),
+			MenuItem::subMenu('One-time assignments', 'fa fa-calendar')
+				->setSubItems([
+					MenuItem::linkToCrud('All', 'fa fa-list', Assignment::class)
+						->setDefaultSort(['id' => 'DESC'])
+						->setController(AssignmentCrudController::class),
 
-			MenuItem::linkToCrud('Repeated assignments', 'fa fa-calendar-day', RepeatedAssignment::class)
-				->setDefaultSort(['id' => 'DESC']),
+					MenuItem::linkToCrud('Ongoing', 'fa fa-calendar-check', Assignment::class)
+						->setDefaultSort(['id' => 'DESC'])
+						->setController(OngoingAssignmentsCrudController::class),
+				]),
+
+			MenuItem::subMenu('Repeated assignments', 'fa fa-calendar-day')
+				->setSubItems([
+					MenuItem::linkToCrud('All', 'fa fa-list', RepeatedAssignment::class)
+						->setDefaultSort(['id' => 'DESC'])
+						->setController(RepeatedAssignmentCrudController::class),
+
+					MenuItem::linkToCrud('Ongoing', 'fa fa-calendar-check', RepeatedAssignment::class)
+						->setDefaultSort(['id' => 'DESC'])
+						->setController(OngoingRepeatedAssignmentsCrudController::class),
+				]),
 
 			MenuItem::linkToCrud('Users', 'fa fa-user', User::class),
 

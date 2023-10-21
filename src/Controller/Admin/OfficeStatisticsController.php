@@ -25,6 +25,9 @@ class OfficeStatisticsController extends AbstractDashboardController
 		$this->repeatedAssignmentRepository = $repeatedAssignmentRepository;
 	}
 
+	/**
+	 * @throws \Exception
+	 */
 	#[Route('/admin/office-statistics', name: 'app_admin_office_statistics_index')]
 	public function index(): Response
 	{
