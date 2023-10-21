@@ -9,7 +9,9 @@ use App\Entity\Seat;
 use DateTime;
 use DateTimeZone;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\DBAL\Exception;
 use Doctrine\DBAL\Types\Types;
+use Doctrine\ORM\AbstractQuery;
 use Doctrine\ORM\Query;
 use Doctrine\Persistence\ManagerRegistry;
 use http\Exception\InvalidArgumentException;
@@ -86,6 +88,9 @@ class RepeatedAssignmentRepository extends ServiceEntityRepository
 		return $qb->getQuery()->execute();
 	}
 
+	/**
+	 * @throws Exception
+	 */
 	public function findOverlappingRepeatedAssignments(Assignment|RepeatedAssignment $assignment, string $param) : mixed
 	{
 		// Ensure that $param is one of the allowed values.
@@ -117,7 +122,7 @@ class RepeatedAssignmentRepository extends ServiceEntityRepository
 					->setParameter('seat', $assignment->getSeat());
 			}
 
-			return $qb->getQuery()->setHydrationMode(Query::HYDRATE_ARRAY)->execute();
+			return $qb->getQuery()->setHydrationMode(AbstractQuery::HYDRATE_ARRAY)->execute();
 		}
 		else {
 			// TODO: test this, especially dealing with time zones, so the -2 modifying
@@ -156,6 +161,12 @@ class RepeatedAssignmentRepository extends ServiceEntityRepository
                 OR
                 (e.to_time::TIME >= :fromDate AND e.from_time::TIME <= :toDate)
             )
+            AND (
+                e.start_date <= :startDate
+            )
+            AND (
+ 			   e.until_date IS NULL OR e.until_date >= :untilDate
+			)
        		";
 
 			$params = [
@@ -164,6 +175,8 @@ class RepeatedAssignmentRepository extends ServiceEntityRepository
 				'dayOfWeek' => $adjustedFromDate->format('N'),
 				'fromDate' => $adjustedFromDate->format('H:i:s'),
 				'toDate' => $adjustedToDate->format('H:i:s'),
+				'startDate' => $adjustedFromDate->format('Y-m-d'),
+				'untilDate' => $adjustedToDate->format('Y-m-d'),
 			];
 
 			$stmt = $connection->prepare($sql);
