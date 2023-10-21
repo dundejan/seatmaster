@@ -3,58 +3,63 @@
 namespace App\DataFixtures;
 
 use App\Entity\Assignment;
-use App\Entity\Person;
-use App\Entity\Seat;
+use App\Factory\PersonFactory;
+use App\Factory\SeatFactory;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class AssignmentFixtures extends Fixture implements DependentFixtureInterface
 {
-    public function load(ObjectManager $manager): void
+	private ValidatorInterface $validator;
+
+	public function __construct(ValidatorInterface $validator)
+	{
+		$this->validator = $validator;
+	}
+
+	/**
+	 * @throws \Exception
+	 */
+	public function load(ObjectManager $manager): void
     {
-        $assignment1 = new Assignment();
-	    /** @var Person $person */
-		$person = $this->getReference(PersonFixtures::PERSON_1_REFERENCE);
-	    /** @var Seat $seat */
-		$seat = $this->getReference(SeatFixtures::SEAT_1_REFERENCE);
-		$assignment1->setPerson($person)->setSeat($seat)->setFromDate(new \DateTime('today 10:00'))->setToDate(new \DateTime('today 12:30'));
+		echo 'Creating not overlapping assignments, this may take a while...' . PHP_EOL;
 
-	    $assignment2 = new Assignment();
-	    /** @var Person $person */
-	    $person = $this->getReference(PersonFixtures::PERSON_2_REFERENCE);
-	    /** @var Seat $seat */
-	    $seat = $this->getReference(SeatFixtures::SEAT_4_REFERENCE);
-	    $assignment2->setPerson($person)->setSeat($seat)->setFromDate(new \DateTime('tomorrow 8:00'))->setToDate(new \DateTime('tomorrow 16:00'));
+	    for ($i = 0; $i < 500; $i++) {
+			$assignment = new Assignment();
+			$assignment->setSeat(SeatFactory::random()->object());
+			$assignment->setPerson(PersonFactory::random()->object());
 
-	    $assignment3 = new Assignment();
-	    /** @var Person $person */
-	    $person = $this->getReference(PersonFixtures::PERSON_3_REFERENCE);
-	    /** @var Seat $seat */
-	    $seat = $this->getReference(SeatFixtures::SEAT_2_REFERENCE);
-	    $assignment3->setPerson($person)->setSeat($seat)->setFromDate(new \DateTime('tomorrow 8:00'))->setToDate(new \DateTime('tomorrow 12:00'));
+		    $baseDate = new \DateTime();
+		    $baseDate->modify(random_int(-5, 5) . ' days');
 
-	    $assignment4 = new Assignment();
-	    /** @var Person $person */
-	    $person = $this->getReference(PersonFixtures::PERSON_4_REFERENCE);
-	    /** @var Seat $seat */
-	    $seat = $this->getReference(SeatFixtures::SEAT_3_REFERENCE);
-	    $assignment4->setPerson($person)->setSeat($seat)->setFromDate(new \DateTime('today 8:00'))->setToDate(new \DateTime('today 12:30 '));
+			// Round base date to the nearest hour
+			$baseDate->setTime((int)$baseDate->format('H'), 0);
 
-	    $assignment5 = new Assignment();
-	    /** @var Person $person */
-	    $person = $this->getReference(PersonFixtures::PERSON_4_REFERENCE);
-	    /** @var Seat $seat */
-	    $seat = $this->getReference(SeatFixtures::SEAT_1_REFERENCE);
-	    $assignment5->setPerson($person)->setSeat($seat)->setFromDate(new \DateTime('today 12:30'))->setToDate(new \DateTime('today 16:00'));
+			// Clone the base date to create fromDate
+			$fromDate = clone $baseDate;
 
-        $manager->persist($assignment1);
-	    $manager->persist($assignment2);
-	    $manager->persist($assignment3);
-	    $manager->persist($assignment4);
-	    $manager->persist($assignment5);
+			// Add random hours and minutes to the base date to create toDate
+			$hoursToAdd = random_int(1, 8);
+			$minutesToAdd = round(random_int(1, 59) / 10) * 10; // Round to nearest 10
 
-        $manager->flush();
+			$toDate = (clone $baseDate)->modify("+{$hoursToAdd} hours {$minutesToAdd} minutes");
+
+			$assignment->setFromDate($fromDate);
+			$assignment->setToDate($toDate);
+
+			$violations = $this->validator->validate($assignment);
+			echo $i . ': ' . count($violations) . PHP_EOL;
+
+			if (count($violations) > 0) {
+				--$i;
+				continue;
+			}
+
+		    $manager->persist($assignment);
+		    $manager->flush();
+	    }
     }
 
 	public function getDependencies(): array

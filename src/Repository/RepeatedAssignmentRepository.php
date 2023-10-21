@@ -4,11 +4,9 @@ namespace App\Repository;
 
 use App\Entity\Assignment;
 use App\Entity\Office;
-use App\Entity\Person;
 use App\Entity\RepeatedAssignment;
 use App\Entity\Seat;
 use DateTime;
-use DateTimeInterface;
 use DateTimeZone;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\DBAL\Types\Types;
