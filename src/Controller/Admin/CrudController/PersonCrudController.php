@@ -1,30 +1,30 @@
 <?php
 
-namespace App\Controller\Admin;
+namespace App\Controller\Admin\CrudController;
 
-use App\Entity\Seat;
+use App\Entity\Person;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Filters;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
-use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\IntegerField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 
-class SeatCrudController extends AbstractCrudController
+class PersonCrudController extends AbstractCrudController
 {
     public static function getEntityFqcn(): string
     {
-        return Seat::class;
+        return Person::class;
     }
-
 
     public function configureFields(string $pageName): iterable
     {
         return [
-            IdField::new('id')
-	            ->hideOnForm(),
-	        AssociationField::new('office')
-		        ->autocomplete()
-		        ->setRequired(false),
+	        IdField::new('id')
+		        ->hideOnForm(),
+	        TextField::new('firstName'),
+	        TextField::new('lastName'),
+	        IntegerField::new('idExternal'),
         ];
     }
 
@@ -32,10 +32,11 @@ class SeatCrudController extends AbstractCrudController
 	{
 		return $crud
 			// the labels used to refer to this entity in titles, buttons, etc.
-			->setEntityLabelInSingular('Seat')
-			->setEntityLabelInPlural('Seats')
+			->setEntityLabelInSingular('Person')
+			->setEntityLabelInPlural('People')
 			->setDefaultSort([
-				'id' => 'ASC',
+				'lastName' => 'ASC',
+				'firstName' => 'ASC',
 			])
 
 			// the Symfony Security permission needed to manage the entity
@@ -47,6 +48,8 @@ class SeatCrudController extends AbstractCrudController
 	public function configureFilters(Filters $filters): Filters
 	{
 		return parent::configureFilters($filters)
-			->add('office');
+			->add('firstName')
+			->add('lastName')
+			->add('idExternal');
 	}
 }

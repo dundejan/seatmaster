@@ -2,6 +2,10 @@
 
 namespace App\Controller\Admin;
 
+use App\Controller\Admin\CrudController\AssignmentCrudController;
+use App\Controller\Admin\CrudController\OngoingAssignmentsCrudController;
+use App\Controller\Admin\CrudController\OngoingRepeatedAssignmentsCrudController;
+use App\Controller\Admin\CrudController\RepeatedAssignmentCrudController;
 use App\Entity\ApiToken;
 use App\Entity\Assignment;
 use App\Entity\Office;
@@ -84,10 +88,23 @@ class DashboardController extends AbstractDashboardController
 
 	public function configureMenuItems(): iterable
 	{
+		$officeSubMenuItems = [];
+		$offices = $this->officeRepository->findAll();  // Assuming you've injected officeRepository
+
+		foreach ($offices as $office) {
+			$officeSubMenuItems[] = MenuItem::linkToRoute(
+				$office->getName(), // label
+				'fa fa-building', // icon
+				'your_route_here', // route
+				['officeId' => $office->getId()] // parameters
+			);
+		}
+
 		return [
 			MenuItem::section('Info'),
 			MenuItem::linkToDashboard('Statistics', 'fa fa-chart-simple'),
 			MenuItem::linkToRoute('Current occupancy', 'fa fa-building-user','app_admin_office_statistics_index'),
+			MenuItem::subMenu('Office statistics', 'fa fa-building')->setSubItems($officeSubMenuItems),
 
 			MenuItem::section('Management'),
 			MenuItem::linkToCrud('Offices', 'fa fa-building', Office::class),

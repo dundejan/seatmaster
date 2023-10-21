@@ -1,9 +1,8 @@
 <?php
 
-namespace App\Controller\Admin;
+namespace App\Controller\Admin\CrudController;
 
 use App\Repository\RepeatedAssignmentRepository;
-use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\QueryBuilder;
 use EasyCorp\Bundle\EasyAdminBundle\Collection\FieldCollection;
 use EasyCorp\Bundle\EasyAdminBundle\Collection\FilterCollection;
