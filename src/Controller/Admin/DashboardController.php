@@ -95,7 +95,7 @@ class DashboardController extends AbstractDashboardController
 			$officeSubMenuItems[] = MenuItem::linkToRoute(
 				$office->getName(), // label
 				'fa fa-building', // icon
-				'your_route_here', // route
+				'app_admin_office_statistics_show', // route
 				['officeId' => $office->getId()] // parameters
 			);
 		}
