@@ -9,6 +9,7 @@ use App\Entity\Seat;
 use DateTime;
 use DateTimeZone;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\AbstractQuery;
 use Doctrine\Persistence\ManagerRegistry;
 use Exception;
 use InvalidArgumentException;
@@ -99,7 +100,7 @@ class AssignmentRepository extends ServiceEntityRepository
 					->setParameter('seat', $assignment->getSeat());
 			}
 
-			return $qb->getQuery()->execute();
+			return $qb->getQuery()->getResult(AbstractQuery::HYDRATE_ARRAY);
 		}
 		else {
 			// TODO: test this, especially dealing with time zones, so the -2 modifying

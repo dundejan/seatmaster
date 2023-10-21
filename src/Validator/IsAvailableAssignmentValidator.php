@@ -21,8 +21,19 @@ class IsAvailableAssignmentValidator extends ConstraintValidator
 		$this->em = $em;
 	}
 
-	public function validate(mixed $value, Constraint $constraint): void
+	public function normalizeToArray(mixed $value) : array
 	{
+		// Normalize to array
+		if (!is_array($value)) {
+			return [$value];
+		}
+		return $value;
+	}
+
+	public function validate(mixed $value, Constraint $constraint): bool
+	{
+		$valid = true;
+
 		/** @var AssignmentRepository $assignmentRepository */
 		$assignmentRepository = $this->em->getRepository(Assignment::class);
 		/** @var RepeatedAssignmentRepository $repeatedAssignmentRepository */
@@ -46,6 +57,8 @@ class IsAvailableAssignmentValidator extends ConstraintValidator
 					)
 				->setParameter('{{ assignmentType }}', 'one-time')
 				->addViolation();
+
+			$valid = false;
 		}
 
 		// Overlapping one-time assignments using same seat
@@ -61,6 +74,8 @@ class IsAvailableAssignmentValidator extends ConstraintValidator
 					)
 				->setParameter('{{ assignmentType }}', 'one-time')
 				->addViolation();
+
+			$valid = false;
 		}
 
 		// Overlapping repeated assignments using same person
@@ -82,6 +97,8 @@ class IsAvailableAssignmentValidator extends ConstraintValidator
 				)
 				->setParameter('{{ assignmentType }}', 'repeated')
 				->addViolation();
+
+			$valid = false;
 		}
 
 		// Overlapping repeated assignments using same seat
@@ -103,6 +120,10 @@ class IsAvailableAssignmentValidator extends ConstraintValidator
 				)
 				->setParameter('{{ assignmentType }}', 'repeated')
 				->addViolation();
+
+			$valid = false;
 		}
+
+		return $valid;
 	}
 }
