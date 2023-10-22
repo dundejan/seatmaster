@@ -77,7 +77,7 @@ class DashboardController extends AbstractDashboardController
 
 		return $this->render('admin/dashboard.html.twig', [
 			'statistics' => $statistics,
-			'chartDay' => $this->createChart(),
+			'chartDay' => $this->createChartAllOfficesToday(),
 			'chartMonth' => $this->createChartAllOfficesMonth(),
 		]);
     }
@@ -166,7 +166,7 @@ class DashboardController extends AbstractDashboardController
 	/**
 	 * @throws Exception
 	 */
-	private function createChart(): Chart
+	private function createChartAllOfficesToday(): Chart
 	{
 		$chart = $this->chartBuilder->createChart(Chart::TYPE_LINE);
 
@@ -223,13 +223,16 @@ class DashboardController extends AbstractDashboardController
 				'x' => [
 					'title' => [
 						'display' => true,
-						'text' => 'Time (today)',
+						'text' => 'Time of today '
+							. '('
+							. (new DateTime('now', new DateTimeZone('Europe/Paris')))->format('Y-m-d')
+							. ')',
 					],
 				],
 				'y' => [
 					'title' => [
 						'display' => true,
-						'text' => 'Number of occupied seats',
+						'text' => 'Occupied seats',
 					],
 					'suggestedMin' => 0,
 					'suggestedMax' => $this->seatRepository->count([]),
@@ -312,7 +315,7 @@ class DashboardController extends AbstractDashboardController
 				'y' => [
 					'title' => [
 						'display' => true,
-						'text' => 'Average Occupancy',
+						'text' => 'Average occupied seats between 8:00 and 20:00',
 					],
 					'suggestedMin' => 0,
 					'suggestedMax' => $this->seatRepository->count([]),
