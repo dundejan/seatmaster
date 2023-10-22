@@ -9,7 +9,8 @@ use App\Repository\RepeatedAssignmentRepository;
 use DateTime;
 use DateTimeZone;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractDashboardController;
-use Symfony\Component\HttpFoundation\Request;
+use Exception;
+use LogicException;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\UX\Chartjs\Builder\ChartBuilderInterface;
@@ -35,16 +36,16 @@ class OfficeStatisticsController extends AbstractDashboardController
 	}
 
 	/**
-	 * @throws \Exception
+	 * @throws Exception
 	 */
 	#[Route('/admin/office-statistics', name: 'app_admin_office_statistics_index')]
 	public function index(): Response
 	{
-		$offices = $this->officeRepository->findAll();
+		$offices = $this->officeRepository->findBy([], ['name' => 'ASC']);
 
 		$officesArray = [];
 
-		foreach ($offices as $index => $office) {
+		foreach ($offices as $office) {
 			$officeArray = [
 				'name' => $office->getName(),
 				'currentPersons' =>
@@ -62,14 +63,14 @@ class OfficeStatisticsController extends AbstractDashboardController
 	}
 
 	/**
-	 * @throws \Exception
+	 * @throws Exception
 	 */
 	#[Route('/admin/statistics/{officeId}', name: 'app_admin_office_statistics_show')]
 	public function show(int $officeId): Response
 	{
 		$office = $this->officeRepository->find($officeId);
 		if ($office == null) {
-			throw new \LogicException('The requested office does not exist, although it is id was previously found.');
+			throw new LogicException('The requested office does not exist, although it is id was previously found.');
 		}
 
 		return $this->render('admin/office_statistics_show.html.twig', [
@@ -82,17 +83,17 @@ class OfficeStatisticsController extends AbstractDashboardController
 	}
 
 	/**
-	 * @throws \Exception
+	 * @throws Exception
 	 */
 	private function createChart(Office $office): Chart
 	{
 		$chart = $this->chartBuilder->createChart(Chart::TYPE_LINE);
-		$hoursInDay = array_map(fn($hour) => str_pad($hour, 2, '0', STR_PAD_LEFT) . ':00', range(0, 23));
+		$hoursInDay = array_map(fn($hour) => str_pad((string)$hour, 2, '0', STR_PAD_LEFT) . ':00', range(0, 23));
 
 		$data = [];
 		foreach (range(0, 23) as $hour) {
 			$date = new DateTime('now', new DateTimeZone('UTC'));
-			$date->setTime($hour, 0, 0);
+			$date->setTime($hour, 0);
 			$date->modify('-2 hours');
 			$count = count($this->assignmentRepository->findOngoing($date, $date, $office))
 				+ count($this->repeatedAssignmentRepository->findOngoing($date, $date, $office));

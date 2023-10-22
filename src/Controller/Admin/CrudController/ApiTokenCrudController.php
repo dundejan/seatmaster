@@ -85,7 +85,7 @@ class ApiTokenCrudController extends AbstractCrudController
 			;
 	}
 
-	public function createEntity(string $entityFqcn)
+	public function createEntity(string $entityFqcn) : mixed
 	{
 		/**
 		 * @var User $user

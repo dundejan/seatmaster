@@ -5,7 +5,8 @@
 {% endblock %}
 
 {% block main %}
-    <div class="row mb-3">
+<div class="container-fluid">
+    <div class="row">
         <div class="col-8 col-md-4">
             <div class="dashboard-stat card">
                 <div class="card-body d-flex align-items-center">
@@ -27,8 +28,9 @@
             </div>
         </div>
     </div>
-    <div class="col-8">
+    <div class="col-8 mt-5">
         {{ render_chart(chart) }}
     </div>
+</div>
 {% endblock %}
 

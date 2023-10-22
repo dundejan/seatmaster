@@ -8,6 +8,7 @@ use App\Repository\RepeatedAssignmentRepository;
 use App\Repository\SeatRepository;
 use DateTime;
 use DateTimeZone;
+use Exception;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -20,6 +21,7 @@ class AssignmentController extends AbstractController
 {
 	/**
 	 * @Route("/api/ongoing_assignments/office/{officeId?}", methods={"GET"}, name="api_ongoing_office_assignments")
+	 * @throws Exception
 	 */
 	public function getOngoingAssignmentsForOffice(
 		?int $officeId,
@@ -48,7 +50,7 @@ class AssignmentController extends AbstractController
 	}
 
 	/**
-	 * @throws \Exception
+	 * @throws Exception
 	 */
 	#[Route('/ongoing_assignments/seat/{seatId}', name: 'ongoing_seat_assignments')]
 	public function getOngoingAssignmentsForSeat(
@@ -87,13 +89,12 @@ class AssignmentController extends AbstractController
 	}
 
 	/**
-	 * @throws \Exception
+	 * @throws Exception
 	 */
 	#[Route('/ongoing_assignments/all', name: 'ongoing_assignments')]
 	public function getOngoingAssignments(
-		\DateTime $from,
-		\DateTime $to,
-		RepeatedAssignmentRepository $repeatedAssignmentRepository,
+		DateTime $from,
+		DateTime $to,
 		AssignmentRepository $assignmentRepository,
 		SerializerInterface $serializer,
 	): JsonResponse {

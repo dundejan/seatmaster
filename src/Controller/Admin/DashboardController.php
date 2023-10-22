@@ -27,6 +27,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Dashboard;
 use EasyCorp\Bundle\EasyAdminBundle\Config\MenuItem;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractDashboardController;
+use Exception;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\UX\Chartjs\Builder\ChartBuilderInterface;
@@ -58,7 +59,7 @@ class DashboardController extends AbstractDashboardController
 	}
 
 	/**
-	 * @throws \Exception
+	 * @throws Exception
 	 */
 	#[Route('/admin', name: 'admin')]
     public function index(): Response
@@ -89,11 +90,11 @@ class DashboardController extends AbstractDashboardController
 	public function configureMenuItems(): iterable
 	{
 		$officeSubMenuItems = [];
-		$offices = $this->officeRepository->findAll();  // Assuming you've injected officeRepository
+		$offices = $this->officeRepository->findBy([], ['name' => 'ASC']);  // Assuming you've injected officeRepository
 
 		foreach ($offices as $office) {
 			$officeSubMenuItems[] = MenuItem::linkToRoute(
-				$office->getName(), // label
+				(string)$office->getName(), // label
 				'fa fa-building', // icon
 				'app_admin_office_statistics_show', // route
 				['officeId' => $office->getId()] // parameters
@@ -160,13 +161,13 @@ class DashboardController extends AbstractDashboardController
 	}
 
 	/**
-	 * @throws \Exception
+	 * @throws Exception
 	 */
 	private function createChart(): Chart
 	{
 		$chart = $this->chartBuilder->createChart(Chart::TYPE_LINE);
 
-		$hoursInDay = array_map(fn($hour) => str_pad($hour, 2, '0', STR_PAD_LEFT) . ':00', range(0, 23));
+		$hoursInDay = array_map(fn($hour) => str_pad((string)$hour, 2, '0', STR_PAD_LEFT) . ':00', range(0, 23));
 
 		// Initializing data array for sum of all offices
 		$totalData = array_fill(0, 24, 0);
@@ -183,7 +184,7 @@ class DashboardController extends AbstractDashboardController
 			$data = [];
 			foreach (range(0, 23) as $hour) {
 				$date = new DateTime('now', new DateTimeZone('UTC'));
-				$date->setTime($hour, 0, 0);
+				$date->setTime($hour, 0);
 				$date->modify('-2 hours');
 				$count = count($this->assignmentRepository->findOngoing($date, $date, $office))
 					+ count($this->repeatedAssignmentRepository->findOngoing($date, $date, $office));

@@ -6,6 +6,7 @@ use App\Entity\Assignment;
 use App\Entity\RepeatedAssignment;
 use App\Repository\AssignmentRepository;
 use App\Repository\RepeatedAssignmentRepository;
+use Doctrine\DBAL\Exception;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Form\Exception\LogicException;
 use Symfony\Component\Validator\Constraint;
@@ -21,15 +22,9 @@ class IsAvailableAssignmentValidator extends ConstraintValidator
 		$this->em = $em;
 	}
 
-	public function normalizeToArray(mixed $value) : array
-	{
-		// Normalize to array
-		if (!is_array($value)) {
-			return [$value];
-		}
-		return $value;
-	}
-
+	/**
+	 * @throws Exception
+	 */
 	public function validate(mixed $value, Constraint $constraint): bool
 	{
 		$valid = true;
