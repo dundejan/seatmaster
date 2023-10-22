@@ -10,6 +10,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Collection\FilterCollection;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Dto\EntityDto;
 use EasyCorp\Bundle\EasyAdminBundle\Dto\SearchDto;
+use Exception;
 
 class OngoingAssignmentsCrudController extends AssignmentCrudController
 {
@@ -20,7 +21,7 @@ class OngoingAssignmentsCrudController extends AssignmentCrudController
 	}
 
 	/**
-	 * @throws \Exception
+	 * @throws Exception
 	 */
 	public function createIndexQueryBuilder(
 		SearchDto $searchDto,

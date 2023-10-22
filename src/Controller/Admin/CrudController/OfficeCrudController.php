@@ -20,13 +20,8 @@ class OfficeCrudController extends AbstractCrudController
 	public function configureCrud(Crud $crud): Crud
 	{
 		return $crud
-			// the labels used to refer to this entity in titles, buttons, etc.
 			->setEntityLabelInSingular('Office')
 			->setEntityLabelInPlural('Offices')
-
-			// the Symfony Security permission needed to manage the entity
-			// (none by default, so you can manage all instances of the entity)
-			// ->setEntityPermission('ROLE_EDITOR')
 			;
 	}
 

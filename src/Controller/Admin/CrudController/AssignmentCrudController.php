@@ -42,14 +42,9 @@ class AssignmentCrudController extends AbstractCrudController
 	public function configureCrud(Crud $crud): Crud
 	{
 		return $crud
-			// the labels used to refer to this entity in titles, buttons, etc.
 			->setEntityLabelInSingular('One-time assignment')
 			->setEntityLabelInPlural('One-time assignments')
 			->setTimezone('Europe/Paris')
-
-			// the Symfony Security permission needed to manage the entity
-			// (none by default, so you can manage all instances of the entity)
-			// ->setEntityPermission('ROLE_EDITOR')
 			;
 	}
 

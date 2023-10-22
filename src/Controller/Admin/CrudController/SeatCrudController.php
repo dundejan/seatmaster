@@ -16,7 +16,6 @@ class SeatCrudController extends AbstractCrudController
         return Seat::class;
     }
 
-
     public function configureFields(string $pageName): iterable
     {
         return [
@@ -31,16 +30,11 @@ class SeatCrudController extends AbstractCrudController
 	public function configureCrud(Crud $crud): Crud
 	{
 		return $crud
-			// the labels used to refer to this entity in titles, buttons, etc.
 			->setEntityLabelInSingular('Seat')
 			->setEntityLabelInPlural('Seats')
 			->setDefaultSort([
 				'id' => 'ASC',
 			])
-
-			// the Symfony Security permission needed to manage the entity
-			// (none by default, so you can manage all instances of the entity)
-			// ->setEntityPermission('ROLE_EDITOR')
 			;
 	}
 

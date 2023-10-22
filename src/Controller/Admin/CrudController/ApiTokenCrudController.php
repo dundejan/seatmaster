@@ -23,7 +23,6 @@ class ApiTokenCrudController extends AbstractCrudController
         return ApiToken::class;
     }
 
-
     public function configureFields(string $pageName): iterable
     {
         return [
@@ -75,13 +74,8 @@ class ApiTokenCrudController extends AbstractCrudController
 	public function configureCrud(Crud $crud): Crud
 	{
 		return $crud
-			// the labels used to refer to this entity in titles, buttons, etc.
 			->setEntityLabelInSingular('API Token')
 			->setEntityLabelInPlural('API Tokens')
-
-			// the Symfony Security permission needed to manage the entity
-			// (none by default, so you can manage all instances of the entity)
-			// ->setEntityPermission('ROLE_EDITOR')
 			;
 	}
 
@@ -129,7 +123,6 @@ class ApiTokenCrudController extends AbstractCrudController
 		if (!$user->hasRole('ROLE_SUPER_ADMIN')) {
 			throw new AccessDeniedException('You can not edit yourself from admin section.');
 		}
-
 
 		parent::deleteEntity($entityManager, $entityInstance);
 	}
