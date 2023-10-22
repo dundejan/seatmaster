@@ -26,7 +26,7 @@ class AssignmentFixtures extends Fixture implements DependentFixtureInterface
     {
 		echo 'Creating not overlapping assignments, this may take a while...' . PHP_EOL;
 
-	    for ($i = 0; $i < 500; $i++) {
+	    for ($i = 0; $i < 300; $i++) {
 			$assignment = new Assignment();
 			$assignment->setSeat(SeatFactory::random()->object());
 			$assignment->setPerson(PersonFactory::random()->object());
@@ -50,7 +50,7 @@ class AssignmentFixtures extends Fixture implements DependentFixtureInterface
 			$assignment->setToDate($toDate);
 
 			$violations = $this->validator->validate($assignment);
-			echo $i . ': ' . count($violations) . PHP_EOL;
+			//echo $i . ': ' . count($violations) . PHP_EOL;
 
 			if (count($violations) > 0) {
 				--$i;

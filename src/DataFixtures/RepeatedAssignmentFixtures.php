@@ -26,7 +26,7 @@ class RepeatedAssignmentFixtures extends Fixture implements DependentFixtureInte
 	{
 		echo 'Creating not overlapping repeated assignments, this may take a while...' . PHP_EOL;
 
-		for ($i = 0; $i < 200; $i++) {
+		for ($i = 0; $i < 1500; $i++) {
 			$repeatedAssignment = new RepeatedAssignment();
 
 			// Set Person and Seat
@@ -59,7 +59,7 @@ class RepeatedAssignmentFixtures extends Fixture implements DependentFixtureInte
 			$repeatedAssignment->setToTime($toTime);
 
 			$violations = $this->validator->validate($repeatedAssignment);
-			echo $i . ': ' . count($violations) . PHP_EOL;
+			//echo $i . ': ' . count($violations) . PHP_EOL;
 
 			if (count($violations) > 0) {
 				--$i;

@@ -9,8 +9,11 @@ use App\Entity\Seat;
 use DateTime;
 use DateTimeZone;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\DBAL\Exception;
 use Doctrine\DBAL\Types\Types;
+use Doctrine\ORM\AbstractQuery;
 use Doctrine\ORM\Query;
+use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 use http\Exception\InvalidArgumentException;
 use Symfony\Component\Form\Exception\LogicException;
@@ -33,17 +36,7 @@ class RepeatedAssignmentRepository extends ServiceEntityRepository
 	/**
 	 * @throws \Exception
 	 */
-	public function findCurrentlyOngoing(mixed $parameter = null): mixed
-	{
-		$now = new DateTime('now', new DateTimeZone('UTC'));
-
-		return $this->findOngoing($now, $now, $parameter);
-	}
-
-	/**
-	 * @throws \Exception
-	 */
-	public function findOngoing(DateTime $from, DateTime $to, mixed $parameter = null): mixed
+	public function getQueryForOngoing(DateTime $from, DateTime $to, mixed $parameter = null): QueryBuilder
 	{
 		// Create clones and convert time zones
 		$fromParis = clone $from;
@@ -82,10 +75,39 @@ class RepeatedAssignmentRepository extends ServiceEntityRepository
 			}
 		}
 
-		// Execute and return the query result
-		return $qb->getQuery()->execute();
+		return $qb;
 	}
 
+	/**
+	 * @throws \Exception
+	 */
+	public function getQueryForCurrentlyOngoing(mixed $parameter = null): QueryBuilder
+	{
+		$now = new DateTime('now', new DateTimeZone('UTC'));
+		return $this->getQueryForOngoing($now, $now, $parameter);
+	}
+
+	/**
+	 * @throws \Exception
+	 */
+	public function findCurrentlyOngoing(mixed $parameter = null): mixed
+	{
+		// Execute and return the query result
+		return $this->getQueryForCurrentlyOngoing($parameter)->getQuery()->execute();
+	}
+
+	/**
+	 * @throws \Exception
+	 */
+	public function findOngoing(DateTime $from, DateTime $to, mixed $parameter = null): mixed
+	{
+		// Execute and return the query result
+		return $this->getQueryForOngoing($from, $to, $parameter)->getQuery()->execute();
+	}
+
+	/**
+	 * @throws Exception
+	 */
 	public function findOverlappingRepeatedAssignments(Assignment|RepeatedAssignment $assignment, string $param) : mixed
 	{
 		// Ensure that $param is one of the allowed values.
@@ -117,7 +139,7 @@ class RepeatedAssignmentRepository extends ServiceEntityRepository
 					->setParameter('seat', $assignment->getSeat());
 			}
 
-			return $qb->getQuery()->setHydrationMode(Query::HYDRATE_ARRAY)->execute();
+			return $qb->getQuery()->setHydrationMode(AbstractQuery::HYDRATE_ARRAY)->execute();
 		}
 		else {
 			// TODO: test this, especially dealing with time zones, so the -2 modifying
@@ -156,6 +178,12 @@ class RepeatedAssignmentRepository extends ServiceEntityRepository
                 OR
                 (e.to_time::TIME >= :fromDate AND e.from_time::TIME <= :toDate)
             )
+            AND (
+                e.start_date <= :startDate
+            )
+            AND (
+ 			   e.until_date IS NULL OR e.until_date >= :untilDate
+			)
        		";
 
 			$params = [
@@ -164,6 +192,8 @@ class RepeatedAssignmentRepository extends ServiceEntityRepository
 				'dayOfWeek' => $adjustedFromDate->format('N'),
 				'fromDate' => $adjustedFromDate->format('H:i:s'),
 				'toDate' => $adjustedToDate->format('H:i:s'),
+				'startDate' => $adjustedFromDate->format('Y-m-d'),
+				'untilDate' => $adjustedToDate->format('Y-m-d'),
 			];
 
 			$stmt = $connection->prepare($sql);

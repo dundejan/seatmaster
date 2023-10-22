@@ -72,6 +72,9 @@ class AssignmentRepository extends ServiceEntityRepository
 		return $qb->getQuery()->execute();
 	}
 
+	/**
+	 * @throws \Doctrine\DBAL\Exception
+	 */
 	public function findOverlappingAssignments(Assignment|RepeatedAssignment $assignment, string $param) : mixed
 	{
 		// Ensure that $param is one of the allowed values.
@@ -100,7 +103,7 @@ class AssignmentRepository extends ServiceEntityRepository
 					->setParameter('seat', $assignment->getSeat());
 			}
 
-			return $qb->getQuery()->getResult(AbstractQuery::HYDRATE_ARRAY);
+			return $qb->getQuery()->setHydrationMode(AbstractQuery::HYDRATE_ARRAY)->execute();
 		}
 		else {
 			// TODO: test this, especially dealing with time zones, so the -2 modifying
@@ -144,7 +147,7 @@ class AssignmentRepository extends ServiceEntityRepository
                 (e.to_date::TIME >= :fromTime AND e.from_date::TIME <= :toTime)
             )
             AND (
-                e.from_date > :startDate
+                e.from_date >= :startDate
             )
        		";
 

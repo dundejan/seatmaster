@@ -31,6 +31,7 @@ export function Seat({ id, left, top, currentAssignments }) {
 			title = (
 				<div>
 					This chair is currently occupied.<br />
+					(one time assignment)<br />
 					PERSON: {name}<br />
 					FROM: {from.getHours()}:{from.getMinutes().toString().padStart(2, '0')}<br />
 					TO: {to.getHours()}:{to.getMinutes().toString().padStart(2, '0')}
@@ -44,6 +45,7 @@ export function Seat({ id, left, top, currentAssignments }) {
 			title = (
 				<div>
 					This chair is currently occupied.<br />
+					(repeated assignment) <br />
 					PERSON: {name}<br />
 					FROM: {from.getUTCHours()}:{from.getUTCMinutes().toString().padStart(2, '0')}<br />
 					TO: {to.getUTCHours()}:{to.getUTCMinutes().toString().padStart(2, '0')}

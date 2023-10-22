@@ -1,4 +1,6 @@
 api_platform:
+  defaults:
+    pagination_enabled: false
   formats:
     jsonld: [ 'application/ld+json' ]
     json: [ 'application/json' ]

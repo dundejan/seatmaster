@@ -22,7 +22,7 @@ Encore
      */
     .addEntry('app', './assets/app.js')
     .addEntry('office_map_react', './assets/controllers/office_map_react.js')
-    .addStyleEntry('admin', './assets/styles/admin.css')
+    .addEntry('admin', './assets/admin.js')
 
     // enables the Symfony UX Stimulus bridge (used in assets/bootstrap.js)
     .enableStimulusBridge('./assets/controllers.json')

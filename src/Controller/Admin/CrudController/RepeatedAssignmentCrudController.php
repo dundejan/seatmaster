@@ -1,20 +1,18 @@
 <?php
 
-namespace App\Controller\Admin;
+namespace App\Controller\Admin\CrudController;
 
 use App\Entity\RepeatedAssignment;
 use DateTime;
 use DateTimeZone;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Filters;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
-use EasyCorp\Bundle\EasyAdminBundle\Field\BooleanField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\ChoiceField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\DateField;
-use EasyCorp\Bundle\EasyAdminBundle\Field\DateTimeField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\FormField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
-use EasyCorp\Bundle\EasyAdminBundle\Field\IntegerField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TimeField;
 
 class RepeatedAssignmentCrudController extends AbstractCrudController
@@ -72,14 +70,21 @@ class RepeatedAssignmentCrudController extends AbstractCrudController
 	public function configureCrud(Crud $crud): Crud
 	{
 		return $crud
-			// the labels used to refer to this entity in titles, buttons, etc.
 			->setEntityLabelInSingular('Repeated assignment')
 			->setEntityLabelInPlural('Repeated assignments')
 			->setTimezone('UTC')
-
-			// the Symfony Security permission needed to manage the entity
-			// (none by default, so you can manage all instances of the entity)
-			// ->setEntityPermission('ROLE_EDITOR')
 			;
+	}
+
+	public function configureFilters(Filters $filters): Filters
+	{
+		return parent::configureFilters($filters)
+			->add('dayOfWeek')
+			->add('seat')
+			->add('person')
+			->add('fromTime')
+			->add('toTime')
+			->add('startDate')
+			->add('untilDate');
 	}
 }
