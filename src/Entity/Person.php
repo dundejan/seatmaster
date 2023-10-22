@@ -65,7 +65,7 @@ class Person
     private Collection $assignments;
 
     #[ORM\Column(nullable: true)]
-    private ?int $idExternal = null;
+    private ?string $idExternal = null;
 
 	/**
 	 * @var Collection<int, RepeatedAssignment>
@@ -154,12 +154,12 @@ class Person
         return $this;
     }
 
-    public function getIdExternal(): ?int
+    public function getIdExternal(): ?string
     {
         return $this->idExternal;
     }
 
-    public function setIdExternal(?int $idExternal): static
+    public function setIdExternal(?string $idExternal): static
     {
         $this->idExternal = $idExternal;
 

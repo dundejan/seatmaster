@@ -58,6 +58,9 @@ final class PersonFactory extends ModelFactory
         return [
             'firstName' => self::faker()->firstName(),
             'lastName' => self::faker()->lastName(),
+	        'idExternal' => self::faker()->uuid(),
+	        'email' => self::faker()->email(),
+	        'jobTitle' => self::faker()->jobTitle(),
         ];
     }
 
