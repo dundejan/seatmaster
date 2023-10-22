@@ -5,3 +5,14 @@
 .main-content {
     margin-bottom: 100px;
 }
+
+/* Dark mode */
+.ea-dark-scheme .dashboard-stat.card {
+    background-color: #333;
+    color: #fff;
+}
+
+.ea-dark-scheme .dashboard-stat.card .card-footer {
+    background-color: #0056b3;
+    color: white;
+}
