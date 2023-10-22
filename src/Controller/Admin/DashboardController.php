@@ -13,6 +13,8 @@ use App\Entity\Person;
 use App\Entity\RepeatedAssignment;
 use App\Entity\Seat;
 use App\Entity\User;
+use App\Helper\ChartHelper;
+use App\Helper\ColorHelper;
 use App\Repository\AssignmentRepository;
 use App\Repository\OfficeRepository;
 use App\Repository\PersonRepository;
@@ -173,7 +175,7 @@ class DashboardController extends AbstractDashboardController
 		$totalData = array_fill(0, 24, 0);
 
 		$allDatasets = [];
-		$colors = $this->getNiceColors();
+		$colors = ColorHelper::getNiceColors();
 		$colorIndex = 0;
 
 		$currentHour = (new DateTime('now', new DateTimeZone('Europe/Paris')))->format('H') . ':00';
@@ -232,66 +234,11 @@ class DashboardController extends AbstractDashboardController
 					'suggestedMax' => $this->seatRepository->count([]),
 				],
 			],
-			'plugins' => [
-				'zoom' => [
-					'zoom' => [
-						'wheel' => ['enabled' => true],
-						'pinch' => ['enabled' => true],
-						'mode' => 'xy',
-					],
-					'pan' => [
-						'enabled' => true,
-						'mode' => 'xy',
-						'threshold' => 10, // Minimum amount of pixels the user must pan before it starts panning.
-					],
-				],
-				'annotation' => [
-					'annotations' => [
-						[
-							'type' => 'line',
-							'mode' => 'vertical',
-							'scaleID' => 'x',
-							'value' => $currentHour,
-							'borderColor' => 'rgb(217, 120, 23)',
-							'borderWidth' => 1.5,
-							'label' => [
-								'enabled' => true,
-								'content' => 'Current hour'
-							]
-						],
-					],
-				],
-			],
 		]);
 
-		return $chart;
-	}
+		ChartHelper::addPluginZoom($chart);
+		ChartHelper::addPluginAnnotation($chart, $currentHour);
 
-	/**
-	 * @return string[]
-	 */
-	function getNiceColors(): array {
-		return [
-			'rgb(255, 99, 132)',  // pink
-			'rgb(75, 192, 192)',  // teal
-			'rgb(255, 159, 64)',  // orange
-			'rgb(153, 102, 255)', // purple
-			'rgb(54, 162, 235)',  // blue
-			'rgb(255, 206, 86)',  // yellow
-			'rgb(231, 76, 60)',   // red
-			'rgb(46, 204, 113)',  // green
-			'rgb(52, 152, 219)',  // light blue
-			'rgb(155, 89, 182)',  // lavender
-			'rgb(241, 196, 15)',  // sunflower yellow
-			'rgb(26, 188, 156)',  // turquoise
-			'rgb(22, 160, 133)',  // green sea
-			'rgb(52, 73, 94)',    // wet asphalt
-			'rgb(192, 57, 43)',   // alizarin
-			'rgb(189, 195, 199)', // gray
-			'rgb(243, 156, 18)',  // orange
-			'rgb(142, 68, 173)',  // wisteria
-			'rgb(44, 62, 80)',    // midnight blue
-			'rgb(211, 84, 0)',    // pumpkin orange
-		];
+		return $chart;
 	}
 }

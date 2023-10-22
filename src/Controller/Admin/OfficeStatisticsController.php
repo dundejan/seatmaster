@@ -3,6 +3,7 @@
 namespace App\Controller\Admin;
 
 use App\Entity\Office;
+use App\Helper\ChartHelper;
 use App\Repository\AssignmentRepository;
 use App\Repository\OfficeRepository;
 use App\Repository\RepeatedAssignmentRepository;
@@ -129,37 +130,10 @@ class OfficeStatisticsController extends AbstractDashboardController
 					'suggestedMax' => count($office->getSeats()),
 				],
 			],
-			'plugins' => [
-				'zoom' => [
-					'zoom' => [
-						'wheel' => ['enabled' => true],
-						'pinch' => ['enabled' => true],
-						'mode' => 'xy',
-					],
-					'pan' => [
-						'enabled' => true,
-						'mode' => 'xy',
-						'threshold' => 10, // Minimum amount of pixels the user must pan before it starts panning.
-					],
-				],
-				'annotation' => [
-					'annotations' => [
-						[
-							'type' => 'line',
-							'mode' => 'vertical',
-							'scaleID' => 'x',
-							'value' => $currentHour,
-							'borderColor' => 'rgb(217, 120, 23)',
-							'borderWidth' => 1.5,
-							'label' => [
-								'enabled' => true,
-								'content' => 'Current hour'
-							]
-						],
-					],
-				],
-			],
 		]);
+
+		ChartHelper::addPluginZoom($chart);
+		ChartHelper::addPluginAnnotation($chart, $currentHour);
 
 		return $chart;
 	}
