@@ -6,8 +6,9 @@
 
 {% block main %}
 <div class="container-fluid">
+    <h3>Current occupation</h3>
     <div class="row">
-        <div class="col-8 col-md-4">
+        <div class="col-5 col-md-5">
             <div class="dashboard-stat card">
                 <div class="card-body d-flex align-items-center">
                     <h3 class="card-title mb-0">{{ currentPersons }}</h3>
@@ -17,7 +18,7 @@
                 </footer>
             </div>
         </div>
-        <div class="col-8 col-md-4">
+        <div class="col-5 col-md-5">
             <div class="dashboard-stat card">
                 <div class="card-body d-flex align-items-center">
                     <h3 class="card-title mb-0">{{ capacity }}</h3>
@@ -28,8 +29,13 @@
             </div>
         </div>
     </div>
-    <div class="col-8 mt-5">
-        {{ render_chart(chart) }}
+    <div class="col-10 mt-5">
+        <h3>Today's occupation</h3>
+        {{ render_chart(chartToday) }}
+    </div>
+    <div class="col-10 mt-5">
+        <h3>Average occupation in last 20 and future 10 days</h3>
+        {{ render_chart(chartMonth) }}
     </div>
 </div>
 {% endblock %}

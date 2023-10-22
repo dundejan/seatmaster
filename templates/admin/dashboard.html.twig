@@ -49,8 +49,11 @@
             </div>
             {# Additional blocks for other statistics... #}
         </div>
-        <div class="col-8 mt-5">
-            {{ render_chart(chart) }}
+        <div class="col-10 mt-5">
+            {{ render_chart(chartDay) }}
+        </div>
+        <div class="col-10 mt-5">
+            {{ render_chart(chartMonth) }}
         </div>
     </div>
 {% endblock %}

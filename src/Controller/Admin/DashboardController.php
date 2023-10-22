@@ -77,7 +77,8 @@ class DashboardController extends AbstractDashboardController
 
 		return $this->render('admin/dashboard.html.twig', [
 			'statistics' => $statistics,
-			'chart' => $this->createChart(),
+			'chartDay' => $this->createChart(),
+			'chartMonth' => $this->createChartAllOfficesMonth(),
 		]);
     }
 
@@ -238,6 +239,89 @@ class DashboardController extends AbstractDashboardController
 
 		ChartHelper::addPluginZoom($chart);
 		ChartHelper::addPluginAnnotation($chart, $currentHour);
+
+		return $chart;
+	}
+
+	/**
+	 * @throws Exception
+	 */
+	private function createChartAllOfficesMonth(): Chart
+	{
+		$chart = $this->chartBuilder->createChart(Chart::TYPE_LINE);
+
+		// Generate array of days with last 20 days and next 10 days
+		$days = array_map(fn($day) => (new DateTime('now', new DateTimeZone('UTC')))->modify("$day days")->format('Y-m-d'), range(-20, 9));
+
+		$allDatasets = [];
+		$totalData = array_fill(0, count($days), 0);
+		$colors = ColorHelper::getNiceColors();
+		$colorIndex = 0;
+
+		// Loop through each office
+		$offices = $this->officeRepository->findAll();
+		foreach ($offices as $office) {
+			$data = [];
+			foreach ($days as $dayIndex => $day) {
+				$sum = 0;
+				foreach (range(8, 20) as $hour) {
+					$startDate = new DateTime("$day $hour:00:00", new DateTimeZone('UTC'));
+					$endDate = new DateTime("$day $hour:59:59", new DateTimeZone('UTC'));
+
+					$count = count($this->assignmentRepository->findOngoing($startDate, $endDate, $office))
+						+ count($this->repeatedAssignmentRepository->findOngoing($startDate, $endDate, $office));
+
+					$sum += $count;
+				}
+				$average = $sum / 13;
+				$data[] = $average;
+				$totalData[$dayIndex] += $average;
+			}
+
+			$allDatasets[] = [
+				'label' => $office->getName(),
+				'backgroundColor' => $colors[$colorIndex],
+				'borderColor' => $colors[$colorIndex],
+				'data' => $data,
+			];
+
+			$colorIndex++;
+		}
+
+		// Add dataset for all offices
+		$allDatasets[] = [
+			'label' => 'All Offices',
+			'backgroundColor' => 'rgb(0, 0, 0)',
+			'borderColor' => 'rgb(0, 0, 0)',
+			'data' => $totalData,
+		];
+
+		$chart->setData([
+			'labels' => $days,
+			'datasets' => $allDatasets,
+		]);
+
+		$chart->setOptions([
+			'scales' => [
+				'x' => [
+					'title' => [
+						'display' => true,
+						'text' => 'Day',
+					],
+				],
+				'y' => [
+					'title' => [
+						'display' => true,
+						'text' => 'Average Occupancy',
+					],
+					'suggestedMin' => 0,
+					'suggestedMax' => $this->seatRepository->count([]),
+				],
+			],
+		]);
+
+		ChartHelper::addPluginZoom($chart);
+		ChartHelper::addPluginAnnotation($chart, (new DateTime('now', new DateTimeZone('Europe/Paris')))->format('Y-m-d'));
 
 		return $chart;
 	}

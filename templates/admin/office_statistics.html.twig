@@ -10,12 +10,12 @@
         <h3>Real-time occupancy in offices</h3>
         <div class="row mb-3">
         {% for office in offices %}
-                <div class="col-6 col-md-3 m-1">
+                <div class="col-5 col-md-2 m-1">
                     <div class="dashboard-stat card">
                         <div class="card-body d-flex align-items-center">
                             <h3 class="card-title mb-0">{{ office.currentPersons }} / {{ office.capacity }}</h3>
                         </div>
-                        <footer class="card-footer bg-primary text-white">
+                        <footer class="card-footer bg-warning text-white">
                             {{ office.name }}
                         </footer>
                     </div>
