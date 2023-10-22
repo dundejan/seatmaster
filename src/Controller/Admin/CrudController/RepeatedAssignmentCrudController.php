@@ -57,7 +57,14 @@ class RepeatedAssignmentCrudController extends AbstractCrudController
 		    $startDateField,
 		    DateField::new('untilDate')
 		        ->setLabel('End date of repetition')
-			    ->setHelp('(leave blank to repeat forever)'),
+			    ->setHelp('(leave blank to repeat forever)')
+			    ->formatValue(function ($value) {
+				    if ($value === null) {
+					    return '<span class="badge badge-secondary">never</span>';
+				    }
+
+				    return $value;
+			    }),
 		    AssociationField::new('seat')
 			    ->autocomplete()
 			    ->setRequired(true),
