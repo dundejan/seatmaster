@@ -56,6 +56,7 @@ class Person
     #[Groups(['person:read', 'person:write', 'assignment:read', 'repeatedAssignment:read'])]
     #[Assert\NotBlank]
     private ?string $lastName = null;
+
 	/**
 	 * @var Collection<int, Assignment>
 	 */
@@ -64,13 +65,19 @@ class Person
     private Collection $assignments;
 
     #[ORM\Column(nullable: true)]
-    private ?int $idExternal = null;
+    private ?string $idExternal = null;
 
 	/**
 	 * @var Collection<int, RepeatedAssignment>
 	 */
     #[ORM\OneToMany(mappedBy: 'person', targetEntity: RepeatedAssignment::class, orphanRemoval: true)]
     private Collection $repeatedAssignments;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $email = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $jobTitle = null;
 
     public function __construct()
     {
@@ -79,14 +86,14 @@ class Person
     }
 
 	public function __toString(): string
-               	{
-               		return $this->getFullName();
-               	}
+	{
+		return $this->getFullName();
+	}
 
 	public function getFullName(): string
-               	{
-               		return $this->firstName . ' ' . $this->lastName;
-               	}
+	{
+		return $this->firstName . ' ' . $this->lastName;
+	}
 
     public function getId(): ?int
     {
@@ -147,12 +154,12 @@ class Person
         return $this;
     }
 
-    public function getIdExternal(): ?int
+    public function getIdExternal(): ?string
     {
         return $this->idExternal;
     }
 
-    public function setIdExternal(?int $idExternal): static
+    public function setIdExternal(?string $idExternal): static
     {
         $this->idExternal = $idExternal;
 
@@ -185,6 +192,30 @@ class Person
                 $repeatedAssignment->setPerson(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getEmail(): ?string
+    {
+        return $this->email;
+    }
+
+    public function setEmail(?string $email): static
+    {
+        $this->email = $email;
+
+        return $this;
+    }
+
+    public function getJobTitle(): ?string
+    {
+        return $this->jobTitle;
+    }
+
+    public function setJobTitle(?string $jobTitle): static
+    {
+        $this->jobTitle = $jobTitle;
 
         return $this;
     }

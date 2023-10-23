@@ -8,6 +8,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Config\Filters;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\IntegerField;
 
 class SeatCrudController extends AbstractCrudController
 {
@@ -23,7 +24,11 @@ class SeatCrudController extends AbstractCrudController
 	            ->hideOnForm(),
 	        AssociationField::new('office')
 		        ->autocomplete()
-		        ->setRequired(false),
+		        ->setRequired(true),
+	        IntegerField::new('coordX')
+		        ->setLabel('X coordinate'),
+	        IntegerField::new('coordY')
+		        ->setLabel('Y coordinate'),
         ];
     }
 
