@@ -4,6 +4,7 @@ namespace App\Repository;
 
 use App\Entity\Assignment;
 use App\Entity\Office;
+use App\Entity\Person;
 use App\Entity\RepeatedAssignment;
 use App\Entity\Seat;
 use DateTime;
@@ -65,6 +66,11 @@ class AssignmentRepository extends ServiceEntityRepository
 			else if ($parameter instanceof Seat) {
 				$qb->andWhere('e.seat = :seat')
 					->setParameter('seat', $parameter);
+			}
+			// If parameter is person instance, add additional condition
+			else if ($parameter instanceof Person) {
+				$qb->andWhere('e.person = :person')
+					->setParameter('person', $parameter);
 			}
 		}
 

@@ -23,7 +23,7 @@
                     </thead>
                     <tbody>
                     {% for person in persons %}
-                        <tr>
+                        <tr style="cursor:pointer" onclick="window.location='{{ path('app_person_detail', {'id': person.id}) }}'">
                             <td>{{ person.id }}</td>
                             <td>{{ person.firstName }}</td>
                             <td>{{ person.lastName }}</td>
