@@ -52,8 +52,10 @@ class RepeatedAssignmentCollisionTest extends KernelTestCase
 
 		/** @var RepeatedAssignmentRepository $repeatedAssignmentRepository */
 		$repeatedAssignmentRepository = $this->entityManager->getRepository(RepeatedAssignment::class);
-		$overlappingRepeatedAssignments = $repeatedAssignmentRepository->findOverlappingRepeatedAssignments($repeatedAssignment2, 'person');
 
+		$overlappingRepeatedAssignments = $repeatedAssignmentRepository->findOverlappingRepeatedAssignments($repeatedAssignment2, 'person');
+		$this->assertCount(0, $overlappingRepeatedAssignments);
+		$overlappingRepeatedAssignments = $repeatedAssignmentRepository->findOverlappingRepeatedAssignments($repeatedAssignment2, 'seat');
 		$this->assertCount(0, $overlappingRepeatedAssignments);
 
 		$this->assertRepeatedAssignmentsExist($repeatedAssignment1, $repeatedAssignment2);
@@ -76,9 +78,12 @@ class RepeatedAssignmentCollisionTest extends KernelTestCase
 
 		/** @var RepeatedAssignmentRepository $repeatedAssignmentRepository */
 		$repeatedAssignmentRepository = $this->entityManager->getRepository(RepeatedAssignment::class);
-		$overlappingAssignments = $repeatedAssignmentRepository->findOverlappingRepeatedAssignments($repeatedAssignment, 'person');
 
-		$this->assertCount(1, $overlappingAssignments);
+		$overlappingRepeatedAssignments = $repeatedAssignmentRepository->findOverlappingRepeatedAssignments($repeatedAssignment, 'person');
+		$this->assertCount(1, $overlappingRepeatedAssignments);
+
+		$overlappingRepeatedAssignments = $repeatedAssignmentRepository->findOverlappingRepeatedAssignments($repeatedAssignment, 'seat');
+		$this->assertCount(1, $overlappingRepeatedAssignments);
 	}
 
 	/**
