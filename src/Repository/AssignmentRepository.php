@@ -112,8 +112,6 @@ class AssignmentRepository extends ServiceEntityRepository
 			return $qb->getQuery()->setHydrationMode(AbstractQuery::HYDRATE_ARRAY)->execute();
 		}
 		else {
-			// TODO: test this, especially dealing with time zones, so the -2 modifying
-
 			$em = $this->getEntityManager();
 			$connection = $em->getConnection();
 
@@ -131,13 +129,6 @@ class AssignmentRepository extends ServiceEntityRepository
 				throw new LogicException('fromTime or toTime or Person or Seat null, but never should be');
 			}
 
-			/** @var DateTime $adjustedFromTime */
-			$adjustedFromTime = clone $fromTime;
-			/** @var DateTime $adjustedToTime */
-			$adjustedToTime = clone $toTime;
-			$adjustedFromTime->modify('-2 hours');
-			$adjustedToTime->modify('-2 hours');
-
 			$param_id = $param . '_id';
 
 			$sql = "
@@ -148,9 +139,9 @@ class AssignmentRepository extends ServiceEntityRepository
             WHERE e.$param_id = :param_id 
             AND (EXTRACT(dow FROM e.from_date) = :dayOfWeek OR EXTRACT(dow FROM e.to_date) = :dayOfWeek)
             AND (
-                (e.from_date::TIME <= :toTime AND e.to_date::TIME >= :fromTime)
-                OR
-                (e.to_date::TIME >= :fromTime AND e.from_date::TIME <= :toTime)
+                ((e.from_date::timestamptz AT TIME ZONE 'Europe/Prague')::TIME < :toTime 
+                     AND 
+                 (e.to_date::timestamptz AT TIME ZONE 'Europe/Prague')::TIME > :fromTime)
             )
             AND (
                 e.from_date >= :startDate
@@ -161,8 +152,8 @@ class AssignmentRepository extends ServiceEntityRepository
 				// As param_id return personId or seatId based on $param value
 				'param_id' => $param === 'person' ? $person->getId() : $seat->getId(),
 				'dayOfWeek' => $dayOfWeek !== 7 ? $dayOfWeek : 0, // Adjust for PostgreSQL day of week
-				'fromTime' => $adjustedFromTime->format('H:i:s'),
-				'toTime' => $adjustedToTime->format('H:i:s'),
+				'fromTime' => $fromTime->format('H:i:s'),
+				'toTime' => $toTime->format('H:i:s'),
 				'startDate' => $startDate->format('Y-m-d H:i:s'),
 			];
 

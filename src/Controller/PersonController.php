@@ -79,8 +79,8 @@ class PersonController extends AbstractController
 		return $this->render('person/detail.html.twig', [
 			'person' => $person,
 			'currentAssignment' => $assignment,
-			'from' => $from->format('H:i'),
-			'to' => $to->format('H:i'),
+			'from' => $from ? $from->format('H:i') : $from,
+			'to' => $to ? $to->format('H:i') : $to,
 		]);
 	}
 }

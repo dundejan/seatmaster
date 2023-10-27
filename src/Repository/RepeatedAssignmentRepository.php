@@ -148,8 +148,6 @@ class RepeatedAssignmentRepository extends ServiceEntityRepository
 			return $qb->getQuery()->setHydrationMode(AbstractQuery::HYDRATE_ARRAY)->execute();
 		}
 		else {
-			// TODO: test this, especially dealing with time zones, so the -2 modifying
-
 			$em = $this->getEntityManager();
 			$connection = $em->getConnection();
 
@@ -166,8 +164,10 @@ class RepeatedAssignmentRepository extends ServiceEntityRepository
 			$adjustedFromDate = clone $fromDate;
 			/** @var DateTime $adjustedToDate */
 			$adjustedToDate = clone $toDate;
-			$adjustedFromDate->modify('+2 hours');
-			$adjustedToDate->modify('+2 hours');
+
+			// Set timezone to modify the time +1 or +2 hours depending on the current DST
+			$adjustedFromDate->setTimezone(new DateTimeZone('Europe/Prague'));
+			$adjustedToDate->setTimezone(new DateTimeZone('Europe/Prague'));
 
 			$param_id = $param . '_id';
 
@@ -180,9 +180,9 @@ class RepeatedAssignmentRepository extends ServiceEntityRepository
             WHERE e.$param_id = :param_id 
             AND e.day_of_week = :dayOfWeek
             AND (
-                (e.from_time::TIME <= :toDate AND e.to_time::TIME >= :fromDate)
+                (e.from_time::TIME < :toDate AND e.to_time::TIME > :fromDate)
                 OR
-                (e.to_time::TIME >= :fromDate AND e.from_time::TIME <= :toDate)
+                (e.to_time::TIME > :fromDate AND e.from_time::TIME < :toDate)
             )
             AND (
                 e.start_date <= :startDate

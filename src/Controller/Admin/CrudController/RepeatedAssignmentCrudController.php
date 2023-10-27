@@ -14,6 +14,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\DateField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\FormField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TimeField;
+use Exception;
 
 class RepeatedAssignmentCrudController extends AbstractCrudController
 {
@@ -22,7 +23,10 @@ class RepeatedAssignmentCrudController extends AbstractCrudController
         return RepeatedAssignment::class;
     }
 
-    public function configureFields(string $pageName): iterable
+	/**
+	 * @throws Exception
+	 */
+	public function configureFields(string $pageName): iterable
     {
 		// Declare this field here to perform logic with the default value
 	    $startDateField = DateField::new('startDate')

@@ -2,7 +2,6 @@
 
 namespace App\Controller;
 
-use App\Entity\Seat;
 use App\Repository\AssignmentRepository;
 use App\Repository\RepeatedAssignmentRepository;
 use App\Repository\SeatRepository;
@@ -10,7 +9,9 @@ use DateTime;
 use DateTimeZone;
 use Exception;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Routing\Annotation\Route;
 
 class SeatController extends AbstractController
@@ -26,11 +27,26 @@ class SeatController extends AbstractController
 	 * @throws Exception
 	 */
 	#[Route('/seats-free', name: 'app_seats_free', methods: ['GET'])]
-	public function show(): Response
+	public function show(Request $request): Response
 	{
-		$now = new DateTime('now', new DateTimeZone('UTC'));
-		$currentAssignments = $this->assignmentRepository->findOngoing($now, $now);
-		$currentRepeatedAssignments = $this->repeatedAssignmentRepository->findCurrentlyOngoing();
+		$fromDateTimeString = $request->query->get('fromDateTime');
+		$toDateTimeString = $request->query->get('toDateTime');
+
+		$dateTimeZone = new DateTimeZone('Europe/Paris');
+
+		if ($fromDateTimeString !== null && !is_string($fromDateTimeString)) {
+			throw new BadRequestHttpException("Invalid 'fromDateTime' parameter.");
+		}
+		if ($toDateTimeString !== null && !is_string($toDateTimeString)) {
+			throw new BadRequestHttpException("Invalid 'toDateTime' parameter.");
+		}
+
+		$fromDateTime = $fromDateTimeString ? new DateTime($fromDateTimeString, $dateTimeZone) : new DateTime('now', $dateTimeZone);
+		$toDateTime = $toDateTimeString ? new DateTime($toDateTimeString, $dateTimeZone) : new DateTime('now', $dateTimeZone);
+
+		// TODO: test this, need to modify DateTimeZone or do +-2 hours to call findOngoing on assignmentRepository
+		$currentAssignments = $this->assignmentRepository->findOngoing($fromDateTime, $toDateTime);
+		$currentRepeatedAssignments = $this->repeatedAssignmentRepository->findOngoing($fromDateTime, $toDateTime);
 
 		$allCurrentAssignments = array_merge($currentAssignments, $currentRepeatedAssignments);
 
@@ -39,7 +55,7 @@ class SeatController extends AbstractController
 			return $assignment->getSeat()->getId();
 		}, $allCurrentAssignments);
 
-		$allSeats = $this->seatRepository->findAll();
+		$allSeats = $this->seatRepository->findBy([], ['id' => 'ASC']);
 
 		// Filter out those seats from the second array.
 		$availableSeats = array_filter($allSeats, function($seat) use ($assignedSeatIds) {
@@ -51,6 +67,8 @@ class SeatController extends AbstractController
 
 		return $this->render('seat/available.html.twig', [
 			"availableSeats" => $availableSeats,
+			"fromDateTime" => $fromDateTime->format('Y-m-d\TH:i:s'),
+			"toDateTime" => $toDateTime->format('Y-m-d\TH:i:s'),
 		]);
 	}
 }
