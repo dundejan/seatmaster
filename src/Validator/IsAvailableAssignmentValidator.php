@@ -47,8 +47,8 @@ class IsAvailableAssignmentValidator extends ConstraintValidator
 				->setParameter('{{ collisionType }}', 'person')
 				->setParameter('{{ collidingAssignment }}',
 					'id: ' . $personConflictsWithAssignments[0]['id'] .
-					', from: ' . TimeHelper::getDateTimeAsString($personConflictsWithAssignments[0]['fromDate']) .
-					', to: ' . TimeHelper::getDateTimeAsString($personConflictsWithAssignments[0]['toDate'])
+					', from: ' . TimeHelper::getDateTimeAsString($personConflictsWithAssignments[0]['fromDate'] . ' UTC') .
+					', to: ' . TimeHelper::getDateTimeAsString($personConflictsWithAssignments[0]['toDate'] . ' UTC')
 					)
 				->setParameter('{{ assignmentType }}', 'one-time')
 				->addViolation();
@@ -64,8 +64,8 @@ class IsAvailableAssignmentValidator extends ConstraintValidator
 				->setParameter('{{ collisionType }}', 'seat')
 				->setParameter('{{ collidingAssignment }}',
 					'id: ' . $seatConflictsWithAssignments[0]['id'] .
-					', from: ' . TimeHelper::getDateTimeAsString($seatConflictsWithAssignments[0]['fromDate']) .
-					', to: ' . TimeHelper::getDateTimeAsString($seatConflictsWithAssignments[0]['toDate'])
+					', from: ' . TimeHelper::getDateTimeAsString($seatConflictsWithAssignments[0]['fromDate'] . ' UTC') .
+					', to: ' . TimeHelper::getDateTimeAsString($seatConflictsWithAssignments[0]['toDate'] . ' UTC')
 					)
 				->setParameter('{{ assignmentType }}', 'one-time')
 				->addViolation();

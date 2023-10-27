@@ -21,6 +21,21 @@ class PersonRepository extends ServiceEntityRepository
         parent::__construct($registry, Person::class);
     }
 
+	public function search(string $term)
+	{
+		$qb = $this->createQueryBuilder('p');
+
+		if ($term) {
+			$qb->where('LOWER(p.firstName) LIKE LOWER(:term) OR LOWER(p.lastName) LIKE LOWER(:term) OR LOWER(p.email) LIKE LOWER(:term) OR LOWER(p.jobTitle) LIKE LOWER(:term)')
+				->setParameter('term', '%' . $term . '%');
+		}
+
+		$qb->orderBy('p.lastName', 'ASC')
+			->addOrderBy('p.firstName', 'ASC');
+
+		return $qb->getQuery()->getResult();
+	}
+
 //    /**
 //     * @return Person[] Returns an array of Person objects
 //     */
