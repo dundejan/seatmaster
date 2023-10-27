@@ -13,10 +13,9 @@ use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\DBAL\Exception;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\AbstractQuery;
-use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
-use http\Exception\InvalidArgumentException;
+use InvalidArgumentException;
 use Symfony\Component\Form\Exception\LogicException;
 
 /**
@@ -58,7 +57,7 @@ class RepeatedAssignmentRepository extends ServiceEntityRepository
 
 		$qb->andWhere('e.startDate <= :fromTime AND COALESCE(e.untilDate, :infinityDate) >= :fromTime')
 			->setParameter('fromTime', $fromParis)
-			->setParameter('infinityDate', new \DateTime('9999-12-31 23:59:59'));
+			->setParameter('infinityDate', new DateTime('9999-12-31 23:59:59'));
 
 		// If parameter is provided
 		if ($parameter !== null) {
@@ -129,10 +128,10 @@ class RepeatedAssignmentRepository extends ServiceEntityRepository
 				->setParameter('fromTime', $assignment->getFromTime())
 				->setParameter('toTime', $assignment->getToTime())
 				->setParameter('id', $assignment->getId() ?: -1)
-				->andWhere('e.startDate < :untilDate AND COALESCE(e.untilDate, :infinityDate) > :startDate')
-				->setParameter('untilDate', $assignment->getUntilDate() ?: new \DateTime('9999-12-31 23:59:59'))
+				->andWhere('e.startDate <= :untilDate AND COALESCE(e.untilDate, :infinityDate) >= :startDate')
+				->setParameter('untilDate', $assignment->getUntilDate() ?: new DateTime('9999-12-31 23:59:59'))
 				->setParameter('startDate', $assignment->getStartDate())
-				->setParameter('infinityDate', new \DateTime('9999-12-31 23:59:59'))
+				->setParameter('infinityDate', new DateTime('9999-12-31 23:59:59'))
 			;
 
 			// Filter just those for the same person
