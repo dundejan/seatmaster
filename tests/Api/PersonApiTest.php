@@ -99,7 +99,7 @@ class PersonApiTest extends WebTestCase
 		$this->assertSame('John', $decodedContent['hydra:member'][0]['firstName']);
 	}
 
-	public function testCreatePersonAsAdmin(): void
+	public function testRedirectWhenTryToPostPersonWithoutAdmin(): void
 	{
 		$client = static::createClient();
 		$container = $client->getContainer();
@@ -144,6 +144,34 @@ class PersonApiTest extends WebTestCase
 
 		// 302 because of the redirect to login page
 		$this->assertEquals(302, $client->getResponse()->getStatusCode());
+	}
+
+	public function testPostPersonAsAdmin(): void
+	{
+		$client = static::createClient();
+		$container = $client->getContainer();
+
+		/** @var ManagerRegistry|null $doctrine */
+		$doctrine = $container->get('doctrine');
+		if ($doctrine === null) {
+			$this->fail('Doctrine is not available.');
+		}
+
+		/** @var EntityManagerInterface $entityManager */
+		$entityManager = $doctrine->getManager();
+
+		// Create a new User entity and set its role to 'ROLE_ADMIN'.
+		$user = new User();
+		$user->setEmail('admin@example.com');
+		$user->setRoles(['ROLE_ADMIN']);
+		$user->setPassword('password');
+		$token = new ApiToken();
+		$token->setOwnedBy($user);
+
+		$entityManager->persist($user);
+		$entityManager->persist($token);
+		$entityManager->flush();
+
 
 		$headers = [
 			'CONTENT_TYPE' => 'application/ld+json',

@@ -39,7 +39,7 @@ class AssignmentCollisionTest extends KernelTestCase
 	 * @dataProvider provideNoCollisionData
 	 * @throws Exception
 	 */
-	public function testNoCollision(string $fromDate1, string $toDate1, string $fromDate2, string $toDate2): void
+	public function testNoCollisionForNotOverlappingAssignments(string $fromDate1, string $toDate1, string $fromDate2, string $toDate2): void
 	{
 		$person = $this->createPerson();
 		$seat = $this->createSeat();
@@ -60,7 +60,7 @@ class AssignmentCollisionTest extends KernelTestCase
 	 * @dataProvider provideCollisionData
 	 * @throws Exception
 	 */
-	public function testCollision(string $fromDate1, string $toDate1, string $fromDate2, string $toDate2): void
+	public function testCollisionForOverlappingAssignments(string $fromDate1, string $toDate1, string $fromDate2, string $toDate2): void
 	{
 		$person = $this->createPerson();
 		$seat = $this->createSeat();

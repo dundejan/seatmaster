@@ -42,7 +42,7 @@ class AssignmentWithRepeatedAssignmentCollisionTest extends KernelTestCase
 	 * @dataProvider provideNoCollisionData
 	 * @throws Exception
 	 */
-	public function testNoCollision(string $fromDate, string $toDate, string $fromTime, string $toTime, int $dayOfWeek, string $startDate, string|null $untilDate): void
+	public function testNoCollisionForNotOverlappingAssignmentWithRepeatedAssignment(string $fromDate, string $toDate, string $fromTime, string $toTime, int $dayOfWeek, string $startDate, string|null $untilDate): void
 	{
 		$person = $this->createPerson();
 		$seat = $this->createSeat();
@@ -94,7 +94,7 @@ class AssignmentWithRepeatedAssignmentCollisionTest extends KernelTestCase
 	 * @dataProvider provideCollisionData
 	 * @throws Exception
 	 */
-	public function testCollision(string $fromDate, string $toDate, string $fromTime, string $toTime, int $dayOfWeek, string $startDate, string|null $untilDate): void
+	public function testCollisionForOverlappingAssignmentWithRepeatedAssignment(string $fromDate, string $toDate, string $fromTime, string $toTime, int $dayOfWeek, string $startDate, string|null $untilDate): void
 	{
 		$person = $this->createPerson();
 		$seat = $this->createSeat();

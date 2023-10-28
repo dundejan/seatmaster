@@ -39,7 +39,7 @@ class RepeatedAssignmentCollisionTest extends KernelTestCase
 	 * @dataProvider provideNoCollisionData
 	 * @throws Exception
 	 */
-	public function testNoCollision(
+	public function testNoCollisionForNotOverlappingRepeatedAssignments(
 		string $fromTime1, string $toTime1, int $dayOfWeek1, string $startDate1, string|null $untilDate1,
 		string $fromTime2, string $toTime2, int $dayOfWeek2, string $startDate2, string|null $untilDate2)
 	: void
@@ -65,7 +65,7 @@ class RepeatedAssignmentCollisionTest extends KernelTestCase
 	 * @dataProvider provideCollisionData
 	 * @throws Exception
 	 */
-	public function testCollision(
+	public function testCollisionForOverlappingRepeatedAssignments(
 		string $fromTime1, string $toTime1, int $dayOfWeek1, string $startDate1, string|null $untilDate1,
 		string $fromTime2, string $toTime2, int $dayOfWeek2, string $startDate2, string|null $untilDate2)
 	: void 
