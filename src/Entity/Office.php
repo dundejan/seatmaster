@@ -63,10 +63,12 @@ class Office
 
     #[ORM\Column]
     #[Groups(['office:read', 'office:write'])]
+    #[Assert\GreaterThanOrEqual(50)]
     private ?int $width = 500;
 
     #[ORM\Column]
     #[Groups(['office:read', 'office:write'])]
+    #[Assert\GreaterThanOrEqual(50)]
     private ?int $height = 500;
 
     public function __construct()
@@ -122,9 +124,9 @@ class Office
     }
 
 	public function __toString(): string
-                  	{
-                  		return (string) $this->name;
-                  	}
+	{
+		return (string) $this->name;
+	}
 
     public function getWidth(): ?int
     {
