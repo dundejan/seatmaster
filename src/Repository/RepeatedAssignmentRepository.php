@@ -187,7 +187,7 @@ class RepeatedAssignmentRepository extends ServiceEntityRepository
                 e.start_date <= :startDate
             )
             AND (
- 			   e.until_date IS NULL OR e.until_date >= :untilDate
+ 			   e.until_date IS NULL OR DATE(e.until_date) >= DATE(:untilDate)
 			)
        		";
 

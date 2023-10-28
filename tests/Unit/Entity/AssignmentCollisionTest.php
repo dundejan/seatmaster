@@ -81,9 +81,17 @@ class AssignmentCollisionTest extends KernelTestCase
 	public function provideNoCollisionData(): array
 	{
 		return [
+			// NO COLLISION DURING DST (Daylight Saving Time)
 			['2023-10-01 10:00', '2023-10-01 12:00', '2023-10-01 13:00', '2023-10-01 14:00'],
+			// NO COLLISION BECAUSE I ACCEPT SAME END TIME AND START TIME DURING DST (Daylight Saving Time)
 			['2023-10-01 10:00', '2023-10-01 12:00', '2023-10-01 12:00', '2023-10-01 14:00'],
 			['2023-10-01 20:00', '2023-10-01 22:00', '2023-10-01 10:00', '2023-10-01 20:00'],
+
+			// NO COLLISION NOT DURING DST (Daylight Saving Time)
+			['2023-02-01 10:00', '2023-02-01 12:00', '2023-02-01 13:00', '2023-02-01 14:00'],
+			// NO COLLISION BECAUSE I ACCEPT SAME END TIME AND START TIME NOT DURING DST (Daylight Saving Time)
+			['2023-02-01 10:00', '2023-02-01 12:00', '2023-02-01 12:00', '2023-02-01 14:00'],
+			['2023-02-01 20:00', '2023-02-01 22:00', '2023-02-01 10:00', '2023-02-01 20:00'],
 		];
 	}
 
@@ -93,12 +101,18 @@ class AssignmentCollisionTest extends KernelTestCase
 	public function provideCollisionData(): array
 	{
 		return [
+			// COLLISIONS BECAUSE OF TIME DURING DST (Daylight Saving Time)
 			['2023-10-01 10:00', '2023-10-01 12:00', '2023-10-01 11:00', '2023-10-01 13:00'],
 			['2023-10-01 10:00', '2023-10-01 12:01', '2023-10-01 12:00', '2023-10-01 13:00'],
 			['2023-10-01 10:00', '2023-10-01 12:00', '2023-10-01 09:00', '2023-10-01 11:00'],
 			['2023-10-01 10:00', '2023-10-01 12:00', '2023-10-01 10:59', '2023-10-01 11:00'],
 			['2023-10-01 10:00', '2023-10-01 10:01', '2023-10-01 10:00', '2023-10-01 10:02'],
 			['2023-10-01 10:00', '2023-10-01 10:01', '2023-10-01 00:01', '2023-10-01 23:59'],
+
+			// COLLISIONS BECAUSE OF TIME NOT DURING DST (Daylight Saving Time)
+			['2023-02-01 10:00', '2023-02-01 12:00', '2023-02-01 11:00', '2023-02-01 13:00'],
+			['2023-02-01 10:00', '2023-02-01 12:01', '2023-02-01 12:00', '2023-02-01 13:00'],
+			['2023-02-01 10:00', '2023-02-01 12:00', '2023-02-01 09:00', '2023-02-01 11:00'],
 		];
 	}
 

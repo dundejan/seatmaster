@@ -13,15 +13,11 @@ use App\Entity\Person;
 use App\Entity\RepeatedAssignment;
 use App\Entity\Seat;
 use App\Entity\User;
-use App\Helper\ChartHelper;
-use App\Helper\ColorHelper;
 use App\Repository\AssignmentRepository;
 use App\Repository\OfficeRepository;
 use App\Repository\PersonRepository;
 use App\Repository\RepeatedAssignmentRepository;
 use App\Repository\SeatRepository;
-use DateTime;
-use DateTimeZone;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Assets;
@@ -32,7 +28,6 @@ use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractDashboardController;
 use Exception;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\UX\Chartjs\Builder\ChartBuilderInterface;
 
 class DashboardController extends AbstractDashboardController
 {

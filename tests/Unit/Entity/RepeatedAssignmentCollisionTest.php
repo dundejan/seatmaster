@@ -92,12 +92,26 @@ class RepeatedAssignmentCollisionTest extends KernelTestCase
 	public function provideNoCollisionData(): array
 	{
 		return [
+			// NO COLLISION DURING DST (Daylight Saving Time)
 			['10:00', '12:00', 1, '2023-10-01', null, '13:00', '14:00', 1, '2023-10-01', null],
+			// NO COLLISION BECAUSE I ACCEPT SAME END TIME AND START TIME DURING DST (Daylight Saving Time)
 			['10:00', '12:00', 5, '2023-10-01', null, '12:00', '14:00', 5, '2023-10-01', null],
 			['20:00', '22:00', 6, '2023-10-01', null, '10:00', '20:00', 6, '2023-10-01', null],
+			// NO COLLISIONS BECAUSE ANOTHER DAY IN WEEK IN REPEATED ASSIGNMENT DURING DST (Daylight Saving Time)
 			['10:00', '12:00', 1, '2023-10-01', null, '10:00', '12:00', 2, '2023-10-01', null],
+
+			// NO COLLISION NOT DURING DST (Daylight Saving Time)
+			['10:00', '12:00', 1, '2023-01-01', null, '13:00', '14:00', 1, '2023-01-01', null],
+			// NO COLLISION BECAUSE I ACCEPT SAME END TIME AND START TIME NOT DURING DST (Daylight Saving Time)
+			['10:00', '12:00', 5, '2023-01-01', null, '12:00', '14:00', 5, '2023-01-01', null],
+			['20:00', '22:00', 6, '2023-01-01', null, '10:00', '20:00', 6, '2023-01-01', null],
+			// NO COLLISIONS BECAUSE ANOTHER DAY IN WEEK IN REPEATED ASSIGNMENT NOT DURING DST (Daylight Saving Time)
+			['10:00', '12:00', 1, '2023-01-01', null, '10:00', '12:00', 2, '2023-01-01', null],
+
+			// NO COLLISIONS BECAUSE START DATE IS AFTER END DATE OF ANOTHER DURING DST (Daylight Saving Time)
 			['10:00', '12:00', 1, '2023-10-01', '2023-10-07', '10:00', '12:00', 1, '2023-10-08', null],
-			['10:00', '11:00', 5, '2023-10-08', null, '10:00', '12:00', 5, '2023-01-01', '2023-10-07'],
+			// NO COLLISIONS BECAUSE START DATE IS AFTER END DATE OF ANOTHER NOT DURING DST (Daylight Saving Time)
+			['10:00', '11:00', 5, '2023-12-08', null, '10:00', '12:00', 5, '2023-01-01', '2023-12-07'],
 		];
 	}
 
@@ -107,9 +121,17 @@ class RepeatedAssignmentCollisionTest extends KernelTestCase
 	public function provideCollisionData(): array
 	{
 		return [
+			// COLLISIONS BECAUSE OF TIME DURING DST (Daylight Saving Time)
 			['10:00', '12:00', 1, '2023-10-01', null, '11:00', '14:00', 1, '2023-10-01', null],
 			['10:00', '13:00', 5, '2023-10-01', null, '12:59', '14:00', 5, '2023-10-01', null],
-			['20:00', '22:00', 6, '2023-10-01', null, '10:00', '23:00', 6, '2023-10-01', null],
+			['20:00', '22:00', 6, '2023-10-01', '2023-10-10', '10:00', '23:00', 6, '2023-10-01', '2023-12-15'],
+
+			// COLLISIONS BECAUSE OF TIME NOT DURING DST (Daylight Saving Time)
+			['10:00', '12:00', 1, '2023-12-01', null, '11:00', '14:00', 1, '2023-12-01', null],
+			['10:00', '13:00', 5, '2023-12-01', null, '12:59', '14:00', 5, '2023-12-01', null],
+			['20:00', '22:00', 6, '2023-12-01', '2023-12-10', '10:00', '23:00', 6, '2023-12-01', '2023-12-12'],
+
+			// COLLISIONS BECAUSE OF TIME + SAME START DATE AND END DATE
 			['10:00', '12:00', 1, '2023-10-01', '2023-10-07', '10:00', '12:00', 1, '2023-10-07', null],
 			['10:00', '11:00', 5, '2023-10-07', null, '10:00', '12:00', 5, '2023-01-01', '2023-10-07'],
 		];
