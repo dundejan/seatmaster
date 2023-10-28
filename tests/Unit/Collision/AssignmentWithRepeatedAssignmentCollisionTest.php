@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Tests\Unit\Entity;
+namespace App\Tests\Unit\Collision;
 
 use App\Entity\Assignment;
 use App\Entity\Office;
@@ -17,7 +17,7 @@ use Doctrine\Persistence\ObjectManager;
 use Exception;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
-class AssignmentRepeatedAssignmentCollisionTest extends KernelTestCase
+class AssignmentWithRepeatedAssignmentCollisionTest extends KernelTestCase
 {
 	private EntityManagerInterface|ObjectManager $entityManager;
 

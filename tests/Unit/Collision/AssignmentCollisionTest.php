@@ -1,18 +1,18 @@
 <?php
 
-namespace App\Tests\Unit\Entity;
+namespace App\Tests\Unit\Collision;
 
-use App\Entity\Office;
 use App\Entity\Assignment;
+use App\Entity\Office;
 use App\Entity\Person;
 use App\Entity\Seat;
 use App\Repository\AssignmentRepository;
 use DateTime;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\ObjectManager;
 use Exception;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
-use Doctrine\ORM\EntityManagerInterface;
 
 class AssignmentCollisionTest extends KernelTestCase
 {
