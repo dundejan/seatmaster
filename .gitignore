@@ -23,3 +23,4 @@ yarn-error.log
 ###< symfony/phpunit-bridge ###
 
 /docker/
+tests/_output
