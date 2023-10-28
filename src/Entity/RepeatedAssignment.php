@@ -11,6 +11,7 @@ use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use App\Repository\RepeatedAssignmentRepository;
 use App\Validator\IsAvailableAssignment;
+use DateTimeInterface;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
@@ -70,21 +71,21 @@ class RepeatedAssignment
     #[ORM\Column(type: Types::TIME_MUTABLE)]
     #[Groups(['repeatedAssignment:read', 'repeatedAssignment:write', 'seat:read'])]
     #[Assert\NotBlank]
-    private ?\DateTimeInterface $fromTime = null;
+    private ?DateTimeInterface $fromTime = null;
 
     #[ORM\Column(type: Types::TIME_MUTABLE)]
     #[Groups(['repeatedAssignment:read', 'repeatedAssignment:write', 'seat:read'])]
     #[Assert\NotBlank]
-    private ?\DateTimeInterface $toTime = null;
+    private ?DateTimeInterface $toTime = null;
 
     #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
     #[Groups(['repeatedAssignment:read', 'repeatedAssignment:write', 'seat:read'])]
-    private ?\DateTimeInterface $untilDate = null;
+    private ?DateTimeInterface $untilDate = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     #[Groups(['repeatedAssignment:read', 'repeatedAssignment:write', 'seat:read'])]
     #[Assert\NotBlank]
-    private ?\DateTimeInterface $startDate = null;
+    private ?DateTimeInterface $startDate = null;
 
     public function getId(): ?int
     {
@@ -127,48 +128,48 @@ class RepeatedAssignment
         return $this;
     }
 
-    public function getFromTime(): ?\DateTimeInterface
+    public function getFromTime(): ?DateTimeInterface
     {
         return $this->fromTime;
     }
 
-    public function setFromTime(\DateTimeInterface $fromTime): static
+    public function setFromTime(DateTimeInterface $fromTime): static
     {
         $this->fromTime = $fromTime;
 
         return $this;
     }
 
-    public function getToTime(): ?\DateTimeInterface
+    public function getToTime(): ?DateTimeInterface
     {
         return $this->toTime;
     }
 
-    public function setToTime(?\DateTimeInterface $toTime): static
+    public function setToTime(?DateTimeInterface $toTime): static
     {
         $this->toTime = $toTime;
 
         return $this;
     }
 
-    public function getUntilDate(): ?\DateTimeInterface
+    public function getUntilDate(): ?DateTimeInterface
     {
         return $this->untilDate;
     }
 
-    public function setUntilDate(?\DateTimeInterface $untilDate): static
+    public function setUntilDate(?DateTimeInterface $untilDate): static
     {
         $this->untilDate = $untilDate;
 
         return $this;
     }
 
-    public function getStartDate(): ?\DateTimeInterface
+    public function getStartDate(): ?DateTimeInterface
     {
         return $this->startDate;
     }
 
-    public function setStartDate(\DateTimeInterface $startDate): static
+    public function setStartDate(DateTimeInterface $startDate): static
     {
         $this->startDate = $startDate;
 
