@@ -21,7 +21,7 @@ class PersonRepository extends ServiceEntityRepository
         parent::__construct($registry, Person::class);
     }
 
-	public function search(string $term)
+	public function search(string $term): mixed
 	{
 		$qb = $this->createQueryBuilder('p');
 

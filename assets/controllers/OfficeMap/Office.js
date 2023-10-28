@@ -220,4 +220,8 @@ Office.propTypes = {
 	officeName: PropTypes.string.isRequired,
 	chairs: PropTypes.array.isRequired,
 	addNewChair: PropTypes.func.isRequired,
+	refreshFlag: PropTypes.bool.isRequired,
+	setRefreshFlag: PropTypes.func.isRequired,
+	dateTimeParam: PropTypes.string.isRequired,
+	setDateTimeParam: PropTypes.func.isRequired,
 };

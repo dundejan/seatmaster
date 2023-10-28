@@ -49,13 +49,5 @@
             </div>
             {# Additional blocks for other statistics... #}
         </div>
-        <div class="col-10 mt-5">
-            <h3>Today's occupancy</h3>
-            {{ render_chart(chartDay) }}
-        </div>
-        <div class="col-10 mt-5">
-            <h3>Average occupancy in the last 20 and future 10 days (between 8:00 and 20:00)</h3>
-            {{ render_chart(chartMonth) }}
-        </div>
     </div>
 {% endblock %}

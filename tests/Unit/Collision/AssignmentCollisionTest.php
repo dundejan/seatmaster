@@ -1,18 +1,18 @@
 <?php
 
-namespace App\Tests\Unit\Entity;
+namespace App\Tests\Unit\Collision;
 
-use App\Entity\Office;
 use App\Entity\Assignment;
+use App\Entity\Office;
 use App\Entity\Person;
 use App\Entity\Seat;
 use App\Repository\AssignmentRepository;
 use DateTime;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\ObjectManager;
 use Exception;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
-use Doctrine\ORM\EntityManagerInterface;
 
 class AssignmentCollisionTest extends KernelTestCase
 {
@@ -39,7 +39,7 @@ class AssignmentCollisionTest extends KernelTestCase
 	 * @dataProvider provideNoCollisionData
 	 * @throws Exception
 	 */
-	public function testNoCollision(string $fromDate1, string $toDate1, string $fromDate2, string $toDate2): void
+	public function testNoCollisionForNotOverlappingAssignments(string $fromDate1, string $toDate1, string $fromDate2, string $toDate2): void
 	{
 		$person = $this->createPerson();
 		$seat = $this->createSeat();
@@ -60,7 +60,7 @@ class AssignmentCollisionTest extends KernelTestCase
 	 * @dataProvider provideCollisionData
 	 * @throws Exception
 	 */
-	public function testCollision(string $fromDate1, string $toDate1, string $fromDate2, string $toDate2): void
+	public function testCollisionForOverlappingAssignments(string $fromDate1, string $toDate1, string $fromDate2, string $toDate2): void
 	{
 		$person = $this->createPerson();
 		$seat = $this->createSeat();
@@ -81,9 +81,17 @@ class AssignmentCollisionTest extends KernelTestCase
 	public function provideNoCollisionData(): array
 	{
 		return [
-			['2022-10-01 10:00', '2022-10-01 12:00', '2022-10-01 13:00', '2022-10-01 14:00'],
-			['2022-10-01 10:00', '2022-10-01 12:00', '2022-10-01 12:00', '2022-10-01 14:00'],
-			['2022-10-01 20:00', '2022-10-01 22:00', '2022-10-01 10:00', '2022-10-01 20:00'],
+			// NO COLLISION DURING DST (Daylight Saving Time)
+			['2023-10-01 10:00', '2023-10-01 12:00', '2023-10-01 13:00', '2023-10-01 14:00'],
+			// NO COLLISION BECAUSE I ACCEPT SAME END TIME AND START TIME DURING DST (Daylight Saving Time)
+			['2023-10-01 10:00', '2023-10-01 12:00', '2023-10-01 12:00', '2023-10-01 14:00'],
+			['2023-10-01 20:00', '2023-10-01 22:00', '2023-10-01 10:00', '2023-10-01 20:00'],
+
+			// NO COLLISION NOT DURING DST (Daylight Saving Time)
+			['2023-02-01 10:00', '2023-02-01 12:00', '2023-02-01 13:00', '2023-02-01 14:00'],
+			// NO COLLISION BECAUSE I ACCEPT SAME END TIME AND START TIME NOT DURING DST (Daylight Saving Time)
+			['2023-02-01 10:00', '2023-02-01 12:00', '2023-02-01 12:00', '2023-02-01 14:00'],
+			['2023-02-01 20:00', '2023-02-01 22:00', '2023-02-01 10:00', '2023-02-01 20:00'],
 		];
 	}
 
@@ -93,12 +101,18 @@ class AssignmentCollisionTest extends KernelTestCase
 	public function provideCollisionData(): array
 	{
 		return [
-			['2022-10-01 10:00', '2022-10-01 12:00', '2022-10-01 11:00', '2022-10-01 13:00'],
-			['2022-10-01 10:00', '2022-10-01 12:01', '2022-10-01 12:00', '2022-10-01 13:00'],
-			['2022-10-01 10:00', '2022-10-01 12:00', '2022-10-01 09:00', '2022-10-01 11:00'],
-			['2022-10-01 10:00', '2022-10-01 12:00', '2022-10-01 10:59', '2022-10-01 11:00'],
-			['2022-10-01 10:00', '2022-10-01 10:01', '2022-10-01 10:00', '2022-10-01 10:02'],
-			['2022-10-01 10:00', '2022-10-01 10:01', '2022-10-01 00:01', '2022-10-01 23:59'],
+			// COLLISIONS BECAUSE OF TIME DURING DST (Daylight Saving Time)
+			['2023-10-01 10:00', '2023-10-01 12:00', '2023-10-01 11:00', '2023-10-01 13:00'],
+			['2023-10-01 10:00', '2023-10-01 12:01', '2023-10-01 12:00', '2023-10-01 13:00'],
+			['2023-10-01 10:00', '2023-10-01 12:00', '2023-10-01 09:00', '2023-10-01 11:00'],
+			['2023-10-01 10:00', '2023-10-01 12:00', '2023-10-01 10:59', '2023-10-01 11:00'],
+			['2023-10-01 10:00', '2023-10-01 10:01', '2023-10-01 10:00', '2023-10-01 10:02'],
+			['2023-10-01 10:00', '2023-10-01 10:01', '2023-10-01 00:01', '2023-10-01 23:59'],
+
+			// COLLISIONS BECAUSE OF TIME NOT DURING DST (Daylight Saving Time)
+			['2023-02-01 10:00', '2023-02-01 12:00', '2023-02-01 11:00', '2023-02-01 13:00'],
+			['2023-02-01 10:00', '2023-02-01 12:01', '2023-02-01 12:00', '2023-02-01 13:00'],
+			['2023-02-01 10:00', '2023-02-01 12:00', '2023-02-01 09:00', '2023-02-01 11:00'],
 		];
 	}
 

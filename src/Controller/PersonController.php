@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Repository\AssignmentRepository;
 use App\Repository\RepeatedAssignmentRepository;
 use Exception;
+use InvalidArgumentException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Exception\LogicException;
 use Symfony\Component\HttpFoundation\Request;
@@ -32,6 +33,10 @@ class PersonController extends AbstractController
 	public function index(Request $request, PersonRepository $personRepository): Response
 	{
 		$searchTerm = $request->query->get('search', '');
+
+		if (!is_string($searchTerm)) {
+			throw new InvalidArgumentException('Search term is not a string');
+		}
 
 		$persons = $personRepository->search($searchTerm);
 

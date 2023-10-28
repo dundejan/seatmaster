@@ -15,5 +15,10 @@ module.exports = {
 	rules: {
 		"no-console": 0,
 		"no-unused-vars": 0
+	},
+	settings: {
+		react: {
+			version: "detect"
+		}
 	}
 };

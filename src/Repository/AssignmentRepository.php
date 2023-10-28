@@ -160,9 +160,9 @@ class AssignmentRepository extends ServiceEntityRepository
 			if ($untilDate) {
 				$sql .= "
 			AND (
-				e.to_date < :untilDate
+				DATE(e.to_date) <= DATE(:untilDate)
 			)";
-				$params['untilDate'] = $untilDate->format('Y-m-d H:i:s');
+				$params['untilDate'] = $untilDate->format('Y-m-d');
 			}
 
 			$stmt = $connection->prepare($sql);
