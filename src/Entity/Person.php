@@ -45,6 +45,7 @@ class Person
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['person:read', 'person:write', 'assignment:read', 'repeatedAssignment:read'])]
     private ?int $id = null;
 
 	#[ORM\Column(length: 255)]
