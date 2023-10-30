@@ -18,6 +18,11 @@ export default function Office({onDropChair, officeId, officeName, showPopupMess
 	const [stagedWidth, setStagedWidth] = useState(0);
 	const [isSaving, setIsSaving] = useState(false);
 	const [saveError, setSaveError] = useState(null);
+	const [showSeatInfo, setShowSeatInfo] = useState({ id: null, info: (
+			<div>
+				<i>Click any seat to show info.</i>
+			</div>
+		) });
 
 	useEffect(() => {
 		(async () => {
@@ -139,6 +144,19 @@ export default function Office({onDropChair, officeId, officeName, showPopupMess
 							</Button>
 						</Box>
 					</CardContent>
+					<CardHeader
+						subheader={
+							<span>
+                                INFO{showSeatInfo.id && <b>{`: SEAT ${showSeatInfo.id}`}</b>}
+                            </span>
+						}
+						subheaderTypographyProps={{ variant: 'body1', style: { marginBottom: '-15px', textAlign: 'center', marginTop: '-15px' } }}
+					/>
+					<CardContent sx={{ marginTop: '-15px' }}>
+						<Typography component="div">
+							{showSeatInfo.info}
+						</Typography>
+					</CardContent>
 				</Card>
 				<Card sx={{ maxWidth: 350, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
 					<CardHeader
@@ -197,7 +215,7 @@ export default function Office({onDropChair, officeId, officeName, showPopupMess
 			</Card>
 				{saveError && <p style={{ color: 'red' }}>{saveError}</p>}
 			</div>
-			<div className="col-md-9">
+			<div className="col-md-7">
 				<div style={{ backgroundColor: '#f5f5f5', display: 'inline-block' }}>
 					<Typography variant="caption" color="textSecondary" style={{ fontSize: '0.8em', textTransform: "uppercase" }}>
 						&nbsp;{officeName}&nbsp;
@@ -205,7 +223,7 @@ export default function Office({onDropChair, officeId, officeName, showPopupMess
 				</div>
 				<div ref={officeRef} style={dropAreaStyle}>
 					{chairs.map(chair => (
-						<Seat key={chair.id} id={chair.id} left={chair.coordX} top={chair.coordY} currentAssignments={chair.currentAssignments} />
+						<Seat key={chair.id} id={chair.id} left={chair.coordX} top={chair.coordY} currentAssignments={chair.currentAssignments} showSeatInfo={showSeatInfo} setShowSeatInfo={setShowSeatInfo}/>
 					))}
 				</div>
 			</div>
