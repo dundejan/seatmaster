@@ -122,7 +122,7 @@ export default function Office({onDropChair, officeId, officeName, showPopupMess
 	return (
 		<div className="row mt-2">
 			<div className="col-md-3 ps-md-4">
-				<Card sx={{ maxWidth: 350, display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: '16px' }}>
+				<Card sx={{ maxWidth: 350, display: 'flex', flexDirection: 'column', marginBottom: '16px' }}>
 					<CardHeader
 						subheader="FILTER"
 						subheaderTypographyProps={{ variant: 'body1', style: { marginBottom: '-15px', textAlign: 'center' } }}
@@ -152,10 +152,12 @@ export default function Office({onDropChair, officeId, officeName, showPopupMess
 						}
 						subheaderTypographyProps={{ variant: 'body1', style: { marginBottom: '-15px', textAlign: 'center', marginTop: '-15px' } }}
 					/>
-					<CardContent sx={{ marginTop: '-15px' }}>
+					<CardContent sx={{ marginTop: '-15px', marginLeft: '20px', marginRight: '20px' }}>
+						<Box sx={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
 						<Typography component="div">
 							{showSeatInfo.info}
 						</Typography>
+						</Box>
 					</CardContent>
 				</Card>
 				<Card sx={{ maxWidth: 350, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
