@@ -18,7 +18,7 @@ export default function Office({onDropChair, officeId, officeName, showPopupMess
 	const [stagedWidth, setStagedWidth] = useState(0);
 	const [isSaving, setIsSaving] = useState(false);
 	const [saveError, setSaveError] = useState(null);
-	const [showSeatInfo, setShowSeatInfo] = useState({ id: null, info: (
+	const [seatInfo, setSeatInfo] = useState({ id: null, info: (
 			<div>
 				<i>Click any seat to show info.</i>
 			</div>
@@ -147,7 +147,7 @@ export default function Office({onDropChair, officeId, officeName, showPopupMess
 					<CardHeader
 						subheader={
 							<span>
-                                INFO{showSeatInfo.id && <b>{`: SEAT ${showSeatInfo.id}`}</b>}
+                                INFO{seatInfo.id && <b>{`: SEAT ${seatInfo.id}`}</b>}
                             </span>
 						}
 						subheaderTypographyProps={{ variant: 'body1', style: { marginBottom: '-15px', textAlign: 'center', marginTop: '-15px' } }}
@@ -155,7 +155,7 @@ export default function Office({onDropChair, officeId, officeName, showPopupMess
 					<CardContent sx={{ marginTop: '-15px', marginLeft: '20px', marginRight: '20px' }}>
 						<Box sx={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
 						<Typography component="div">
-							{showSeatInfo.info}
+							{seatInfo.info}
 						</Typography>
 						</Box>
 					</CardContent>
@@ -225,7 +225,7 @@ export default function Office({onDropChair, officeId, officeName, showPopupMess
 				</div>
 				<div ref={officeRef} style={dropAreaStyle}>
 					{chairs.map(chair => (
-						<Seat key={chair.id} id={chair.id} left={chair.coordX} top={chair.coordY} currentAssignments={chair.currentAssignments} showSeatInfo={showSeatInfo} setShowSeatInfo={setShowSeatInfo}/>
+						<Seat key={chair.id} id={chair.id} left={chair.coordX} top={chair.coordY} currentAssignments={chair.currentAssignments} setSeatInfo={setSeatInfo}/>
 					))}
 				</div>
 			</div>

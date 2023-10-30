@@ -5,7 +5,7 @@ import { Tooltip as ReactTooltip } from "react-tooltip";
 import {ChairIcon} from "./ChairIcon/ChairIcon";
 import {Typography} from "@mui/material";
 
-export function Seat({ id, left, top, currentAssignments, showSeatInfo, setShowSeatInfo }) {
+export function Seat({ id, left, top, currentAssignments, setSeatInfo }) {
 	const [isDragging, setIsDragging] = useState(false);
 	const [, ref] = useDrag({
 		type: 'SEAT',
@@ -15,7 +15,7 @@ export function Seat({ id, left, top, currentAssignments, showSeatInfo, setShowS
 
 	const handleMouseDown = () => setIsDragging(true);
 	const handleMouseUp = () => setIsDragging(false);
-	const handleClick = () => setShowSeatInfo({ id: id, info: info });
+	const handleClick = () => setSeatInfo({ id: id, info: info });
 
 	let tooltip, color, personId, info;
 
@@ -100,6 +100,5 @@ Seat.propTypes = {
 	left: PropTypes.number,
 	top: PropTypes.number,
 	currentAssignments: PropTypes.array,
-	showSeatInfo: PropTypes.object,
-	setShowSeatInfo: PropTypes.func,
+	setSeatInfo: PropTypes.func,
 }
