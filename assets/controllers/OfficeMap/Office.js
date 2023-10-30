@@ -18,6 +18,11 @@ export default function Office({onDropChair, officeId, officeName, showPopupMess
 	const [stagedWidth, setStagedWidth] = useState(0);
 	const [isSaving, setIsSaving] = useState(false);
 	const [saveError, setSaveError] = useState(null);
+	const [seatInfo, setSeatInfo] = useState({ id: null, info: (
+			<div>
+				<i>Click any seat to show info.</i>
+			</div>
+		) });
 
 	useEffect(() => {
 		(async () => {
@@ -117,7 +122,7 @@ export default function Office({onDropChair, officeId, officeName, showPopupMess
 	return (
 		<div className="row mt-2">
 			<div className="col-md-3 ps-md-4">
-				<Card sx={{ maxWidth: 350, display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: '16px' }}>
+				<Card sx={{ maxWidth: 350, display: 'flex', flexDirection: 'column', marginBottom: '16px' }}>
 					<CardHeader
 						subheader="FILTER"
 						subheaderTypographyProps={{ variant: 'body1', style: { marginBottom: '-15px', textAlign: 'center' } }}
@@ -137,6 +142,21 @@ export default function Office({onDropChair, officeId, officeName, showPopupMess
 							<Button variant="contained" color="primary" onClick={handleFetch}>
 								<i className="fa-solid fa-business-time"></i>&nbsp;Fetch Assignments
 							</Button>
+						</Box>
+					</CardContent>
+					<CardHeader
+						subheader={
+							<span>
+                                INFO{seatInfo.id && <b>{`: SEAT ${seatInfo.id}`}</b>}
+                            </span>
+						}
+						subheaderTypographyProps={{ variant: 'body1', style: { marginBottom: '-15px', textAlign: 'center', marginTop: '-15px' } }}
+					/>
+					<CardContent sx={{ marginTop: '-15px', marginLeft: '20px', marginRight: '20px' }}>
+						<Box sx={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+						<Typography component="div">
+							{seatInfo.info}
+						</Typography>
 						</Box>
 					</CardContent>
 				</Card>
@@ -197,7 +217,7 @@ export default function Office({onDropChair, officeId, officeName, showPopupMess
 			</Card>
 				{saveError && <p style={{ color: 'red' }}>{saveError}</p>}
 			</div>
-			<div className="col-md-9">
+			<div className="col-md-7">
 				<div style={{ backgroundColor: '#f5f5f5', display: 'inline-block' }}>
 					<Typography variant="caption" color="textSecondary" style={{ fontSize: '0.8em', textTransform: "uppercase" }}>
 						&nbsp;{officeName}&nbsp;
@@ -205,7 +225,7 @@ export default function Office({onDropChair, officeId, officeName, showPopupMess
 				</div>
 				<div ref={officeRef} style={dropAreaStyle}>
 					{chairs.map(chair => (
-						<Seat key={chair.id} id={chair.id} left={chair.coordX} top={chair.coordY} currentAssignments={chair.currentAssignments} />
+						<Seat key={chair.id} id={chair.id} left={chair.coordX} top={chair.coordY} currentAssignments={chair.currentAssignments} setSeatInfo={setSeatInfo}/>
 					))}
 				</div>
 			</div>
