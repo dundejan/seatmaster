@@ -10,7 +10,7 @@ use Doctrine\Migrations\AbstractMigration;
 /**
  * Auto-generated Migration: Please modify to your needs!
  */
-final class Version20231026141756 extends AbstractMigration
+final class Version20231107204123 extends AbstractMigration
 {
     public function getDescription(): string
     {
@@ -38,7 +38,7 @@ final class Version20231026141756 extends AbstractMigration
         $this->addSql('CREATE TABLE repeated_assignment (id INT NOT NULL, person_id INT NOT NULL, seat_id INT NOT NULL, day_of_week INT NOT NULL, from_time TIME(0) WITHOUT TIME ZONE NOT NULL, to_time TIME(0) WITHOUT TIME ZONE NOT NULL, until_date DATE DEFAULT NULL, start_date TIMESTAMP(0) WITHOUT TIME ZONE NOT NULL, PRIMARY KEY(id))');
         $this->addSql('CREATE INDEX IDX_FA68C0BC217BBB47 ON repeated_assignment (person_id)');
         $this->addSql('CREATE INDEX IDX_FA68C0BCC1DAFE35 ON repeated_assignment (seat_id)');
-        $this->addSql('CREATE TABLE seat (id INT NOT NULL, office_id INT NOT NULL, coord_x INT DEFAULT NULL, coord_y INT DEFAULT NULL, PRIMARY KEY(id))');
+        $this->addSql('CREATE TABLE seat (id INT NOT NULL, office_id INT NOT NULL, coord_x INT DEFAULT NULL, coord_y INT DEFAULT NULL, rotation INT NOT NULL, PRIMARY KEY(id))');
         $this->addSql('CREATE INDEX IDX_3D5C3666FFA0C224 ON seat (office_id)');
         $this->addSql('CREATE TABLE "user" (id INT NOT NULL, email VARCHAR(180) NOT NULL, roles JSON NOT NULL, password VARCHAR(255) NOT NULL, PRIMARY KEY(id))');
         $this->addSql('CREATE UNIQUE INDEX UNIQ_8D93D649E7927C74 ON "user" (email)');
