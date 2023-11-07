@@ -3,7 +3,7 @@ import PropTypes from "prop-types";
 import Office from "./Office";
 import {DndProvider} from "react-dnd";
 import {HTML5Backend} from "react-dnd-html5-backend";
-import {getCurrentAssignments, getSeats, updateSeatCoords} from "../api/api";
+import {getCurrentAssignments, getSeats, updateSeatCoords, updateChairRotation} from "../api/api";
 import PopupWarning from "../Warnings/PopupWarning";
 
 // Function to get current datetime in the format "YYYY-MM-DDTHH:MM"
@@ -46,6 +46,29 @@ const OfficeMapApp = ({ officeId, officeName }) => {
 		setChairs([...chairs, newChair]);
 	}
 
+	const changeChairRotation = async (id) => {
+		// Assuming each double click rotates the chair by 90 degrees
+		const chairToRotate = chairs.find(chair => chair.id === id);
+		console.log(chairToRotate);
+		const newRotation = (chairToRotate.rotation + 90) % 360;
+
+		try {
+			const response = await updateChairRotation(id, newRotation);
+
+			if (response.redirected) {
+				setShowPopup(true);
+				setPopupMessage("Seat rotation was not updated. Access denied. You need to have admin rights.");
+				return;
+			}
+
+			// Update rotation in the local state
+			const updatedChairs = chairs.map(chair => chair.id === id ? { ...chair, rotation: newRotation } : chair);
+			setChairs(updatedChairs);
+		} catch (error) {
+			console.error("Error updating coordinates", error);
+		}
+	};
+
 	const handleDropChair = async (id, coords) => {
 		try {
 			const response = await updateSeatCoords(id, coords.x, coords.y);
@@ -56,7 +79,7 @@ const OfficeMapApp = ({ officeId, officeName }) => {
 				return;
 			}
 
-			const updatedChairs = chairs.map(chair => chair.id === id ? { ...chair, coordX: coords.x, coordY: coords.y } : chair);
+			const updatedChairs = chairs.map(chair => chair.id === id ? { ...chair, coordX: coords.x, coordY: coords.y, rotation: chair.rotation || 0 } : chair);
 			setChairs(updatedChairs);
 		} catch (error) {
 			console.error("Error updating coordinates", error);
@@ -86,6 +109,7 @@ const OfficeMapApp = ({ officeId, officeName }) => {
 				setDateTimeParam={setDateTimeParam}
 				refreshFlag={refreshFlag}
 				setRefreshFlag={setRefreshFlag}
+				changeChairRotation={changeChairRotation}
 			>
 			</Office>
 			{showPopup && <PopupWarning message={popupMessage} onClose={closePopup} />}
