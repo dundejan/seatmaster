@@ -20,25 +20,25 @@ use Symfony\Component\Serializer\Annotation\Groups;
 #[ORM\Entity(repositoryClass: SeatRepository::class)]
 #[ApiResource(
 	operations: [
-		new Get(),
-		new GetCollection(),
-		new Post(security: 'is_granted("ROLE_ADMIN")'),
-		new Put(security: 'is_granted("ROLE_ADMIN")'),
-		new Patch(security: 'is_granted("ROLE_ADMIN")'),
-		new Delete(security: 'is_granted("ROLE_ADMIN")'),
-	],
+         		new Get(),
+         		new GetCollection(),
+         		new Post(security: 'is_granted("ROLE_ADMIN")'),
+         		new Put(security: 'is_granted("ROLE_ADMIN")'),
+         		new Patch(security: 'is_granted("ROLE_ADMIN")'),
+         		new Delete(security: 'is_granted("ROLE_ADMIN")'),
+         	],
 	formats: [
-		'jsonld',
-		'json',
-		'html',
-		'csv' => 'text/csv',
-	],
+         		'jsonld',
+         		'json',
+         		'html',
+         		'csv' => 'text/csv',
+         	],
 	normalizationContext: [
-		'groups' => ['seat:read'],
-	],
+         		'groups' => ['seat:read'],
+         	],
 	denormalizationContext: [
-		'groups' => ['seat:write'],
-	],
+         		'groups' => ['seat:write'],
+         	],
 	paginationItemsPerPage: 10,
 )]
 #[ApiFilter(SearchFilter::class, properties: [
@@ -81,6 +81,10 @@ class Seat
     #[Groups(['seat:read', 'seat:write'])]
     private Collection $repeatedAssignments;
 
+    #[ORM\Column]
+    #[Groups(['seat:read', 'seat:write'])]
+    private ?int $rotation = 0;
+
     public function __construct()
     {
         $this->assignments = new ArrayCollection();
@@ -88,9 +92,9 @@ class Seat
     }
 
 	public function __toString(): string
-               	{
-               		return (string) $this->id . ' (' . $this->office . ')';
-               	}
+	{
+		return (string) $this->id . ' (' . $this->office . ')';
+	}
 
     public function getId(): ?int
     {
@@ -189,6 +193,18 @@ class Seat
                 $repeatedAssignment->setSeat(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getRotation(): ?int
+    {
+        return $this->rotation;
+    }
+
+    public function setRotation(int $rotation): static
+    {
+        $this->rotation = $rotation;
 
         return $this;
     }
