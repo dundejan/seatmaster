@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Repository\AssignmentRepository;
 use App\Repository\RepeatedAssignmentRepository;
+use DateTimeZone;
 use Exception;
 use InvalidArgumentException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -72,8 +73,8 @@ class PersonController extends AbstractController
 
 		if (count($currentAssignments) === 1) {
 			$assignment = $currentAssignments[0];
-			$from = $assignment->getFromDate();
-			$to = $assignment->getToDate();
+			$from = $assignment->getFromDate()->setTimezone(new DateTimeZone('Europe/Prague'));
+			$to = $assignment->getToDate()->setTimezone(new DateTimeZone('Europe/Prague'));
 		}
 		else if (count($currentRepeatedAssignments) === 1) {
 			$assignment = $currentRepeatedAssignments[0];

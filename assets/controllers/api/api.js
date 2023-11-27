@@ -37,6 +37,27 @@ export function updateSeatCoords(seatId, coordX, coordY) {
 		});
 }
 
+export function updateChairRotation(seatId, rotation) {
+	return fetch(`/api/seats/${seatId}`, {
+		method: 'PUT',
+		credentials: 'same-origin',
+		headers: {
+			'Content-Type': 'application/json'
+		},
+		body: JSON.stringify({
+			rotation: rotation
+		})
+	})
+		.then(response => {
+			if (!response.ok) {
+				// Handle errors, if the response is not in the 200-299 range
+				throw new Error('Network response was not ok');
+			}
+
+			return response;
+		});
+}
+
 export function addSeat(officeId) {
 	return fetch(`/api/seats`, {
 		method: 'POST',

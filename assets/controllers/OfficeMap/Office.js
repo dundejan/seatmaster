@@ -10,7 +10,11 @@ function roundToNearest50(n) {
 	return Math.round(n / 50) * 50;
 }
 
-export default function Office({onDropChair, officeId, officeName, showPopupMessage, chairs, addNewChair, refreshFlag, setRefreshFlag, dateTimeParam, setDateTimeParam }) {
+export default function Office(
+	{
+		onDropChair, officeId, officeName, showPopupMessage, chairs, addNewChair, refreshFlag,
+		setRefreshFlag, dateTimeParam, setDateTimeParam, changeChairRotation
+	}) {
 	const officeRef = useRef(null);
 	const [size, setSize] = useState(0);
 	const [width, setWidth] = useState(0);
@@ -160,9 +164,10 @@ export default function Office({onDropChair, officeId, officeName, showPopupMess
 						</Box>
 					</CardContent>
 				</Card>
-				<Card sx={{ maxWidth: 350, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+				<Card sx={{ maxWidth: 350, display: 'flex', flexDirection: 'column' }}>
 					<CardHeader
 						title="QUICK ADMIN"
+						titleTypographyProps={{ style: { textAlign: 'center' } }}
 						subheader="OFFICE SIZE"
 						subheaderTypographyProps={{ variant: 'body1', style: { marginBottom: '-15px', textAlign: 'center' } }}
 					/>
@@ -213,6 +218,24 @@ export default function Office({onDropChair, officeId, officeName, showPopupMess
 								</Button>
 							</Box>
 						</CardContent>
+						<CardHeader
+							subheader="INFO"
+							subheaderTypographyProps={{ variant: 'body1', style: { marginBottom: '-15px', textAlign: 'center', marginTop: '-15px' } }}
+						/>
+						<CardContent sx={{ marginTop: '-15px', marginLeft: '20px', marginRight: '20px' }}>
+							<Box sx={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+								<Typography component="div">
+									<div>
+										<i>Move seat to change position.</i>
+									</div>
+								</Typography>
+								<Typography component="div">
+									<div>
+										<i>Double-click to rotate 90°.</i>
+									</div>
+								</Typography>
+							</Box>
+						</CardContent>
 				</CardContent>
 			</Card>
 				{saveError && <p style={{ color: 'red' }}>{saveError}</p>}
@@ -225,7 +248,9 @@ export default function Office({onDropChair, officeId, officeName, showPopupMess
 				</div>
 				<div ref={officeRef} style={dropAreaStyle}>
 					{chairs.map(chair => (
-						<Seat key={chair.id} id={chair.id} left={chair.coordX} top={chair.coordY} currentAssignments={chair.currentAssignments} setSeatInfo={setSeatInfo}/>
+						<Seat
+							key={chair.id} id={chair.id} left={chair.coordX} top={chair.coordY} rotation={chair.rotation}
+							currentAssignments={chair.currentAssignments} setSeatInfo={setSeatInfo} changeChairRotation={changeChairRotation}/>
 					))}
 				</div>
 			</div>

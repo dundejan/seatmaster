@@ -98,12 +98,12 @@ class AssignmentRepository extends ServiceEntityRepository
 				->setParameter('id', $assignment->getId() ?: -1)
 			;
 
-			// Filter just those for the same person
+			// Filter just those with the same person
 			if ($param === 'person') {
 				$qb->andWhere('e.person = :person')
 					->setParameter('person', $assignment->getPerson());
 			}
-			// Filter just those for the same seat
+			// Filter just those with the same seat
 			else {
 				$qb->andWhere('e.seat = :seat')
 					->setParameter('seat', $assignment->getSeat());

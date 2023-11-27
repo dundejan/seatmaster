@@ -18,6 +18,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
+use Symfony\Component\Validator\Exception\LogicException;
 
 #[ORM\Entity(repositoryClass: AssignmentRepository::class)]
 #[ApiResource(
@@ -142,6 +143,25 @@ class Assignment
 	{
 		if ($this->getFromDate() >= $this->getToDate()) {
 			$context->buildViolation('What are you trying to do? Well, no, the duration of the assignment really can not be negative or zero.')
+				->atPath('toDate')
+				->addViolation();
+		}
+	}
+
+	/**
+	 * @noinspection PhpUnused
+	 * @used-by Assert\CallbackValidator
+	 */
+	#[Assert\Callback]
+	public function validateThatAssignmentIsInOneDay(ExecutionContextInterface $context, mixed $payload): void
+	{
+		if ($this->getFromDate() == null || $this->getToDate() == null) {
+			throw new LogicException('FromDate and toDate cannot be null and during callback already should never be.');
+		}
+
+		if ($this->getFromDate()->format('Y-m-d') != $this->getToDate()->format('Y-m-d')) {
+			$context->buildViolation('Not possible to assign over night. Be kind to your employees and do not 
+			force them to work over night or create assignment to midnight and from midnight')
 				->atPath('toDate')
 				->addViolation();
 		}

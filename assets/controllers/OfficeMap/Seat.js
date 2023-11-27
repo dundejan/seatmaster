@@ -5,7 +5,7 @@ import { Tooltip as ReactTooltip } from "react-tooltip";
 import {ChairIcon} from "./ChairIcon/ChairIcon";
 import {Typography} from "@mui/material";
 
-export function Seat({ id, left, top, currentAssignments, setSeatInfo }) {
+export function Seat({ id, left, top, rotation, currentAssignments, setSeatInfo, changeChairRotation }) {
 	const [isDragging, setIsDragging] = useState(false);
 	const [, ref] = useDrag({
 		type: 'SEAT',
@@ -16,6 +16,7 @@ export function Seat({ id, left, top, currentAssignments, setSeatInfo }) {
 	const handleMouseDown = () => setIsDragging(true);
 	const handleMouseUp = () => setIsDragging(false);
 	const handleClick = () => setSeatInfo({ id: id, info: info });
+	const handleDoubleClick = (id) => changeChairRotation(id);
 
 	let tooltip, color, personId, info;
 
@@ -83,9 +84,28 @@ export function Seat({ id, left, top, currentAssignments, setSeatInfo }) {
 			onMouseDown={handleMouseDown}
 			onMouseUp={handleMouseUp}
 			onClick={handleClick}
+			onDoubleClick={() => handleDoubleClick(id)}
 		>
-			<ChairIcon color={color} size="50px" />
-			<Typography variant="body2" style={{ fontSize: '12px' }}>{`SEAT ${id}`}</Typography>
+			<div style={{ position: 'relative', textAlign: 'center' }}>
+				<div
+					style={{
+						transform: `rotate(${rotation}deg)`,
+						margin: '0 auto', // Center the chair if necessary
+					}}
+				>
+					<ChairIcon color={color} size="40" />
+				</div>
+				<Typography
+					variant="body2"
+					style={{
+						fontSize: '12px',
+						marginTop: '4px', // Adjust the space between the icon and text as needed
+						display: 'block', // Ensure the text is on its own line
+					}}
+				>
+					{`SEAT ${id}`}
+				</Typography>
+			</div>
 			{!isDragging && (
 				<ReactTooltip id={id} place="top" style={{ zIndex: 1000 }}>
 					{tooltip}
@@ -99,6 +119,8 @@ Seat.propTypes = {
 	id: PropTypes.number,
 	left: PropTypes.number,
 	top: PropTypes.number,
+	rotation: PropTypes.number,
 	currentAssignments: PropTypes.array,
 	setSeatInfo: PropTypes.func,
+	changeChairRotation: PropTypes.func,
 }
