@@ -73,8 +73,8 @@ class PersonController extends AbstractController
 
 		if (count($currentAssignments) === 1) {
 			$assignment = $currentAssignments[0];
-			$from = $assignment->getFromDate()->setTimezone(new DateTimeZone('Europe/Prague'));;
-			$to = $assignment->getToDate()->setTimezone(new DateTimeZone('Europe/Prague'));;
+			$from = $assignment->getFromDate()->setTimezone(new DateTimeZone('Europe/Prague'));
+			$to = $assignment->getToDate()->setTimezone(new DateTimeZone('Europe/Prague'));
 		}
 		else if (count($currentRepeatedAssignments) === 1) {
 			$assignment = $currentRepeatedAssignments[0];
