@@ -14,7 +14,7 @@ class HomePageTest extends WebTestCase
         $this->assertResponseIsSuccessful();
     }
 
-	public function testHomePageElements(): void
+	public function testHomePageContainsNavbarAndWelcomeText(): void
 	{
 		$client = static::createClient();
 		$crawler = $client->request('GET', '/');
