@@ -13,7 +13,7 @@ class OfficeCreationTest extends WebTestCase
 	/**
 	 * @throws Exception
 	 */
-	public function testCreateOfficeAndCheckItIsShownInNavbar(): void
+	public function testCreatedOfficeIsCorrectlyShownInNavbar(): void
 	{
 		$client = static::createClient();
 		$container = static::getContainer();
