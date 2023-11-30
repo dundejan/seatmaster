@@ -27,9 +27,26 @@ down:
 
 # Target to run tests
 test: docker-up
-	@echo "Running tests..."
-	@php bin/phpunit --testdox-html tests/_output/index.html
-	@echo "Test results available at tests/_output/index.html"
+	@echo "Deleting data..."
+	@php bin/console doctrine:schema:drop --env=test --force --full-database --quiet > /dev/null 2>&1
+	@php bin/console doctrine:schema:create --env=test --quiet > /dev/null 2>&1
+
+	@echo "Ensuring test database exists..."
+	@php bin/console doctrine:database:create --env=test --if-not-exists --quiet > /dev/null 2>&1
+	@php bin/console doctrine:schema:update --env=test --force --quiet > /dev/null 2>&1
+
+	@echo "Running non-Panther tests..."
+	@php bin/phpunit --exclude-group panther --testdox-html tests/_output/non-panther.html
+	@echo "Non-Panther test results available at tests/_output/non-panther.html"
+
+	@echo "Loading fixtures for Panther tests..."
+	@php bin/console doctrine:fixtures:load --env=test --no-interaction
+
+	@echo "Running Panther tests..."
+	@php bin/phpunit --group panther --testdox-html tests/_output/panther.html
+	@echo "Panther test results available at tests/_output/panther.html"
+
+	@echo "Tests complete"
 
 # Target to analyse PHP files
 php-stan:
