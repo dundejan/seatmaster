@@ -9,12 +9,13 @@ ESLINT = ./node_modules/.bin/eslint
 
 # Target to ensure Docker is running
 docker-up:
-	@echo "Starting Docker..."
+	@echo "Starting Docker for the connections to database..."
 	@docker-compose up -d
 
 # Target to start up the development environment
 up: docker-up
 	@echo "Starting up the development environment..."
+	@composer install
 	@symfony serve -d
 	@yarn watch > /dev/null 2>&1 &
 
@@ -27,9 +28,30 @@ down:
 
 # Target to run tests
 test: docker-up
-	@echo "Running tests..."
-	@php bin/phpunit --testdox-html tests/_output/index.html
-	@echo "Test results available at tests/_output/index.html"
+	@echo "Deleting data..."
+	@php bin/console doctrine:schema:drop --env=test --force --full-database --quiet > /dev/null 2>&1
+	@php bin/console doctrine:schema:create --env=test --quiet > /dev/null 2>&1
+
+	@echo "Ensuring test database exists..."
+	@php bin/console doctrine:database:create --env=test --if-not-exists --quiet > /dev/null 2>&1
+	@php bin/console doctrine:schema:update --env=test --force --quiet > /dev/null 2>&1
+
+	@echo "Running non-Panther tests..."
+	@php bin/phpunit --exclude-group panther --testdox-html tests/_output/non-panther.html
+	@echo "Non-Panther test results available at tests/_output/non-panther.html"
+
+	@echo "Loading fixtures for Panther tests to test database..."
+	@php bin/console doctrine:fixtures:load --env=test --no-interaction --group=OfficeFixtures
+
+	@echo "Running Panther tests..."
+	@php bin/phpunit --group panther --testdox-html tests/_output/panther.html
+	@echo "Panther test results available at tests/_output/panther.html"
+
+	@echo "Deleting data from test database..."
+	@php bin/console doctrine:schema:drop --env=test --force --full-database --quiet > /dev/null 2>&1
+	@php bin/console doctrine:schema:create --env=test --quiet > /dev/null 2>&1
+
+	@echo "Tests complete"
 
 # Target to analyse PHP files
 php-stan:

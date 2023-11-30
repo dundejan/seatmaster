@@ -67,8 +67,8 @@ class SeatController extends AbstractController
 
 		return $this->render('seat/available.html.twig', [
 			"availableSeats" => $availableSeats,
-			"fromDateTime" => $fromDateTime->format('Y-m-d\TH:i:s'),
-			"toDateTime" => $toDateTime->format('Y-m-d\TH:i:s'),
+			"fromDateTime" => $fromDateTime->format('Y-m-d\TH:i'),
+			"toDateTime" => $toDateTime->format('Y-m-d\TH:i'),
 		]);
 	}
 }
