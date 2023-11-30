@@ -15,6 +15,7 @@ docker-up:
 # Target to start up the development environment
 up: docker-up
 	@echo "Starting up the development environment..."
+	@composer install
 	@symfony serve -d
 	@yarn watch > /dev/null 2>&1 &
 
