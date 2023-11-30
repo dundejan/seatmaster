@@ -4,6 +4,34 @@ Repozitář pro projekt Seatmaster, vznikající jako součást bakalářské pr
 
 ## Lokální spuštění
 
+### Makefile 🪄
+
+Pro co možná nejjednodušší setup doporučuji využít Makefile.
+
+#### Předpoklady
+
+Lokálně instalované PHP >= 8.1 viz cpomposer.json (pozn. při vývoji bylo použito PHP ve verzi 8.2.13).
+
+#### Postup
+
+Jednoduše v linuxovém (WSL) terminálu v kořenu projektu spusť příkaz:
+
+```bash
+make help
+```
+
+a prohlédni si dostupné cíle (targets). 
+
+Pro rychlý start využiješ příkaz:
+
+```bash
+make up
+```
+
+Ten spustí Docker s databází, stáhne veškeré závislosti composeru, 
+spustí Symfony server (nutno mít lokálně nainstalovaný) a stáhne prostřednictvím Yarn závislosti JS
+(a spustí sledování jejich změn pro případný vývoj).
+
 ### Stáhni závislosti Composeru ⏬
 
 Ujisti se, že máš nainstalovaný [Composer](https://getcomposer.org/download/)
@@ -44,7 +72,8 @@ symfony serve
 ```
 
 (Pokud právě zažíváš se Symfony web-serverem svoje "poprvé" 👩🏽‍❤️‍👨🏽, dost možná narazíš na
-error, který říká, že musíš nejprve nainstalovat certifikáty spuštěním příkazu `symfony server:ca:install`.)
+error, který říká, že musíš nejprve nainstalovat certifikáty spuštěním příkazu `symfony server:ca:install`, 
+podrobněji viz [Symfony Local Web Sever](https://symfony.com/doc/current/setup/symfony_server.html)).
 
 ### Spusť databázi 💾
 
