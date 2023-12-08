@@ -24,6 +24,10 @@ class EasyAdminTest extends WebTestCase
 		$this->client = static::createClient();
 
 		$this->entityManager = static::getContainer()->get(EntityManagerInterface::class);
+		if (!$this->entityManager instanceof EntityManagerInterface) {
+			throw new Exception('Entity manager not found');
+		}
+
 		/** @var UserPasswordHasherInterface $passwordHasher */
 		$passwordHasher = self::getContainer()->get(UserPasswordHasherInterface::class);
 

@@ -3,6 +3,11 @@
 namespace App\Tests\Application;
 
 use App\Entity\Office;
+use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\Persistence\ObjectManager;
+use Exception;
+use Facebook\WebDriver\Exception\NoSuchElementException;
+use Facebook\WebDriver\Exception\TimeoutException;
 use Symfony\Component\Panther\PantherTestCase;
 
 /**
@@ -10,13 +15,22 @@ use Symfony\Component\Panther\PantherTestCase;
  */
 class ReactComponentsTest extends PantherTestCase
 {
+	/**
+	 * @throws NoSuchElementException
+	 * @throws TimeoutException
+	 * @throws Exception
+	 */
 	public function testGetAllOfficeIds(): void
 	{
 		$client = static::createPantherClient();
 		$container = self::getContainer();
 
 		// Retrieve the entity manager
+		/** @var EntityManagerInterface $entityManager @phpstan-ignore-next-line */
 		$entityManager = $container->get('doctrine')->getManager();
+		if (!$entityManager instanceof EntityManagerInterface) {
+			throw new Exception('Entity manager not found');
+		}
 
 		// Retrieve the repository for the Office entity
 		$officeRepository = $entityManager->getRepository(Office::class);
