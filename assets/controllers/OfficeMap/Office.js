@@ -269,4 +269,5 @@ Office.propTypes = {
 	setRefreshFlag: PropTypes.func.isRequired,
 	dateTimeParam: PropTypes.string.isRequired,
 	setDateTimeParam: PropTypes.func.isRequired,
+	changeChairRotation: PropTypes.func.isRequired,
 };
