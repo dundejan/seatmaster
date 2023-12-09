@@ -9,16 +9,17 @@ RUN apt-get update && apt-get install -y \
     libonig-dev \
     libxml2-dev \
     zip \
-    unzip
+    unzip \
+    libzip-dev
+
+# Install PHP extensions
+RUN docker-php-ext-install pdo_pgsql mbstring zip
+
+# Install Composer
+RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
 # Clear out the local repository of retrieved package files
 RUN apt-get clean && rm -rf /var/lib/apt/lists/*
-
-# Install PHP extensions
-RUN docker-php-ext-install pdo_pgsql mbstring
-
-# Check installed PHP modules
-RUN php -m
 
 # Copy Symfony application into container
 COPY . /var/www/symfony

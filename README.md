@@ -1,87 +1,111 @@
 # Seatmaster 🪑📅
 
-Repozitář pro projekt Seatmaster, vznikající jako součást bakalářské práce v rámci mého studia na FIT ČVUT 🎓.
+Repository for Seatmaster project, created as part of my bachelor thesis at FIT CTU 🎓.
 
-## Lokální spuštění
+## Getting Started 🧱⏩🏠
 
-### Makefile 🪄
+These instructions will get your copy of the project up and running on your local machine for development and testing purposes.
 
-Pro co možná nejjednodušší setup doporučuji využít Makefile.
+### Prerequisites 🛠️
 
-#### Předpoklady
+Before you begin, ensure you have met the following requirements:
 
-Lokálně instalované PHP >= 8.1 viz cpomposer.json (pozn. při vývoji bylo použito PHP ve verzi 8.2.13).
+- **Docker** 🐋: [Docker](https://docs.docker.com/get-docker/) is used for containerization. 
+Ensure you have Docker installed. Any recent version should work, but it's recommended to use the latest stable release.
+- **Node.js** 💚: [Node.js](https://nodejs.org/en/download/) for JavaScript runtime environment. During development used in version 18.17.1. 
+- **Yarn** 🧶: [Yarn](https://yarnpkg.com/getting-started/install) for managing JavaScript packages. 
+Yarn is preferred over npm for its performance and reliability in this project. During development used in version 1.22.19.
 
-#### Postup
+Optional for running Panther tests or local development: 
+- **PHP**: [PHP](https://www.php.net/manual/en/install.php) version 8.1 or higher with certain php extensions
+(see composer.json or Dockerfile), Symfony CLI (recommend version 5.5.2 or higher).
+During development used PHP in version 8.2.13.
+- **Composer**: [Composer](https://getcomposer.org/download/) version 2.x for managing PHP dependencies. 
+During development used in version 2.5.5.
+- **Google Chrome**: Any stable release should be fine. During development used in version 119.0.6045.159.
+- **Chromedriver**: Ensure Chromedriver version matches the version of Google Chrome.
 
-Jednoduše v linuxovém (WSL) terminálu v kořenu projektu spusť příkaz:
+Note: The versions mentioned above are tested and known to work with this project. If you are using different versions, you may encounter compatibility issues.
 
-```bash
+### Setting Up for Development 🪄
+
+1. **Clone the Repository** 🙋‍♂️🙋‍♂️:
+   ```
+   git clone https://gitlab.fit.cvut.cz/dundejan/seatmaster.git
+   cd seatmaster
+   ```
+
+2. **Start the Development Environment** 🏃‍♂️:
+   ```
+   make up
+   ```
+    Note: The command is running yarn watch in the current terminal, so closing the terminal or 
+          Ctrl+C will terminate the yarn watcher. If you prefer the yarn watch to run silently, feel free to modify 
+          make up command to use for example `@nohup yarn watch > /dev/null 2>&1 &` instead of simple `@yarn watch`.
+
+
+3. **Access the Application** 🕺:
+   - The application should now be running on [localhost](http://localhost) (or a specified port).
+
+### Running Tests 📈
+
+- **Run Tests** (excluding Panther tests):
+  ```
+  make test
+  ```
+
+- **Run Panther Tests** 🐈‍⬛:
+  Panther tests require a specific local setup:
+    - **Composer**: Ensure you have Composer and run 
+    - **PHP 8.1 or Higher**: Ensure you have PHP 8.1 or a higher version installed locally.
+    - **Symfony Console**: The Symfony Console component is used for executing Doctrine commands.
+    - **Google Chrome or an Alternative Browser**: Ensure you have Google Chrome (or the browser you intend to use with Panther) installed on your local machine. The current setup is tested with Google Chrome version 119.
+    - **Chromedriver**: Make sure you have Chromedriver installed that matches the version of Google Chrome. For Chrome 119, use the corresponding version of Chromedriver.
+    - **Environment Variables**: Set the path to Chromedriver and Google Chrome in the `.env.test` file. For example:
+      ```
+      PANTHER_CHROME_DRIVER_BINARY=/usr/bin/chromedriver
+      PANTHER_CHROME_BINARY=/usr/bin/google-chrome
+      ```
+    - Change the browser for Panther tests by updating the `.env.test` file with the respective binary paths for the chosen browser.
+
+  To run Panther tests:
+  ```
+  make test-panther
+  ```
+
+  Note: The commands within `test-panther` make use of the local PHP installation and Symfony console commands to interact with the Doctrine database, including creating, updating, and dropping the test database schema and loading fixtures.
+
+### Linting and Static Analysis 🧪
+
+- To lint JavaScript files 🧫:
+  ```
+  make eslint
+  ```
+
+- To perform PHP static analysis 🔬:
+  ```
+  make php-stan
+  ```
+
+### Cleaning Up 🧹
+
+- To clean up generated files and clear caches:
+  ```
+  make clean
+  ```
+
+### Rebuilding the Environment 🏗️
+
+- To rebuild the entire development environment:
+  ```
+  make rebuild
+  ```
+  Note: This is not rebuilding docker containers, this is just shutting the containers down, cleaning cache and again starting the containers.
+        For container rebuild you will use `make docker-build`.
+
+### Other 📜
+
+All Makefile commands with descriptions can be seen with the command
+```
 make help
 ```
-
-a prohlédni si dostupné cíle (targets). 
-
-Pro rychlý start využiješ příkaz:
-
-```bash
-make up
-```
-
-Ten spustí Docker s databází, stáhne veškeré závislosti composeru, 
-spustí Symfony server (nutno mít lokálně nainstalovaný) a stáhne prostřednictvím Yarn závislosti JS
-(a spustí sledování jejich změn pro případný vývoj).
-
-### Stáhni závislosti Composeru ⏬
-
-Ujisti se, že máš nainstalovaný [Composer](https://getcomposer.org/download/)
-a spusť příkaz:
-
-```bash
-composer install
-```
-
-(V závislosti na tom, jak máš nainstalovaný Composer na svém počítači, může být nutné namísto toho spustit `php composer.phar install`.)
-
-### Stáhni závislosti JS ⏬
-
-Ujisti se, že máš nainstalovaný [Yarn](https://classic.yarnpkg.com/lang/en/docs/install/#windows-stable) a spusť příkaz:
-```bash
-yarn watch
-```
-
-### Načti fixtures (volitelně) 🗃️
-
-Načti symfony fixtures ze src/DataFixtures
-```bash
-symfony console doctrine:fixtures:load
-```
-
-### Spusť Symfony server 🏃
-
-Pokud preferuješ Nginx nebo Apache, neváhej ho použít, ale lokální Symfony web-server
-funguje bez problémů.
-
-Pokud ještě nemáš na svém počítači nainstalovaný lokální Symfony web-server, následuj
-"Downloading the Symfony client" instrukce z této stránky: https://symfony.com/download.
-
-Poté, pro spustění aplikace, otevři terminál a spusť příkaz:
-
-```bash
-symfony serve
-```
-
-(Pokud právě zažíváš se Symfony web-serverem svoje "poprvé" 👩🏽‍❤️‍👨🏽, dost možná narazíš na
-error, který říká, že musíš nejprve nainstalovat certifikáty spuštěním příkazu `symfony server:ca:install`, 
-podrobněji viz [Symfony Local Web Sever](https://symfony.com/doc/current/setup/symfony_server.html)).
-
-### Spusť databázi 💾
-
-Aplikaci je možné po úpravě souboru .env připojit k libovolné databázi 
-(návod viz [Databases and the Doctrine ORM](https://symfony.com/doc/current/doctrine.html)), 
-ovšem pro aplikaci je připravený Docker obsahující PostgreSQL databázi.
-Lze jej spustit příkazem `docker compose up` (či pro starší verze Dockeru `docker-compose up`).
-
-### Kochej se 🤓
-
-Otevři svůj oblíbený webový prohlížeč, (používáš-li Symfony web-server) zadej https://localhost:8000 a prohlédni si mou aplikaci 🔎.

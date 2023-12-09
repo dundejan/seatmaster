@@ -1,5 +1,5 @@
 # Variables for common paths or flags
-PHPSTAN = vendor/bin/phpstan
+PHPSTAN = docker-compose exec php vendor/bin/phpstan
 ESLINT = ./node_modules/.bin/eslint
 
 # Makefile for managing Symfony, Yarn, and Docker tasks for development
@@ -7,38 +7,60 @@ ESLINT = ./node_modules/.bin/eslint
 # Default target when you run 'make' will be to display help
 .DEFAULT_GOAL := help
 
-# Target to ensure Docker is running
+# Builds Docker images without using the cache for a fresh build
+docker-build:
+	@echo "Building fresh Docker images without any cache..."
+	@docker-compose build --no-cache
+
+# Starts Docker containers necessary for the development environment
 docker-up:
-	@echo "Starting Docker for the connections to database..."
+	@echo "Starting Docker container for the connections to database and PHP/Nginx services..."
 	@docker-compose up -d
 
-# Target to start up the development environment
-up: docker-up
-	@echo "Starting up the development environment..."
-	@composer install
-	@symfony serve -d
-	@yarn watch > /dev/null 2>&1 &
+# Installs PHP dependencies using Composer
+compose:
+	@echo "Installing packages with composer..."
+	@docker-compose exec php composer install
 
-# Target to shut down the development environment
+# Starts the development environment, including front-end asset watcher
+up: docker-up compose
+	@echo "Starting front-end asset watcher..."
+	@yarn watch
+
+# Shuts down the development environment and stops Docker containers
 down:
 	@echo "Shutting down the development environment..."
 	@docker-compose down
-	@symfony server:stop
-	@pkill -f "yarn watch" || true
 
-# Target to run tests
+# Runs tests excluding Panther tests
 test: docker-up
-	@echo "Deleting data..."
-	@php bin/console doctrine:schema:drop --env=test --force --full-database --quiet > /dev/null 2>&1
-	@php bin/console doctrine:schema:create --env=test --quiet > /dev/null 2>&1
-
 	@echo "Ensuring test database exists..."
-	@php bin/console doctrine:database:create --env=test --if-not-exists --quiet > /dev/null 2>&1
-	@php bin/console doctrine:schema:update --env=test --force --quiet > /dev/null 2>&1
+	@docker-compose exec php bin/console doctrine:database:create --env=test --if-not-exists
+	@docker-compose exec php bin/console doctrine:schema:update --env=test --force
+
+	@echo "Deleting data from test database..."
+	@docker-compose exec php bin/console doctrine:schema:drop --env=test --force --full-database
+	@docker-compose exec php bin/console doctrine:schema:create --env=test
 
 	@echo "Running non-Panther tests..."
-	@php bin/phpunit --exclude-group panther --testdox-html tests/_output/non-panther.html
+	@docker-compose exec php bin/phpunit --exclude-group panther --testdox-html tests/_output/non-panther.html
 	@echo "Non-Panther test results available at tests/_output/non-panther.html"
+
+	@echo "Tests complete"
+
+# Runs Panther tests, requiring a local environment setup
+# Before running the Panther tests locally, you need to modify .env.test or .env.panther for another database
+test-panther: docker-up
+	@echo "Composer packages installation locally"
+	@composer install
+
+	@echo "Ensuring test database exists..."
+	@php bin/console doctrine:database:create --env=test --if-not-exists
+	@php bin/console doctrine:schema:update --env=test --force
+
+	@echo "Deleting data from test database..."
+	@php bin/console doctrine:schema:drop --env=test --force --full-database
+	@php bin/console doctrine:schema:create --env=test
 
 	@echo "Loading fixtures for Panther tests to test database..."
 	@php bin/console doctrine:fixtures:load --env=test --no-interaction --group=OfficeFixtures
@@ -48,18 +70,21 @@ test: docker-up
 	@echo "Panther test results available at tests/_output/panther.html"
 
 	@echo "Deleting data from test database..."
-	@php bin/console doctrine:schema:drop --env=test --force --full-database --quiet > /dev/null 2>&1
-	@php bin/console doctrine:schema:create --env=test --quiet > /dev/null 2>&1
+	@php bin/console doctrine:schema:drop --env=test --force --full-database
+	@php bin/console doctrine:schema:create --env=test
 
-	@echo "Tests complete"
-
-# Target to analyse PHP files
-php-stan:
+# Analyses code using PHPStan with increased memory limit
+php-stan: docker-up
 	@echo "Analysing code using PHPStan..."
-	@$(PHPSTAN) analyse --level 8 src tests
+	@$(PHPSTAN) analyse --level 8 src tests --memory-limit=256M
 
-# Target to lint JavaScript files
-eslint:
+# Installs Node.js dependencies if not already present
+yarn-install:
+	@echo "Installing Node.js packages..."
+	@yarn install
+
+# Lints JavaScript files
+eslint: yarn-install
 	@echo "Linting JavaScript files..."
 	@output=$$($(ESLINT) assets/controllers/**/*.js); \
     	if [ -z "$$output" ]; then \
@@ -68,31 +93,35 @@ eslint:
     		echo "$$output"; \
     	fi
 
-# Target to analyse code
+# Runs both PHP and JavaScript analysis
 analyse: php-stan eslint
 
-# Target for cleanup
+# Cleans up generated files and clears Symfony cache
 clean:
 	@echo "Cleaning up..."
-	@rm -rf var/cache/*
-	@rm -rf public/build/*
+	@php bin/console cache:clear
 
-# Target to rebuild the environment
+# Rebuilds the development environment
 rebuild: down clean up
 
-# Target to display help
+# Displays available make targets and their descriptions
 help:
 	@echo "Available targets:"
-	@echo "  docker-up  - Ensure Docker is running."
-	@echo "  up         - Start up the development environment."
-	@echo "  down       - Shut down the development environment."
-	@echo "  test       - Run tests."
-	@echo "  php-stan   - Analyse PHP files using PHPStan."
-	@echo "  eslint     - Lint JavaScript files with ESLint."
-	@echo "  analyse    - Analyse code using both PHPStan and ESLint."
-	@echo "  clean      - Clean up generated files and caches."
-	@echo "  rebuild    - Rebuild the development environment."
-	@echo "  help       - Display this help message."
+	@echo "  docker-build  - Build Docker images without using cache."
+	@echo "  docker-up     - Start Docker containers necessary for the development environment."
+	@echo "  compose       - Install PHP dependencies using Composer inside Docker."
+	@echo "  up            - Start the entire development environment, including Docker setup and front-end assets."
+	@echo "  down          - Shut down the development environment and stop Docker containers."
+	@echo "  test          - Run automated tests excluding Panther tests."
+	@echo "  test-panther  - Run Panther tests, requires local PHP setup and appropriate environment configurations."
+	@echo "  php-stan      - Perform PHP static analysis using PHPStan with an increased memory limit."
+	@echo "  yarn-install  - Install Node.js dependencies with Yarn."
+	@echo "  eslint        - Lint JavaScript files."
+	@echo "  analyse       - Run both PHP and JavaScript analysis using PHPStan and ESLint."
+	@echo "  clean         - Clean up generated files and clear Symfony cache."
+	@echo "  rebuild       - Rebuild the entire development environment."
+	@echo "  help          - Display this help message."
 
-# Specify .PHONY at the end
-.PHONY: docker-up up down test analyse php-stan eslint help clean rebuild
+# Specify .PHONY to indicate that these are not files
+.PHONY: docker-build docker-up compose up down test test-panther php-stan yarn-install eslint analyse clean rebuild help
+
