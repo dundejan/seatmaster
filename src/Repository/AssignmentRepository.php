@@ -79,6 +79,9 @@ class AssignmentRepository extends ServiceEntityRepository
 	}
 
 	/**
+	 * @param Assignment|RepeatedAssignment $assignment New Assignment or RepeatedAssignment that needs to be validated
+	 * @param string $param Parameter to validate the new assignment against "person" or "seat"
+	 * @return mixed Overlapping assignments
 	 * @throws \Doctrine\DBAL\Exception
 	 */
 	public function findOverlappingAssignments(Assignment|RepeatedAssignment $assignment, string $param) : mixed
@@ -90,6 +93,7 @@ class AssignmentRepository extends ServiceEntityRepository
 
 		$qb = $this->createQueryBuilder('e');
 
+		// Find overlapping assignments with new one-time Assignment
 		if ($assignment instanceof Assignment) {
 			// Time overlapping assignment
 			$qb->andWhere('e.fromDate < :toDate AND e.toDate > :fromDate AND e.id <> :id')
@@ -111,6 +115,7 @@ class AssignmentRepository extends ServiceEntityRepository
 
 			return $qb->getQuery()->setHydrationMode(AbstractQuery::HYDRATE_ARRAY)->execute();
 		}
+		// Find overlapping assignments with new RepeatedAssignment
 		else {
 			$em = $this->getEntityManager();
 			$connection = $em->getConnection();
