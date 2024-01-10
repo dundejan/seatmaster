@@ -31,7 +31,7 @@ class PersonController extends AbstractController
 	}
 
 	#[Route('/person', name: 'app_person')]
-	public function index(Request $request, PersonRepository $personRepository): Response
+	public function index(Request $request): Response
 	{
 		$searchTerm = $request->query->get('search', '');
 
@@ -39,7 +39,7 @@ class PersonController extends AbstractController
 			throw new InvalidArgumentException('Search term is not a string');
 		}
 
-		$persons = $personRepository->search($searchTerm);
+		$persons = $this->personRepository->search($searchTerm);
 
 		return $this->render('person/show.html.twig', [
 			'persons' => $persons,

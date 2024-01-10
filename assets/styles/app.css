@@ -90,10 +90,21 @@ body {
 
 .inline-search button[type="submit"] {
     background-color: #007bff;
-    border: 1px solid #007bff;
-    border-radius: 0.25rem;
     color: white;
     padding: 0.5rem 1rem;
     cursor: pointer;
+    margin-left: 0.3rem;
 }
 
+/* Custom Form Label Styles */
+.inline-search .form-label {
+    font-size: 1rem;
+    margin: 0.3rem;
+    padding: 0.5rem;
+    background-color: white;
+    display: inline-flex;
+    align-items: center;
+    height: calc(2rem + 2px);
+    border: 1px solid #ccc;
+    border-radius: 0.25rem;
+}

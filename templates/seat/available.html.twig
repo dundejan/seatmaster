@@ -6,11 +6,15 @@
     <div class="d-flex justify-content-center">
         <div class="col-md-8 mt-2">
             <h2 class="font-weight-bold bg-light rounded mx-auto text-center" style="opacity: 0.9;">
-                Currently available seats
+                Free seats
                 </h2>
-            <form method="GET" action="{{ path('app_seats_free') }}" class="mb-3 d-flex inline-search">
-                <input type="datetime-local" name="fromDateTime" class="form-control" placeholder="From Date Time" value="{{ fromDateTime }}" />
-                <input type="datetime-local" name="toDateTime" class="form-control" placeholder="To Date Time" value="{{ toDateTime }}" />
+            <form method="GET" action="{{ path('app_seats_free') }}" class="mb-3 d-flex align-items-center inline-search">
+                <span class="form-label">From:</span>
+                <input type="datetime-local" name="fromDateTime" class="form-control mr-2" value="{{ fromDateTime }}" />
+
+                <span class="form-label">To:</span>
+                <input type="datetime-local" name="toDateTime" class="form-control mr-2" value="{{ toDateTime }}" />
+
                 <button type="submit" class="btn btn-primary">Search</button>
             </form>
             <div class="table-responsive" style="max-height: 70vh; overflow-y: auto;">

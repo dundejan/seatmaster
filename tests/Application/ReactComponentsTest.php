@@ -4,7 +4,6 @@ namespace App\Tests\Application;
 
 use App\Entity\Office;
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\Persistence\ObjectManager;
 use Exception;
 use Facebook\WebDriver\Exception\NoSuchElementException;
 use Facebook\WebDriver\Exception\TimeoutException;
@@ -20,7 +19,7 @@ class ReactComponentsTest extends PantherTestCase
 	 * @throws TimeoutException
 	 * @throws Exception
 	 */
-	public function testGetAllOfficeIds(): void
+	public function testCheckReactIsRenderedOnOfficePage(): void
 	{
 		$client = static::createPantherClient();
 		$container = self::getContainer();

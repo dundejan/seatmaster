@@ -27,7 +27,7 @@ class PersonCrudController extends AbstractCrudController
 	        TextField::new('lastName'),
 	        EmailField::new('email'),
 	        TextField::new('jobTitle'),
-	        IntegerField::new('idExternal'),
+	        TextField::new('idExternal'),
         ];
     }
 
