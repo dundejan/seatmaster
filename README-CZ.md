@@ -1,6 +1,6 @@
 # Seatmaster 🪑📅
 
-Repozitář pro projekt Seatmaster, vytvořený v rámci mé bakalářské práce na FIT ČVUT 🎓.
+Repozitář pro projekt Seatmaster, vytvořený v rámci mé bakalářské práce na FIT ČVUT 🎓. Kompletní text bakalářské práce je dostupný na [ČVUT DSpace](http://hdl.handle.net/10467/113722).
 
 ## Začínáme 🧱⏩🏠
 

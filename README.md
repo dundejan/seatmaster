@@ -1,6 +1,6 @@
 # Seatmaster 🪑📅
 
-Repository for Seatmaster project, created as part of my bachelor thesis at FIT CTU 🎓.
+Repository for Seatmaster project, created as part of my bachelor thesis at FIT CTU 🎓. Full thesis text available at [CTU DSpace](http://hdl.handle.net/10467/113722).
 
 ## Getting Started 🧱⏩🏠
 
