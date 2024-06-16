@@ -2,6 +2,8 @@
 
 Repository for Seatmaster project, created as part of my bachelor thesis at FIT CTU 🎓. Full thesis text available at [CTU DSpace](http://hdl.handle.net/10467/113722).
 
+Overview of functionalities available [here](documentation/Overview.md).
+
 ## Getting Started 🧱⏩🏠
 
 These instructions will get your copy of the project up and running on your local machine for development and testing purposes.

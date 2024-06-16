@@ -2,6 +2,8 @@
 
 Repozitář pro projekt Seatmaster, vytvořený v rámci mé bakalářské práce na FIT ČVUT 🎓. Kompletní text bakalářské práce je dostupný na [ČVUT DSpace](http://hdl.handle.net/10467/113722).
 
+Přehled funkcí dostupný [zde](documentation/Overview.md).
+
 ## Začínáme 🧱⏩🏠
 
 Tyto pokyny vám umožní vytvořit kopii projektu a spustit ji na vašem lokálním počítači pro účely vývoje a testování.
